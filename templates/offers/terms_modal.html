@@ -1,0 +1,146 @@
+<!-- Mandatory Offer Terms Disclaimer Modal -->
+<div id="offerTermsModal" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.75); z-index: 1060; align-items: center; justify-content: center; padding: 1rem; backdrop-filter: blur(4px);">
+  <div class="card" style="max-width: 480px; width: 100%; border-radius: var(--radius-lg, 16px); overflow: hidden; background: #ffffff; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); border: 1px solid var(--border-light, #e2e8f0); animation: modalFadeIn 0.2s ease;">
+    
+    <!-- Modal Header -->
+    <div style="background: linear-gradient(135deg, #0f172a, #1e293b); color: #fff; padding: 1.25rem 1.5rem; display: flex; align-items: center; justify-content: space-between;">
+      <div style="display: flex; align-items: center; gap: 0.6rem;">
+        <div style="width: 36px; height: 36px; border-radius: 50%; background: rgba(234, 88, 12, 0.2); color: #fb923c; display: flex; align-items: center; justify-content: center; font-size: 1.15rem;">
+          <i class="bi bi-shield-exclamation"></i>
+        </div>
+        <div>
+          <h4 style="font-size: 1.05rem; font-weight: 800; margin: 0; color: #fff;">
+            Offer Terms &amp; Conditions
+          </h4>
+          <span style="font-size: 0.75rem; color: #94a3b8;">
+            Mandatory Disclaimer Confirmation
+          </span>
+        </div>
+      </div>
+      <button type="button" onclick="closeOfferTermsModal()" style="background: none; border: none; color: #94a3b8; font-size: 1.5rem; line-height: 1; cursor: pointer; padding: 0.25rem;" aria-label="Close">
+        &times;
+      </button>
+    </div>
+
+    <!-- Modal Body -->
+    <div style="padding: 1.5rem;">
+      
+      <!-- Offer Terms / Disclaimer Callout -->
+      <div style="background: #fffbeb; border: 1px solid #fef3c7; border-left: 4px solid #f59e0b; border-radius: 8px; padding: 1rem 1.15rem; margin-bottom: 1.25rem;">
+        <div style="font-size: 0.92rem; font-weight: 600; color: #92400e; line-height: 1.55;" id="modalDisclaimerText">
+          This offer is valid only for in-store redemption at the verified merchant counter. Terms and conditions apply.
+        </div>
+      </div>
+
+      <!-- Specific Offer Context if provided -->
+      <div id="modalOfferDetailsContainer" style="display: none; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 1.25rem; font-size: 0.82rem; color: #475569;">
+        <div style="font-weight: 700; color: #1e293b;" id="modalOfferTitleDisplay"></div>
+        <div style="font-size: 0.75rem; color: #64748b; margin-top: 0.2rem;" id="modalOfferShopDisplay"></div>
+      </div>
+
+      <!-- Mandatory Agreement Checkbox -->
+      <div style="margin-bottom: 1.5rem;">
+        <label style="display: flex; align-items: flex-start; gap: 0.65rem; cursor: pointer; user-select: none;">
+          <input type="checkbox" id="termsAgreementCheckbox" style="margin-top: 0.25rem; width: 18px; height: 18px; accent-color: var(--brand-saffron-500, #ea580c); cursor: pointer;">
+          <span style="font-size: 0.88rem; font-weight: 600; color: var(--brand-navy-900, #0f172a); line-height: 1.45;">
+            I have read, understood, and agree to these offer terms and conditions.
+          </span>
+        </label>
+      </div>
+
+      <!-- Action Buttons -->
+      <div style="display: flex; gap: 0.75rem;">
+        <button type="button" onclick="closeOfferTermsModal()" class="btn btn-outline" style="flex: 1; font-weight: 600; padding: 0.65rem 1rem;">
+          Cancel
+        </button>
+        <button type="button" id="confirmTermsProceedBtn" disabled class="btn btn-primary" style="flex: 2; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 0.4rem; padding: 0.65rem 1rem;">
+          <span>Accept Terms &amp; Proceed</span>
+          <i class="bi bi-arrow-right"></i>
+        </button>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<script>
+  let pendingTermsAction = null;
+
+  function openOfferTermsModal(onConfirmCallback, offerTitle, shopName, offerTerms) {
+    pendingTermsAction = onConfirmCallback;
+    const modal = document.getElementById('offerTermsModal');
+    const checkbox = document.getElementById('termsAgreementCheckbox');
+    const proceedBtn = document.getElementById('confirmTermsProceedBtn');
+    const detailsContainer = document.getElementById('modalOfferDetailsContainer');
+    const titleDisplay = document.getElementById('modalOfferTitleDisplay');
+    const shopDisplay = document.getElementById('modalOfferShopDisplay');
+    const termsDisplay = document.getElementById('modalDisclaimerText');
+
+    if (checkbox) checkbox.checked = false;
+    if (proceedBtn) {
+      proceedBtn.disabled = true;
+      proceedBtn.style.opacity = '0.6';
+      proceedBtn.style.cursor = 'not-allowed';
+    }
+
+    if (offerTitle && titleDisplay && detailsContainer) {
+      titleDisplay.textContent = offerTitle;
+      if (shopName && shopDisplay) shopDisplay.textContent = shopName;
+      detailsContainer.style.display = 'block';
+    } else if (detailsContainer) {
+      detailsContainer.style.display = 'none';
+    }
+
+    if (termsDisplay) {
+      if (offerTerms && offerTerms.trim()) {
+        termsDisplay.textContent = offerTerms.trim();
+      } else {
+        termsDisplay.textContent = "This offer is valid only for in-store redemption at the verified merchant counter. Terms and conditions apply.";
+      }
+    }
+
+    if (modal) {
+      modal.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+    }
+  }
+
+  function closeOfferTermsModal() {
+    const modal = document.getElementById('offerTermsModal');
+    if (modal) {
+      modal.style.display = 'none';
+      document.body.style.overflow = '';
+    }
+    pendingTermsAction = null;
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    const checkbox = document.getElementById('termsAgreementCheckbox');
+    const proceedBtn = document.getElementById('confirmTermsProceedBtn');
+
+    if (checkbox && proceedBtn) {
+      checkbox.addEventListener('change', function() {
+        proceedBtn.disabled = !this.checked;
+        if (this.checked) {
+          proceedBtn.style.opacity = '1';
+          proceedBtn.style.cursor = 'pointer';
+        } else {
+          proceedBtn.style.opacity = '0.6';
+          proceedBtn.style.cursor = 'not-allowed';
+        }
+      });
+    }
+
+    if (proceedBtn) {
+      proceedBtn.addEventListener('click', function() {
+        if (!checkbox || !checkbox.checked) return;
+        const callback = pendingTermsAction;
+        closeOfferTermsModal();
+        if (typeof callback === 'function') {
+          callback();
+        }
+      });
+    }
+  });
+</script>

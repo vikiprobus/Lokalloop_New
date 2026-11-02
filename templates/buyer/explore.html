@@ -1,0 +1,142 @@
+{% extends "base/buyer_base.html" %}
+
+{% block title %}Explore Local Deals & Stores — {{ BRAND_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 1.5rem; padding-bottom: 3.5rem;">
+  
+  <!-- Gennie Personalized Greeting Banner -->
+  <div class="card card-padded" style="background: linear-gradient(135deg, #4f46e5, #7c3aed, #ec4899); color: #ffffff; border-radius: var(--radius-xl); margin-bottom: 1.5rem; padding: 1.25rem 1.75rem; box-shadow: 0 10px 25px -5px rgba(124, 58, 237, 0.35); border: none; position: relative; overflow: hidden;">
+    <div style="position: absolute; right: -15px; bottom: -20px; font-size: 7rem; opacity: 0.12; pointer-events: none;">
+      <i class="bi bi-stars"></i>
+    </div>
+    <div class="d-flex align-center justify-between flex-wrap gap-2">
+      <div style="position: relative; z-index: 2;">
+        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+          <span class="badge" style="background: rgba(255,255,255,0.22); color: #ffffff; font-weight: 700; font-size: 0.72rem; letter-spacing: 0.05em; backdrop-filter: blur(4px);">
+            ✨ GENNIE COMPANION
+          </span>
+          <span style="font-size: 0.8rem; color: rgba(255,255,255,0.85); font-family: monospace; font-weight: 700;">
+            {{ request.user.buyer_profile.public_unique_id|default:request.user.buyer_profile.shopper_id|default:"ID Pending" }}
+          </span>
+        </div>
+        <h2 style="font-size: 1.5rem; font-weight: 800; color: #ffffff; margin: 0; font-family: var(--font-display); letter-spacing: -0.01em;">
+          ✨ Welcome to the Gennie App {{ request.user.buyer_profile.nickname|default:"Shopper" }} !!!
+        </h2>
+        <p style="margin: 0.25rem 0 0; font-size: 0.85rem; color: rgba(255,255,255,0.9);">
+          Exploring the best verified billing deals near you.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="d-flex align-center justify-between flex-wrap gap-3" style="margin-bottom: 1.75rem;">
+    <div>
+      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+        <span class="badge badge-saffron" style="font-size: 0.72rem; letter-spacing: 0.04em;">NEIGHBORHOOD DEALS</span>
+        <span style="font-size: 0.8rem; color: var(--text-muted);">&bull;</span>
+        <span style="font-size: 0.8rem; font-weight: 600; color: var(--brand-navy-800);">{{ current_city }}</span>
+      </div>
+      <h1 style="font-size: 1.75rem; font-weight: 800; color: var(--brand-navy-900); letter-spacing: -0.02em; margin: 0;">
+        Explore Neighborhood Offers
+      </h1>
+      <p style="font-size: 0.88rem; color: var(--text-muted); margin: 0.2rem 0 0;">
+        Redeem discounts directly at store billing counters using your counter scanner
+      </p>
+    </div>
+
+    <!-- Toggle View -->
+    <div style="background: var(--bg-subtle); padding: 0.25rem; border-radius: var(--radius-md); display: flex; gap: 0.25rem; border: 1px solid var(--border-light);">
+      <a href="?type=offers{% if current_category %}&category={{ current_category }}{% endif %}{% if current_city %}&city={{ current_city }}{% endif %}{% if current_query %}&q={{ current_query }}{% endif %}" 
+         class="btn btn-sm {% if view_type == 'offers' %}btn-dark{% else %}btn-outline{% endif %}" style="border: none; font-size: 0.82rem;">
+        <i class="bi bi-tag-fill"></i> Offers ({{ offers|length }})
+      </a>
+      <a href="?type=shops{% if current_category %}&category={{ current_category }}{% endif %}{% if current_city %}&city={{ current_city }}{% endif %}{% if current_query %}&q={{ current_query }}{% endif %}" 
+         class="btn btn-sm {% if view_type == 'shops' %}btn-dark{% else %}btn-outline{% endif %}" style="border: none; font-size: 0.82rem;">
+        <i class="bi bi-shop"></i> Shops ({{ shops|length }})
+      </a>
+    </div>
+  </div>
+
+  <!-- Search Filter Card -->
+  <div class="card card-padded" style="margin-bottom: 2rem; background: #ffffff; border: 1px solid var(--border-light); box-shadow: var(--shadow-sm);">
+    <form method="GET" action="/buyer/explore/" class="d-flex gap-2 flex-wrap align-center">
+      <input type="hidden" name="type" value="{{ view_type }}">
+      <input type="hidden" name="lat" id="user-lat" value="{{ user_lat|default:'' }}">
+      <input type="hidden" name="lng" id="user-lng" value="{{ user_lng|default:'' }}">
+
+      <div style="min-width: 170px;">
+        <select name="city" class="form-select" onchange="this.form.submit()" style="font-weight: 600;">
+          <option value="Bengaluru" {% if current_city == 'Bengaluru' %}selected{% endif %}>📍 Bengaluru, KA</option>
+          <option value="Mumbai" {% if current_city == 'Mumbai' %}selected{% endif %}>📍 Mumbai, MH</option>
+          <option value="Pune" {% if current_city == 'Pune' %}selected{% endif %}>📍 Pune, MH</option>
+          <option value="all" {% if current_city == 'all' %}selected{% endif %}>All Metro Cities</option>
+        </select>
+      </div>
+
+      <div style="flex: 1; min-width: 220px;">
+        <input type="text" name="q" value="{{ current_query }}" class="form-control" placeholder="Search offers, store name, or area (e.g. Indiranagar)...">
+      </div>
+
+      <button type="submit" class="btn btn-primary">
+        <i class="bi bi-search"></i> Search
+      </button>
+
+      <button type="button" id="detect-location-btn" class="btn btn-secondary find-nearest-trigger" title="Find shops nearest to your physical location">
+        <i class="bi bi-geo-alt-fill text-saffron"></i> 📍 Find Nearest Shops to Me
+      </button>
+
+      {% if user_lat and user_lng %}
+        <span class="badge badge-success" style="padding: 0.5rem 0.75rem; font-size: 0.78rem;">
+          <i class="bi bi-geo-fill"></i> Location Active (Nearest First)
+        </span>
+      {% endif %}
+
+      {% if current_category or current_query or current_city != 'Bengaluru' or user_lat %}
+        <a href="/buyer/explore/?type={{ view_type }}" class="btn btn-outline" title="Reset all filters">
+          Reset
+        </a>
+      {% endif %}
+    </form>
+
+    <!-- Categories Pills -->
+    <div style="margin-top: 1rem; padding-top: 0.85rem; border-top: 1px solid var(--border-light); display: flex; align-items: center; gap: 0.5rem; overflow-x: auto; white-space: nowrap; scrollbar-width: thin;">
+      <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em;">Category:</span>
+      <a href="?type={{ view_type }}&city={{ current_city }}{% if current_query %}&q={{ current_query }}{% endif %}" 
+         class="badge {% if not current_category %}badge-dark{% else %}badge-neutral{% endif %}" style="padding: 0.4rem 0.8rem; font-size: 0.8rem; text-decoration: none;">
+        All Categories
+      </a>
+      {% for cat in categories %}
+        <a href="?type={{ view_type }}&category={{ cat.slug }}&city={{ current_city }}{% if current_query %}&q={{ current_query }}{% endif %}" 
+           class="badge {% if current_category == cat.slug %}badge-saffron{% else %}badge-neutral{% endif %}" style="padding: 0.4rem 0.8rem; font-size: 0.8rem; text-decoration: none;">
+          <i class="bi {{ cat.icon }}"></i> {{ cat.name }}
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Listings -->
+  {% if view_type == 'offers' %}
+    <div class="d-grid grid-3 gap-3">
+      {% for offer in offers %}
+        {% include "components/offer_card.html" with offer=offer %}
+      {% empty %}
+        <div style="grid-column: 1 / -1;">
+          {% include "components/empty_state.html" with title="No active offers found" description="Try broadening your search or selecting another category." action_url="/buyer/explore/?type=offers" action_text="View All Offers" %}
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="d-grid grid-3 gap-3">
+      {% for shop in shops %}
+        {% include "components/shop_card.html" with shop=shop %}
+      {% empty %}
+        <div style="grid-column: 1 / -1;">
+          {% include "components/empty_state.html" with title="No shops found" description="Try selecting another city or clearing your query." action_url="/buyer/explore/?type=shops" action_text="View All Shops" %}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}

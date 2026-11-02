@@ -1,0 +1,92 @@
+================================================================================
+                    LOKALLOOP - PHASE 2 BACKLOG & ROADMAP
+================================================================================
+
+--------------------------------------------------------------------------------
+FEATURE / BUG ID: BUG-57
+TITLE: Multi-Store & Multi-Branch Outlet Management Architecture
+SEVERITY: Medium-High (Enterprise Feature Enhancement)
+TARGET RELEASE: Phase 2 (Scale & Multi-Outlet Expansion)
+DEFERRED FROM: Phase 1 (MVP Focus: Single-Store Local Retailers)
+--------------------------------------------------------------------------------
+
+1. BACKGROUND & PROBLEM STATEMENT:
+----------------------------------
+In the current Phase 1 MVP implementation, merchant views retrieve the shop
+associated with the authenticated seller using `.first()`:
+  - File: apps/shops/seller_views.py (Line 216 - seller_offer_create_view)
+      shop = Shop.objects.filter(seller=seller).first()
+  - File: apps/shops/seller_views.py (Line 340 - seller_qr_desk_view)
+      shop = Shop.objects.filter(seller=seller).first()
+
+When an enterprise or multi-branch merchant registers multiple outlets
+(e.g., "Branch A - Indiranagar" and "Branch B - Koramangala") under one
+seller account:
+  - Only the primary store (whichever record is returned first by the DB)
+    can publish offers and generate counter desk QR standee posters.
+  - Secondary outlets cannot be independently selected in the UI for
+    campaign launches or localized counter collateral.
+
+2. REASON FOR DEFERRAL TO PHASE 2:
+----------------------------------
+  - Over 95% of target merchants during the Phase 1 launch are independent,
+    single-location neighborhood shops.
+  - For single-store merchants, the current `.first()` logic is completely
+    stable, zero-friction, and eliminates unnecessary UI clutter.
+  - Full multi-store management is an enterprise feature that requires:
+      a) Merchant store switcher UI
+      b) Branch-level manager credentials / cashier logins
+      c) Location-specific customer analytics & reporting
+
+3. PHASE 2 IMPLEMENTATION SPECIFICATION:
+----------------------------------------
+
+A. Store Switcher UI:
+   - Add a persistent store selector dropdown in the Seller Dashboard
+     navigation bar:
+       <select name="active_shop_id" id="storeSwitcher">
+         <option value="1">Outlet 1 - FC Road (Pune)</option>
+         <option value="2">Outlet 2 - Viman Nagar (Pune)</option>
+       </select>
+   - Store the selected `active_shop_id` in the seller session:
+       request.session['active_shop_id'] = shop_id
+
+B. Backend Views Refactoring:
+   Update `apps/shops/seller_views.py`:
+   - Replace hardcoded `.first()` with validated store resolution:
+       seller_shops = Shop.objects.filter(seller=request.user, is_approved=True)
+       shop_id = (
+           request.POST.get('shop_id')
+           or request.GET.get('shop_id')
+           or request.session.get('active_shop_id')
+       )
+       shop = seller_shops.filter(id=shop_id).first() if shop_id else seller_shops.first()
+       if not shop:
+           messages.error(request, "Selected outlet not found or not approved.")
+           return redirect('/seller/dashboard/')
+
+C. Scoped Offer & QR Generation:
+   - In `seller_offer_create_view`: Explicitly bind newly created Offer to the
+     selected `shop`.
+   - In `seller_qr_desk_view`: Render printable standee posters scoped to
+     the selected branch's unique store slug and QR payload.
+
+D. Multi-Outlet Permissions & Security:
+   - Ensure strict tenant validation so merchants cannot pass a `shop_id`
+     belonging to a different seller (IDOR prevention).
+   - Add audit logging for branch-specific campaign changes.
+
+4. PHASE 2 VERIFICATION & TEST PLAN:
+------------------------------------
+  - Unit Test 1: Merchant with 2 approved shops can toggle between shops
+    and create distinct offers for each branch.
+  - Unit Test 2: QR desk view generates distinct QR codes and printable
+    posters for Branch 1 vs Branch 2.
+  - Unit Test 3: Attempting to pass `shop_id` owned by another merchant
+    returns HTTP 403 / 404 access denied.
+  - Unit Test 4: Single-store merchants continue to experience seamless
+    default behavior without needing to interact with the switcher.
+
+================================================================================
+STATUS: LOGGED TO PHASE 2 ROADMAP (NO IMMEDIATE PHASE 1 CODE CHANGES REQUIRED)
+================================================================================

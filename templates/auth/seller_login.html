@@ -1,0 +1,57 @@
+{% extends "base/public_base.html" %}
+
+{% block title %}Merchant Portal Sign In — LokalLoop Business{% endblock %}
+
+{% block content %}
+<div class="container container-narrow" style="padding-top: 3.5rem; padding-bottom: 4rem;">
+  <div class="card" style="max-width: 460px; margin: 0 auto; box-shadow: var(--shadow-md); border-top: 4px solid var(--ink-950);">
+    
+    <div class="card-header" style="flex-direction: column; text-align: center; gap: 0.5rem; background: #fff; padding-top: 2rem; border-bottom: none;">
+      <div style="width: 48px; height: 48px; border-radius: var(--radius-md); background: rgba(12, 16, 23, 0.08); color: var(--ink-950); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin: 0 auto;">
+        <i class="bi bi-shop"></i>
+      </div>
+      <h2 style="font-size: 1.5rem; font-weight: 800; color: var(--ink-950); font-family: var(--font-display);">Merchant portal</h2>
+      <p style="font-size: 0.875rem; color: var(--text-muted);">Manage your storefront, counter QR desk, and promotional credit wallet.</p>
+    </div>
+
+    <div class="card-body" style="padding-top: 0.5rem;">
+      <form method="POST">
+        {% csrf_token %}
+        
+        <div class="form-group">
+          <label class="form-label">Business email or username</label>
+          {{ form.identifier }}
+        </div>
+
+        {% if request.GET.reset == 'success' %}
+          <div class="alert alert-success" style="background: #ecfdf5; border: 1.5px solid #34d399; color: #065f46; border-radius: 8px; padding: 0.85rem; margin-bottom: 1rem; font-size: 0.85rem;">
+            <i class="bi bi-check-circle-fill text-success"></i> Password reset successfully! Please sign in with your new password.
+          </div>
+        {% endif %}
+
+        <div class="form-group">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+            <label class="form-label" style="margin-bottom: 0;">Password</label>
+            <a href="/seller/recover/" style="font-size: 0.8rem; font-weight: 600; color: var(--brand-indigo-600); text-decoration: none;">Forgot Password?</a>
+          </div>
+          {{ form.password }}
+        </div>
+
+        {% include "components/captcha_field.html" %}
+
+        <button type="submit" class="btn btn-dark btn-block btn-lg" style="margin-top: 0.75rem;">
+          Sign in to merchant suite
+        </button>
+      </form>
+    </div>
+
+    <div class="card-footer text-center" style="font-size: 0.875rem; display: flex; flex-direction: column; gap: 0.5rem;">
+      <div>Want to list your shop? <a href="/seller/register/" style="font-weight: 600; color: var(--brand-indigo-600);">Register your store (+50 free promotional credits)</a></div>
+      <div style="color: var(--text-muted); font-size: 0.8rem; border-top: 1px solid var(--border-light); padding-top: 0.5rem;">
+        Are you a customer? <a href="/buyer/login/" style="font-weight: 600; color: var(--brand-saffron-600);">Buyer portal sign in</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,516 @@
+{% extends "base/seller_base.html" %}
+{% load static %}
+
+{% block title %}Manage Store Profile — {{ BRAND_NAME }} Business{% endblock %}
+{% block extra_css %}
+<!-- Leaflet.js Free & Open-Source Map CSS -->
+<link rel="stylesheet" href="{% static 'vendor/leaflet/leaflet.css' %}" />
+<style>
+  #merchantEditMap {
+    height: 240px;
+    width: 100%;
+    border-radius: 10px;
+    border: 1.5px solid #cbd5e1;
+    z-index: 1;
+    margin-top: 0.5rem;
+  }
+</style>
+{% endblock %}
+
+{% block page_title %}Store Profile & Public Information{% endblock %}
+
+{% block content %}
+<div class="card card-padded" style="max-width: 860px; background: #ffffff; border: 1px solid var(--border-light); box-shadow: var(--shadow-sm); border-radius: var(--radius-lg);">
+  <form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <div class="d-flex align-center justify-between flex-wrap gap-2" style="margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-light); padding-bottom: 1rem;">
+      <div>
+        <h3 style="font-size: 1.25rem; font-weight: 800; color: var(--brand-navy-900); margin: 0 0 0.25rem;">Storefront Parameters</h3>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">This information appears publicly on LokalLoop and neighborhood map listings</p>
+      </div>
+      <div class="d-flex gap-2">
+        <a href="/seller/qr/" class="btn btn-outline" title="View & Print Store QR Code Standee">
+          <i class="bi bi-qr-code"></i> Store QR Standee
+        </a>
+        <button type="submit" class="btn btn-primary">
+          <i class="bi bi-check-lg"></i> Save Profile Changes
+        </button>
+      </div>
+    </div>
+
+    <!-- Store Basic Information -->
+    <div class="form-group">
+      <label class="form-label">Store Trade Name <span class="text-danger">*</span></label>
+      <input type="text" name="name" class="form-control" value="{{ shop.name }}" required>
+    </div>
+
+    <div class="d-grid grid-3 gap-2">
+      <div class="form-group">
+        <label class="form-label">Category</label>
+        <select name="category" class="form-select" id="shopCategorySelect">
+          {% for cat in categories %}
+            <option value="{{ cat.id }}" {% if cat.id == shop.category.id %}selected{% endif %}>{{ cat.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Subcategory</label>
+        <select name="subcategory" class="form-select" id="shopSubcategorySelect">
+          <option value="">None / General</option>
+          {% for sub in subcategories %}
+            <option value="{{ sub.id }}" {% if shop.subcategory and sub.id == shop.subcategory.id %}selected{% endif %}>{{ sub.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Short Tagline</label>
+        <input type="text" name="tagline" class="form-control" value="{{ shop.tagline }}" placeholder="e.g. Specialty Coffee & Fresh Bakery">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Store Description</label>
+      <textarea name="description" rows="3" class="form-control">{{ shop.description }}</textarea>
+    </div>
+
+    <!-- Address & Location (Indian Context) -->
+    <h4 style="font-size: 1.05rem; font-weight: 700; color: var(--brand-navy-900); margin: 2rem 0 1rem; border-top: 1px solid var(--border-light); padding-top: 1.25rem;">
+      Store Physical Location & Contact
+    </h4>
+
+    <div class="form-group">
+      <label class="form-label">Shop Number / Building / Street Address <span class="text-danger">*</span></label>
+      <input type="text" name="address" class="form-control" value="{{ shop.address }}" required placeholder="Shop No. 14, 100 Feet Road, Indiranagar">
+    </div>
+
+    <div class="d-grid grid-3 gap-2">
+      <div class="form-group">
+        <label class="form-label">Locality / Neighborhood <span class="text-danger">*</span></label>
+        <input type="text" name="locality" class="form-control" value="{{ shop.locality }}" required placeholder="Indiranagar">
+      </div>
+      <div class="form-group">
+        <label class="form-label">City</label>
+        <input type="text" name="city" class="form-control" value="{{ shop.city }}" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">PIN Code</label>
+        <input type="text" name="pincode" class="form-control" value="{{ shop.pincode }}" required>
+      </div>
+    </div>
+
+    <!-- Interactive Counter Entrance Map Pinning (BUG-PIN-01) -->
+    <div style="margin: 1.5rem 0 1.25rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem; flex-wrap: wrap; gap: 0.5rem;">
+        <label class="form-label" style="font-weight: 700; margin-bottom: 0;">
+          <i class="bi bi-geo-alt-fill text-danger"></i> Pin Store Counter Entrance on Map
+        </label>
+        <button type="button" class="btn btn-sm btn-outline" onclick="detectGPSLocationProfile()" style="font-size: 0.75rem; padding: 0.25rem 0.65rem; font-weight: 700;">
+          <i class="bi bi-crosshair"></i> Use Current Location
+        </button>
+      </div>
+
+      <div id="merchantEditMap"></div>
+
+      <input type="hidden" name="latitude" id="id_latitude" value="{{ shop.latitude }}">
+      <input type="hidden" name="longitude" id="id_longitude" value="{{ shop.longitude }}">
+
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem; flex-wrap: wrap; gap: 0.5rem;">
+        <div style="font-size: 0.8rem; color: #64748b; display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap;">
+          <span>Pinned Entrance:</span>
+          <span id="coordBadge" style="font-family: monospace; font-weight: 700; color: #0f172a; background: #f1f5f9; padding: 2px 8px; border-radius: 4px;">{{ shop.latitude|floatformat:6 }}° N, {{ shop.longitude|floatformat:6 }}° E</span>
+        </div>
+        <small class="text-muted"><i class="bi bi-info-circle"></i> Drag pin or click map to set store entrance location.</small>
+      </div>
+    </div>
+
+    <div class="d-grid grid-2 gap-2">
+      <div class="form-group">
+        <label class="form-label">Store Phone Number <span class="text-danger">*</span></label>
+        <input type="text" name="phone" class="form-control" value="{{ shop.phone }}" required placeholder="+91 98234 56789">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Store Email</label>
+        <input type="email" name="email" class="form-control" value="{{ shop.email }}" placeholder="store@example.com">
+      </div>
+    </div>
+
+    <!-- Branding Photography with Gallery & Device Upload Option -->
+    <div style="margin: 2.25rem 0 1.5rem; border-top: 1px solid var(--border-light); padding-top: 1.5rem;">
+      <div class="d-flex align-center justify-between flex-wrap gap-2" style="margin-bottom: 1.25rem;">
+        <div>
+          <h4 style="font-size: 1.1rem; font-weight: 800; color: var(--brand-navy-900); margin: 0 0 0.25rem;">
+            <i class="bi bi-camera-fill text-saffron"></i> Branding Photography
+          </h4>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">
+            Upload storefront and branding photos directly from your phone gallery or computer
+          </p>
+        </div>
+        <span class="badge badge-success" style="font-size: 0.75rem;">
+          <i class="bi bi-upload"></i> Device & Gallery Upload Active
+        </span>
+      </div>
+
+      <!-- Photography Guidelines Notice Box -->
+      <div style="background: rgba(30, 58, 138, 0.04); border: 1px solid #c7d2fe; border-left: 4px solid #1e3a8a; border-radius: var(--radius-md); padding: 1rem 1.25rem; margin-bottom: 1.5rem;">
+        <div class="d-flex align-center gap-2" style="margin-bottom: 0.5rem;">
+          <i class="bi bi-info-circle-fill" style="font-size: 1.1rem; color: #1e3a8a;"></i>
+          <span style="font-weight: 700; font-size: 0.95rem; color: var(--brand-navy-900);">Recommended Image Dimensions &amp; Aspect Ratios</span>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 0.75rem; font-size: 0.82rem; margin-top: 0.5rem;">
+          <div style="background: #ffffff; padding: 0.75rem 0.85rem; border-radius: var(--radius-sm); border: 1px solid var(--border-light);">
+            <div style="font-weight: 700; color: var(--brand-navy-800); margin-bottom: 0.25rem;">
+              <i class="bi bi-card-image text-saffron"></i> Cover Banner
+            </div>
+            <div style="color: var(--text-muted); line-height: 1.45;">
+              • <strong>Ratio:</strong> 16:9 or 2:1 Landscape<br>
+              • <strong>Recommended:</strong> 1200 &times; 600 px<br>
+              • <strong>Min Width:</strong> 800 px &bull; Max 5 MB
+            </div>
+          </div>
+          <div style="background: #ffffff; padding: 0.75rem 0.85rem; border-radius: var(--radius-sm); border: 1px solid var(--border-light);">
+            <div style="font-weight: 700; color: var(--brand-navy-800); margin-bottom: 0.25rem;">
+              <i class="bi bi-person-bounding-box text-success"></i> Store Emblem / Logo
+            </div>
+            <div style="color: var(--text-muted); line-height: 1.45;">
+              • <strong>Ratio:</strong> 1:1 Perfect Square<br>
+              • <strong>Recommended:</strong> 500 &times; 500 px<br>
+              • <strong>Min Size:</strong> 200 &times; 200 px &bull; Max 2 MB
+            </div>
+          </div>
+          <div style="background: #ffffff; padding: 0.75rem 0.85rem; border-radius: var(--radius-sm); border: 1px solid var(--border-light);">
+            <div style="font-weight: 700; color: var(--brand-navy-800); margin-bottom: 0.25rem;">
+              <i class="bi bi-images text-info"></i> Interior / Showcase
+            </div>
+            <div style="color: var(--text-muted); line-height: 1.45;">
+              • <strong>Ratio:</strong> 4:3 or 16:9 Landscape<br>
+              • <strong>Recommended:</strong> 1024 &times; 768 px+<br>
+              • <strong>Max Size:</strong> 5 MB per photo
+            </div>
+          </div>
+        </div>
+        <p style="font-size: 0.78rem; color: var(--text-muted); margin: 0.65rem 0 0;">
+          <i class="bi bi-lightbulb-fill text-saffron"></i> <em>Tip: Well-lit, high-clarity photos without heavy text build higher buyer trust. Formats supported: JPG, PNG, WEBP.</em>
+        </p>
+      </div>
+
+      <!-- 1. Cover Banner Image Section -->
+      <div class="card card-padded" style="background: var(--bg-subtle); border: 1px solid var(--border-light); margin-bottom: 1.5rem; border-radius: var(--radius-md);">
+        <div class="d-flex align-center justify-between flex-wrap gap-2" style="margin-bottom: 0.5rem;">
+          <label class="form-label" style="font-weight: 700; color: var(--brand-navy-900); margin: 0;">
+            Cover Banner Image
+          </label>
+          <span class="badge badge-neutral" style="font-size: 0.72rem; font-weight: 600;">
+            16:9 or 2:1 &bull; Rec: 1200&times;600 px &bull; Max 5 MB
+          </span>
+        </div>
+        
+        <!-- Current / Live Preview Box -->
+        <div style="margin-bottom: 1rem; position: relative; border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--border-light); max-height: 220px; background: #0c1017;">
+          <img id="banner_preview" src="{{ shop.banner_image_url }}" alt="Cover Banner" 
+               style="width: 100%; height: 200px; object-fit: cover; display: block;" 
+               onerror="this.src='/static/images/placeholder_shop.svg'">
+          <span style="position: absolute; bottom: 10px; left: 10px; background: rgba(0,0,0,0.65); color: #fff; padding: 0.25rem 0.65rem; border-radius: var(--radius-sm); font-size: 0.75rem;">
+            Current Cover Banner
+          </span>
+        </div>
+
+        <!-- File Upload from Gallery -->
+        <div class="form-group" style="margin-bottom: 0.75rem;">
+          <label for="banner_image_file" style="font-size: 0.85rem; font-weight: 600; color: var(--brand-navy-800); display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.35rem;">
+            <i class="bi bi-image"></i> Select New Banner from Gallery / Files:
+          </label>
+          <input type="file" name="banner_image_file" id="banner_image_file" accept="image/*" class="form-control" 
+                 onchange="previewImage(this, 'banner_preview')" 
+                 style="background: #ffffff; padding: 0.5rem; cursor: pointer;">
+          <div class="form-text" style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.35rem;">
+            Recommended: 16:9 or 2:1 landscape (1200&times;600 px). Supported formats: JPG, PNG, WEBP (up to 5 MB).
+          </div>
+        </div>
+
+        <!-- Optional URL Fallback (Collapsible) -->
+        <details style="margin-top: 0.5rem; font-size: 0.82rem; color: var(--text-muted);">
+          <summary style="cursor: pointer; font-weight: 600; color: var(--brand-navy-700);">Or enter image web URL instead</summary>
+          <div style="margin-top: 0.5rem;">
+            <input type="text" name="banner_image_url" class="form-control" value="{% if shop.banner_image_url and 'http' in shop.banner_image_url %}{{ shop.banner_image_url }}{% endif %}" placeholder="https://images.unsplash.com/...">
+          </div>
+        </details>
+      </div>
+
+      <!-- 2. Store Logo / Emblem Section -->
+      <div class="card card-padded" style="background: var(--bg-subtle); border: 1px solid var(--border-light); margin-bottom: 1.5rem; border-radius: var(--radius-md);">
+        <div class="d-flex align-center justify-between flex-wrap gap-2" style="margin-bottom: 0.5rem;">
+          <label class="form-label" style="font-weight: 700; color: var(--brand-navy-900); margin: 0;">
+            Store Emblem / Logo
+          </label>
+          <span class="badge badge-neutral" style="font-size: 0.72rem; font-weight: 600;">
+            1:1 Square &bull; Rec: 500&times;500 px &bull; Max 2 MB
+          </span>
+        </div>
+
+        <div class="d-flex align-center gap-3 flex-wrap" style="margin-bottom: 1rem;">
+          <!-- Logo Preview Avatar -->
+          <div style="width: 84px; height: 84px; border-radius: var(--radius-md); overflow: hidden; border: 2px solid #ffffff; box-shadow: var(--shadow-sm); background: #ffffff; flex-shrink: 0;">
+            <img id="logo_preview" src="{{ shop.logo_image_url }}" alt="Store Logo" 
+                 style="width: 100%; height: 100%; object-fit: cover; display: block;" 
+                 onerror="this.src='/static/images/placeholder_shop.svg'">
+          </div>
+          <div style="flex: 1; min-width: 220px;">
+            <label for="logo_image_file" style="font-size: 0.85rem; font-weight: 600; color: var(--brand-navy-800); display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.35rem;">
+              <i class="bi bi-person-badge"></i> Select Logo from Gallery / Files:
+            </label>
+            <input type="file" name="logo_image_file" id="logo_image_file" accept="image/*" class="form-control" 
+                   onchange="previewImage(this, 'logo_preview')" 
+                   style="background: #ffffff; padding: 0.5rem; cursor: pointer;">
+            <div class="form-text" style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.35rem;">
+              Recommended: 1:1 square (500&times;500 px, minimum 200&times;200 px). Max size 2 MB.
+            </div>
+          </div>
+        </div>
+
+        <!-- Optional URL Fallback (Collapsible) -->
+        <details style="margin-top: 0.25rem; font-size: 0.82rem; color: var(--text-muted);">
+          <summary style="cursor: pointer; font-weight: 600; color: var(--brand-navy-700);">Or enter logo web URL instead</summary>
+          <div style="margin-top: 0.5rem;">
+            <input type="text" name="logo_image_url" class="form-control" value="{% if shop.logo_image_url and 'http' in shop.logo_image_url %}{{ shop.logo_image_url }}{% endif %}" placeholder="https://images.unsplash.com/...">
+          </div>
+        </details>
+      </div>
+
+      <!-- 3. Storefront Gallery Photos (Multiple uploads from gallery) -->
+      <div class="card card-padded" style="background: var(--bg-subtle); border: 1px solid var(--border-light); margin-bottom: 1.5rem; border-radius: var(--radius-md);">
+        <div class="d-flex align-center justify-between flex-wrap gap-2" style="margin-bottom: 0.75rem;">
+          <div>
+            <label class="form-label" style="font-weight: 700; color: var(--brand-navy-900); margin: 0;">
+              Store Interior & Showcase Gallery
+            </label>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0.15rem 0 0;">
+              Upload multiple store photos (interior seating, shelves, counters, products)
+            </p>
+          </div>
+          <div class="d-flex align-center gap-2">
+            <span class="badge badge-neutral" style="font-size: 0.72rem; font-weight: 600;">
+              4:3 or 16:9 &bull; Max 5 MB/photo
+            </span>
+            <span class="badge badge-primary" style="font-size: 0.75rem;">{{ gallery_images|length }} Photos</span>
+          </div>
+        </div>
+
+        <!-- Existing Gallery Images Grid -->
+        {% if gallery_images %}
+          <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1rem; padding: 0.5rem; background: #ffffff; border-radius: var(--radius-sm); border: 1px solid var(--border-light);">
+            {% for g_img in gallery_images %}
+              <div style="position: relative; width: 90px; height: 90px; border-radius: var(--radius-sm); overflow: hidden; border: 1px solid var(--border-light); box-shadow: var(--shadow-xs);">
+                <img src="{{ g_img.image_url }}" alt="Gallery Photo" style="width: 100%; height: 100%; object-fit: cover;">
+                <button type="submit" name="delete_gallery_image_id" value="{{ g_img.id }}" formnovalidate
+                        class="btn btn-sm" 
+                        style="position: absolute; top: 4px; right: 4px; padding: 2px 6px; font-size: 0.7rem; background: rgba(220, 38, 38, 0.9); color: #fff; border: none; border-radius: 4px;" 
+                        title="Remove photo" onclick="return confirm('Remove this photo from gallery?');">
+                  <i class="bi bi-x-lg"></i>
+                </button>
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        <!-- Upload Multiple Files from Gallery -->
+        <div class="form-group" style="margin-bottom: 0;">
+          <label for="gallery_images" style="font-size: 0.85rem; font-weight: 600; color: var(--brand-navy-800); display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.35rem;">
+            <i class="bi bi-plus-circle-fill text-success"></i> Add Photos to Gallery (Select multiple from device):
+          </label>
+          <input type="file" name="gallery_images" id="gallery_images" multiple accept="image/*" class="form-control" 
+                 onchange="previewGalleryImages(this)"
+                 style="background: #ffffff; padding: 0.5rem; cursor: pointer;">
+          <div class="form-text" style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.35rem;">
+            You can select multiple photos at once from your phone gallery or desktop explorer.
+          </div>
+          <div id="gallery_upload_previews" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.75rem;"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Submit Action -->
+    <div style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--border-light);">
+      <button type="submit" class="btn btn-primary btn-lg">
+        <i class="bi bi-check-lg"></i> Save Store Profile & Photos
+      </button>
+    </div>
+
+  </form>
+</div>
+
+
+  <!-- Danger Zone: Close Store & Delete Merchant Account -->
+  <div class="card" style="margin-top: 2rem; border: 1px solid #fecaca; border-radius: 12px; background: #ffffff; overflow: hidden;">
+    <div style="background: #fef2f2; padding: 1.25rem 1.5rem; border-bottom: 1px solid #fecaca; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem;">
+      <div style="display: flex; align-items: center; gap: 0.65rem;">
+        <i class="bi bi-exclamation-triangle-fill text-danger" style="font-size: 1.25rem;"></i>
+        <div>
+          <h3 style="font-size: 1.05rem; font-weight: 800; color: #991b1b; margin: 0;">Danger Zone: Store Closure &amp; Account Deletion</h3>
+          <p style="font-size: 0.8rem; color: #7f1d1d; margin: 0;">Permanently delist this store and deactivate merchant credentials</p>
+        </div>
+      </div>
+      <a href="/seller/delete-account/" class="btn btn-sm btn-primary" style="background: #dc2626; border-color: #dc2626; font-weight: 700;">
+        <i class="bi bi-trash3"></i> Close &amp; Delete Seller Account
+      </a>
+    </div>
+    <div style="padding: 1.25rem 1.5rem; font-size: 0.84rem; color: #64748b; line-height: 1.5;">
+      Once requested, this store and its deals will be immediately removed from public neighborhood searches. Financial and billing records are retained in compliance with Indian GST &amp; IT Rules.
+    </div>
+  </div>
+
+<!-- Live Image Preview JavaScript Helper -->
+<script>
+  function previewImage(input, previewElementId) {
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const previewElement = document.getElementById(previewElementId);
+        if (previewElement) {
+          previewElement.src = e.target.result;
+          previewElement.style.display = 'block';
+        }
+      };
+      reader.readAsDataURL(input.files[0]);
+    }
+  }
+
+  function previewGalleryImages(input) {
+    const container = document.getElementById('gallery_upload_previews');
+    if (!container) return;
+    container.innerHTML = '';
+    if (input.files && input.files.length > 0) {
+      Array.from(input.files).forEach((file, index) => {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const div = document.createElement('div');
+          div.style.cssText = 'position: relative; width: 72px; height: 72px; border-radius: 6px; overflow: hidden; border: 2px solid #10b981; box-shadow: 0 1px 3px rgba(0,0,0,0.1);';
+          const img = document.createElement('img');
+          img.src = e.target.result;
+          img.style.cssText = 'width: 100%; height: 100%; object-fit: cover;';
+          img.title = file.name;
+          div.appendChild(img);
+          const tag = document.createElement('span');
+          tag.style.cssText = 'position: absolute; bottom: 2px; right: 2px; background: #10b981; color: #fff; font-size: 9px; padding: 1px 4px; border-radius: 3px;';
+          tag.textContent = 'New';
+          div.appendChild(tag);
+          container.appendChild(div);
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+  }
+
+  // Dynamic Subcategory filtering based on Category selection (FE-11)
+  const allSubcategories = [
+    {% for sub in subcategories %}
+      { id: "{{ sub.id }}", name: "{{ sub.name|escapejs }}", categoryId: "{{ sub.category_id }}" },
+    {% endfor %}
+  ];
+
+  function updateSubcategories(categoryId, preselectedId) {
+    const subSelect = document.getElementById('shopSubcategorySelect');
+    if (!subSelect) return;
+    
+    const currentVal = preselectedId !== undefined ? String(preselectedId) : subSelect.value;
+    subSelect.innerHTML = '<option value="">None / General</option>';
+    
+    const filtered = allSubcategories.filter(s => String(s.categoryId) === String(categoryId));
+    filtered.forEach(s => {
+      const opt = document.createElement('option');
+      opt.value = s.id;
+      opt.textContent = s.name;
+      if (String(s.id) === currentVal) {
+        opt.selected = true;
+      }
+      subSelect.appendChild(opt);
+    });
+  }
+
+  const catSelect = document.getElementById('shopCategorySelect');
+  if (catSelect) {
+    catSelect.addEventListener('change', function() {
+      updateSubcategories(this.value, "");
+    });
+    // Initialize on page load
+    const initialSubId = "{{ shop.subcategory.id|default:'' }}";
+    updateSubcategories(catSelect.value, initialSubId);
+  }
+</script>
+
+<!-- Free & Open-Source Leaflet.js Interactive Map Engine -->
+<script src="{% static 'vendor/leaflet/leaflet.js' %}"></script>
+<script>
+  let editMap = null;
+  let editMarker = null;
+
+  function initProfileMap() {
+    const mapEl = document.getElementById('merchantEditMap');
+    if (!mapEl || typeof L === 'undefined') return;
+
+    const latVal = parseFloat(document.getElementById('id_latitude').value) || 18.5204;
+    const lngVal = parseFloat(document.getElementById('id_longitude').value) || 73.8567;
+
+    editMap = L.map('merchantEditMap', { scrollWheelZoom: false }).setView([latVal, lngVal], 15);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(editMap);
+
+    editMarker = L.marker([latVal, lngVal], { draggable: true }).addTo(editMap);
+    editMarker.bindTooltip("Drag pin to store entrance", { permanent: false, direction: 'top' });
+
+    function onPosUpdate(lat, lng) {
+      const fLat = parseFloat(lat).toFixed(6);
+      const fLng = parseFloat(lng).toFixed(6);
+      document.getElementById('id_latitude').value = fLat;
+      document.getElementById('id_longitude').value = fLng;
+      const b = document.getElementById('coordBadge');
+      if (b) b.textContent = `${fLat}° N, ${fLng}° E`;
+    }
+
+    editMarker.on('dragend', function(e) {
+      const pos = e.target.getLatLng();
+      onPosUpdate(pos.lat, pos.lng);
+    });
+
+    editMap.on('click', function(e) {
+      editMarker.setLatLng(e.latlng);
+      onPosUpdate(e.latlng.lat, e.latlng.lng);
+    });
+  }
+
+  function detectGPSLocationProfile() {
+    if (!navigator.geolocation) {
+      alert("Geolocation is not supported by your browser.");
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      function(pos) {
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+        if (editMap && editMarker) {
+          editMap.setView([lat, lng], 16);
+          editMarker.setLatLng([lat, lng]);
+          const fLat = parseFloat(lat).toFixed(6);
+          const fLng = parseFloat(lng).toFixed(6);
+          document.getElementById('id_latitude').value = fLat;
+          document.getElementById('id_longitude').value = fLng;
+          const b = document.getElementById('coordBadge');
+          if (b) b.textContent = `${fLat}° N, ${fLng}° E`;
+        }
+      },
+      function(err) {
+        alert("GPS detection failed: " + err.message + ". Please drag pin manually.");
+      },
+      { timeout: 10000, enableHighAccuracy: true }
+    );
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(initProfileMap, 200);
+  });
+</script>
+
+{% endblock %}

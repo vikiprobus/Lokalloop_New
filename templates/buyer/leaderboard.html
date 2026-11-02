@@ -1,0 +1,334 @@
+{% extends "base/buyer_base.html" %}
+
+{% block title %}Weekly Shopper Leaderboard &bull; Cycle #{{ cycle_number }} — {{ BRAND_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 1.5rem; padding-bottom: 3.5rem;">
+  
+  <!-- Header & Gamification Intro -->
+  <div class="d-flex align-center justify-between flex-wrap gap-2" style="margin-bottom: 2rem;">
+    <div>
+      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+        <span class="badge" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; font-weight: 800; font-size: 0.72rem; letter-spacing: 0.04em;">
+          WEEKLY CYCLE #{{ cycle_number }}
+        </span>
+        <span style="font-size: 0.8rem; color: var(--text-muted);">&bull;</span>
+        <span style="font-size: 0.8rem; font-weight: 600; color: var(--brand-navy-800);">Active 7-Day Sprint</span>
+      </div>
+      <h1 style="font-size: 1.85rem; font-weight: 900; color: var(--brand-navy-900); letter-spacing: -0.02em; margin: 0;">
+        🏆 Weekly Shopper Leaderboard
+      </h1>
+      <p style="font-size: 0.88rem; color: var(--text-muted); margin: 0.25rem 0 0;">
+        Earn points by shopping local to climb the ranks and win weekly community rewards.
+      </p>
+    </div>
+
+    <!-- Cycle Window Badge -->
+    <div style="background: #ffffff; border: 1px solid var(--border-light); border-radius: 12px; padding: 0.65rem 1rem; box-shadow: var(--shadow-sm); font-size: 0.825rem; color: var(--brand-navy-900);">
+      <div style="font-size: 0.7rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em;">Cycle Window</div>
+      <div style="font-weight: 800; color: #1e293b; margin-top: 0.1rem;">
+        {{ cycle_start|date:"d M" }} &ndash; {{ cycle_end|date:"d M Y" }}
+      </div>
+    </div>
+  </div>
+
+  <!-- Current Logged-in Buyer Standing (if participating) -->
+  {% if current_user_entry %}
+    <div style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border-radius: 18px; padding: 1.35rem 1.75rem; color: #ffffff; margin-bottom: 2.25rem; box-shadow: 0 10px 25px rgba(15, 23, 42, 0.2); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+      <div style="display: flex; align-items: center; gap: 1rem;">
+        <div style="width: 52px; height: 52px; border-radius: 50%; background: rgba(255,255,255,0.12); border: 2px solid #f59e0b; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; font-weight: 900; color: #f59e0b;">
+          #{{ current_user_entry.rank }}
+        </div>
+        <div>
+          <div style="font-size: 0.72rem; font-weight: 800; text-transform: uppercase; color: #f59e0b; letter-spacing: 0.05em;">Your Current Sprint Standing</div>
+          <div style="font-size: 1.25rem; font-weight: 900; color: #ffffff;">
+            {{ current_user_entry.gennie_nickname }}
+            <span style="font-size: 0.8rem; font-weight: 600; color: #94a3b8; font-family: monospace;">({{ current_user_entry.public_unique_id }})</span>
+          </div>
+          <div style="font-size: 0.8rem; color: #cbd5e1; margin-top: 0.15rem;">
+            Badge: {{ current_user_entry.badge_icon }} {{ current_user_entry.badge_tier }}
+          </div>
+        </div>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 1.5rem;">
+        <div style="text-align: right;">
+          <div style="font-size: 0.72rem; color: #94a3b8; font-weight: 700; text-transform: uppercase;">Points Earned</div>
+          <div style="font-size: 1.75rem; font-weight: 900; color: #22c55e;">
+            {{ current_user_entry.points_earned }} <span style="font-size: 0.9rem; color: #cbd5e1;">Pts</span>
+          </div>
+        </div>
+
+        {% if current_user_entry.in_cooldown %}
+          <div style="background: rgba(245, 158, 11, 0.2); border: 1px solid #f59e0b; padding: 0.45rem 0.85rem; border-radius: 10px; font-size: 0.75rem; font-weight: 800; color: #fde68a;">
+            🏆 Cycle #{{ current_user_entry.last_won_cycle }} Champion &bull; Hall of Fame
+          </div>
+        {% elif current_user_entry.is_grand_prize_winner %}
+          <div style="background: rgba(34, 197, 94, 0.2); border: 1px solid #22c55e; padding: 0.45rem 0.85rem; border-radius: 10px; font-size: 0.75rem; font-weight: 800; color: #86efac;">
+            🎁 Leading for Weekly Grand Prize!
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- Top 3 Podium Cards -->
+  {% if leaderboard|length >= 1 %}
+    <div class="d-grid grid-3 gap-3" style="margin-bottom: 2.5rem; align-items: stretch;">
+      
+      <!-- Rank 1 Card -->
+      {% with first=leaderboard.0 %}
+        <div class="card card-padded" style="background: linear-gradient(135deg, #fffbeb, #fef3c7); border: 2px solid #f59e0b; border-radius: 20px; box-shadow: 0 10px 25px rgba(245, 158, 11, 0.15); text-align: center; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between;">
+          <div style="position: absolute; top: -10px; right: -10px; width: 60px; height: 60px; background: #f59e0b; opacity: 0.15; border-radius: 50%;"></div>
+          <div>
+            <div style="font-size: 2.75rem; line-height: 1; margin-bottom: 0.35rem;">🥇</div>
+            <span class="badge" style="background: #f59e0b; color: #000; font-weight: 800; font-size: 0.75rem; letter-spacing: 0.05em; margin-bottom: 0.5rem;">
+              RANK #1 &bull; GOLD CHAMPION
+            </span>
+            <h3 style="font-size: 1.3rem; font-weight: 900; color: #78350f; margin: 0.35rem 0 0.15rem;">
+              {{ first.gennie_nickname }}
+            </h3>
+            <div style="font-family: monospace; font-size: 0.825rem; font-weight: 700; color: #92400e;">
+              {{ first.public_unique_id }}
+            </div>
+
+            <div style="margin: 1.25rem 0; background: #ffffff; border-radius: 12px; padding: 0.85rem; border: 1px solid #fde68a;">
+              <span style="font-size: 0.72rem; color: #92400e; font-weight: 700; text-transform: uppercase;">Points Scored This Sprint</span>
+              <div style="font-size: 2rem; font-weight: 900; color: #b45309; line-height: 1.1;">
+                {{ first.points_earned }} <span style="font-size: 1rem;">Pts</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            {% if first.in_cooldown %}
+              <div style="background: #fef3c7; border: 1px solid #fde68a; color: #92400e; padding: 0.5rem 0.75rem; border-radius: 8px; font-size: 0.78rem; font-weight: 800;">
+                🏆 Hall of Fame Champion
+              </div>
+            {% elif first.is_grand_prize_winner %}
+              <div style="background: #dcfce7; border: 1px solid #86efac; color: #166534; padding: 0.5rem 0.75rem; border-radius: 8px; font-size: 0.78rem; font-weight: 800;">
+                🎁 Active Grand Prize Winner
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      {% endwith %}
+
+      <!-- Rank 2 Card -->
+      {% if leaderboard|length >= 2 %}
+        {% with second=leaderboard.1 %}
+          <div class="card card-padded" style="background: linear-gradient(135deg, #f8fafc, #f1f5f9); border: 2px solid #94a3b8; border-radius: 20px; box-shadow: var(--shadow-sm); text-align: center; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div style="font-size: 2.5rem; line-height: 1; margin-bottom: 0.35rem;">🥈</div>
+              <span class="badge" style="background: #94a3b8; color: #fff; font-weight: 800; font-size: 0.72rem; letter-spacing: 0.05em; margin-bottom: 0.5rem;">
+                RANK #2 &bull; SILVER RUNNER-UP
+              </span>
+              <h3 style="font-size: 1.2rem; font-weight: 800; color: #1e293b; margin: 0.35rem 0 0.15rem;">
+                {{ second.gennie_nickname }}
+              </h3>
+              <div style="font-family: monospace; font-size: 0.8rem; font-weight: 700; color: #64748b;">
+                {{ second.public_unique_id }}
+              </div>
+
+              <div style="margin: 1.25rem 0; background: #ffffff; border-radius: 12px; padding: 0.85rem; border: 1px solid #e2e8f0;">
+                <span style="font-size: 0.72rem; color: #64748b; font-weight: 700; text-transform: uppercase;">Points Scored This Sprint</span>
+                <div style="font-size: 1.85rem; font-weight: 900; color: #334155; line-height: 1.1;">
+                  {{ second.points_earned }} <span style="font-size: 0.95rem;">Pts</span>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              {% if second.in_cooldown %}
+                <div style="background: #f1f5f9; border: 1px solid #cbd5e1; color: #475569; padding: 0.5rem 0.75rem; border-radius: 8px; font-size: 0.78rem; font-weight: 800;">
+                  ⭐ Hall of Fame Honoree
+                </div>
+              {% elif second.is_grand_prize_winner %}
+                <div style="background: #dcfce7; border: 1px solid #86efac; color: #166534; padding: 0.5rem 0.75rem; border-radius: 8px; font-size: 0.78rem; font-weight: 800;">
+                  🎁 Eligible Grand Prize Winner
+                </div>
+              {% else %}
+                <div style="font-size: 0.78rem; font-weight: 700; color: #64748b;">Silver Honors</div>
+              {% endif %}
+            </div>
+          </div>
+        {% endwith %}
+      {% endif %}
+
+      <!-- Rank 3 Card -->
+      {% if leaderboard|length >= 3 %}
+        {% with third=leaderboard.2 %}
+          <div class="card card-padded" style="background: linear-gradient(135deg, #fff7ed, #ffedd5); border: 2px solid #fb923c; border-radius: 20px; box-shadow: var(--shadow-sm); text-align: center; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div style="font-size: 2.5rem; line-height: 1; margin-bottom: 0.35rem;">🥉</div>
+              <span class="badge" style="background: #ea580c; color: #fff; font-weight: 800; font-size: 0.72rem; letter-spacing: 0.05em; margin-bottom: 0.5rem;">
+                RANK #3 &bull; BRONZE CONTENDER
+              </span>
+              <h3 style="font-size: 1.2rem; font-weight: 800; color: #9a3412; margin: 0.35rem 0 0.15rem;">
+                {{ third.gennie_nickname }}
+              </h3>
+              <div style="font-family: monospace; font-size: 0.8rem; font-weight: 700; color: #c2410c;">
+                {{ third.public_unique_id }}
+              </div>
+
+              <div style="margin: 1.25rem 0; background: #ffffff; border-radius: 12px; padding: 0.85rem; border: 1px solid #fed7aa;">
+                <span style="font-size: 0.72rem; color: #c2410c; font-weight: 700; text-transform: uppercase;">Points Scored This Sprint</span>
+                <div style="font-size: 1.85rem; font-weight: 900; color: #9a3412; line-height: 1.1;">
+                  {{ third.points_earned }} <span style="font-size: 0.95rem;">Pts</span>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              {% if third.in_cooldown %}
+                <div style="background: #f1f5f9; border: 1px solid #cbd5e1; color: #475569; padding: 0.5rem 0.75rem; border-radius: 8px; font-size: 0.78rem; font-weight: 800;">
+                  ⭐ Hall of Fame Honoree
+                </div>
+              {% elif third.is_grand_prize_winner %}
+                <div style="background: #dcfce7; border: 1px solid #86efac; color: #166534; padding: 0.5rem 0.75rem; border-radius: 8px; font-size: 0.78rem; font-weight: 800;">
+                  🎁 Eligible Grand Prize Winner
+                </div>
+              {% else %}
+                <div style="font-size: 0.78rem; font-weight: 700; color: #9a3412;">Bronze Honors</div>
+              {% endif %}
+            </div>
+          </div>
+        {% endwith %}
+      {% endif %}
+
+    </div>
+  {% endif %}
+
+  <!-- Complete Standings Table -->
+  <div class="card card-padded" style="background: #ffffff; border: 1px solid var(--border-light); border-radius: 16px; margin-bottom: 2.5rem; box-shadow: var(--shadow-sm);">
+    <div class="d-flex align-center justify-between" style="margin-bottom: 1.25rem; border-bottom: 1px solid var(--border-light); padding-bottom: 0.85rem;">
+      <div>
+        <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--brand-navy-900); margin: 0;">
+          Full Sprint Standings ({{ total_participants }} Shoppers)
+        </h3>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0.15rem 0 0;">
+          Points refreshed in real time across verified local store checkouts
+        </p>
+      </div>
+      <span class="badge badge-neutral">Cycle #{{ cycle_number }}</span>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th style="width: 70px;">Rank</th>
+            <th>Shopper Identity</th>
+            <th>Badge &amp; Tier</th>
+            <th>Sprint Points</th>
+            <th>Award Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for entry in leaderboard %}
+            <tr {% if entry.buyer_id == request.user.id %}style="background: #f8fafc; font-weight: 700;"{% endif %}>
+              <td>
+                <span style="font-weight: 900; font-size: 1.05rem; color: {% if entry.rank == 1 %}#f59e0b{% elif entry.rank == 2 %}#94a3b8{% elif entry.rank == 3 %}#ea580c{% else %}var(--brand-navy-900){% endif %};">
+                  #{{ entry.rank }}
+                </span>
+              </td>
+              <td>
+                <div style="font-weight: 800; color: var(--brand-navy-900); font-size: 0.95rem;">
+                  {{ entry.gennie_nickname }}
+                </div>
+                <div style="font-size: 0.75rem; color: var(--text-muted); font-family: monospace;">
+                  {{ entry.public_unique_id }}
+                </div>
+              </td>
+              <td>
+                <span class="badge badge-neutral" style="font-size: 0.78rem;">
+                  {{ entry.badge_icon }} {{ entry.badge_tier }}
+                </span>
+              </td>
+              <td style="font-weight: 900; font-size: 1.05rem; color: var(--color-success);">
+                {{ entry.points_earned }} Pts
+              </td>
+              <td>
+                {% if entry.in_cooldown %}
+                  <span class="badge" style="background: #fef3c7; color: #92400e; border: 1px solid #fde68a;">
+                    🏆 Hall of Fame
+                  </span>
+                {% elif entry.is_grand_prize_winner %}
+                  <span class="badge badge-success" style="background: #dcfce7; color: #166534; border: 1px solid #86efac;">
+                    🎁 Grand Prize Leading
+                  </span>
+                {% else %}
+                  <span style="font-size: 0.78rem; color: var(--text-muted);">Active Contender</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="5" class="text-center text-muted" style="padding: 2.5rem 1rem;">
+                No points earned in this sprint cycle yet. Be the first to scan a local deal and grab Rank #1!
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Hall of Fame: Past Cycle Champions -->
+  {% if history_records %}
+    <div class="card card-padded" style="background: #ffffff; border: 1px solid var(--border-light); border-radius: 16px; box-shadow: var(--shadow-sm);">
+      <div style="margin-bottom: 1.25rem; border-bottom: 1px solid var(--border-light); padding-bottom: 0.85rem;">
+        <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--brand-navy-900); margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+          <i class="bi bi-award-fill" style="color: #f59e0b;"></i> Hall of Fame &bull; Past Cycle Champions
+        </h3>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0.15rem 0 0;">
+          Past grand prize winners honored for exceptional support of local neighborhood retail
+        </p>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Cycle</th>
+              <th>Date Concluded</th>
+              <th>Champion Shopper</th>
+              <th>Points Scored</th>
+              <th>Honors</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for h in history_records %}
+              <tr>
+                <td>
+                  <span class="badge badge-primary">Cycle #{{ h.cycle_number }}</span>
+                </td>
+                <td style="font-size: 0.82rem; color: var(--text-muted);">
+                  {{ h.cycle_end|date:"d M Y" }}
+                </td>
+                <td>
+                  <div style="font-weight: 800; color: var(--brand-navy-900);">
+                    {{ h.gennie_nickname }}
+                  </div>
+                  <div style="font-size: 0.75rem; color: var(--text-muted); font-family: monospace;">
+                    {{ h.public_unique_id }}
+                  </div>
+                </td>
+                <td style="font-weight: 800; color: #b45309;">
+                  {{ h.points_scored }} Pts
+                </td>
+                <td>
+                  <span style="font-size: 0.82rem; font-weight: 700; color: #16a34a;">
+                    🥇 Rank #{{ h.rank }} Champion
+                  </span>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}

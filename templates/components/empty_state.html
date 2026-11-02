@@ -1,0 +1,16 @@
+<div class="empty-state">
+  <div class="empty-icon text-muted">
+    <i class="bi {{ icon|default:'bi-inbox' }}"></i>
+  </div>
+  <h4 style="font-size: 1.15rem; font-weight: 700; color: var(--brand-navy-900); margin-bottom: 0.5rem;">
+    {{ title|default:"No items found" }}
+  </h4>
+  <p style="font-size: 0.9rem; color: var(--text-muted); max-width: 450px; margin: 0 auto 1.25rem;">
+    {{ description|default:"There are no records matching your current criteria." }}
+  </p>
+  {% if action_url and action_text %}
+    <a href="{{ action_url }}" class="btn btn-primary btn-sm">
+      {{ action_text }}
+    </a>
+  {% endif %}
+</div>

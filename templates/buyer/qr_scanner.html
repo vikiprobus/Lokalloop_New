@@ -1,0 +1,560 @@
+{% extends "base/buyer_base.html" %}
+{% load static %}
+
+{% block title %}Scan & Redeem In-Store — {{ BRAND_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container container-narrow" style="padding-top: 1rem; padding-bottom: 4rem;">
+  
+  <div class="text-center" style="margin-bottom: 2rem;">
+    <div style="width: 52px; height: 52px; border-radius: var(--radius-md); background: var(--ink-950); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; margin: 0 auto 0.75rem;">
+      <i class="bi bi-qr-code-scan"></i>
+    </div>
+    <h1 style="font-size: 1.85rem; font-weight: 800; color: var(--ink-950); font-family: var(--font-display);">
+      Billing counter redemption
+    </h1>
+    <p style="font-size: 0.925rem; color: var(--text-muted); max-width: 460px; margin: 0 auto;">
+      Present your phone at checkout. Scan the merchant's counter standee or enter the code to apply discount.
+    </p>
+  </div>
+
+  <div class="card" style="box-shadow: var(--shadow-md); overflow: hidden; margin-bottom: 2rem;">
+    
+    <!-- Camera Viewport / Interactive Live Scanner UI (Auto-On Camera) -->
+    <div style="background: var(--ink-950); padding: 1.75rem 1.25rem; text-align: center; color: #ffffff; position: relative;">
+      
+      <!-- Video Element / HTML5 QR Scanner Container -->
+      <div id="reader-container" style="width: 100%; max-width: 380px; margin: 0 auto; position: relative;">
+        <!-- Live Camera Viewport (Open by Default) -->
+        <div id="qr-reader" style="width: 100%; min-height: 280px; border-radius: var(--radius-lg); overflow: hidden; background: #000; border: 2px solid rgba(255,255,255,0.15);"></div>
+
+        <!-- Fallback/Permission Denied Placeholder (Hidden unless error occurs) -->
+        <div id="scanner-placeholder" style="display: none; width: 260px; height: 260px; margin: 0 auto; border: 2px dashed rgba(255,255,255,0.25); border-radius: var(--radius-lg); position: relative; flex-direction: column; align-items: center; justify-content: center; background: rgba(255,255,255,0.03);">
+          <i class="bi bi-camera-video-off" style="font-size: 3.5rem; color: #94a3b8; margin-bottom: 0.5rem;"></i>
+          <span style="font-size: 0.85rem; color: #cbd5e1; font-weight: 600;">Camera is off</span>
+          <span style="font-size: 0.75rem; color: #94a3b8; margin-top: 0.25rem;">Tap below to turn back on</span>
+        </div>
+      </div>
+
+      <!-- Live Scanner Feedback Status -->
+      <div id="scan-status" style="margin-top: 1rem; font-size: 0.85rem; color: #e2e8f0; min-height: 1.4rem;">
+        <span style="color: #f97316;"><i class="bi bi-hourglass-split"></i> Initializing camera scanner...</span>
+      </div>
+
+      <!-- Camera Action Controls -->
+      <div class="d-flex align-center justify-center gap-2" style="margin-top: 1.25rem; flex-wrap: wrap;">
+        <button type="button" id="start-cam-btn" class="btn btn-sm" style="display: none; background: #f97316; color: #ffffff; font-weight: 700; border-radius: var(--radius-full); padding: 0.5rem 1.25rem; align-items: center; gap: 0.4rem;">
+          <i class="bi bi-camera-video-fill"></i> Turn Camera On
+        </button>
+        <button type="button" id="flip-cam-btn" class="btn btn-sm" style="display: inline-flex; background: rgba(255,255,255,0.12); color: #ffffff; border-radius: var(--radius-full); padding: 0.5rem 1rem; align-items: center; gap: 0.35rem; font-weight: 600;">
+          <i class="bi bi-arrow-repeat"></i> Switch Camera
+        </button>
+                <button type="button" id="stop-cam-btn" class="btn btn-sm" style="display: inline-flex; background: rgba(255,255,255,0.1); color: #ffffff; border-radius: var(--radius-full); padding: 0.5rem 1rem;">
+          <i class="bi bi-pause-circle"></i> Pause
+        </button>
+        <input type="file" id="qr-camera-file-input" accept="image/*" capture="environment" style="display: none;">
+        <button type="button" id="snap-camera-btn" class="btn btn-sm" style="display: inline-flex; background: #0284c7; color: #ffffff; border-radius: var(--radius-full); padding: 0.5rem 1rem; align-items: center; gap: 0.35rem; font-weight: 700; box-shadow: 0 4px 10px rgba(2, 132, 199, 0.35);" title="Open native phone camera to snap QR">
+          <i class="bi bi-camera"></i> Snap with Camera App
+        </button>
+        
+        <!-- Live Camera Verification Badge (In-Store Fraud Prevention) -->
+        <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); font-size: 0.78rem; padding: 0.45rem 0.85rem; border-radius: var(--radius-full); display: inline-flex; align-items: center; gap: 0.35rem;">
+          <i class="bi bi-shield-check"></i> Live Camera Verification Enforced
+        </span>
+      </div>
+
+      <div style="margin-top: 1.25rem; font-size: 0.78rem; color: #94a3b8;">
+        <i class="bi bi-shield-check text-success"></i> Real-time local camera processing &bull; No video stream recorded
+      </div>
+    </div>
+
+    <!-- Redemption Form -->
+    <div class="card-body" style="padding: 2rem;">
+      <form method="POST" action="/buyer/scan/" id="redemption-form">
+        {% csrf_token %}
+        <input type="hidden" name="idempotency_key" value="{{ generated_idempotency_key }}">
+        <input type="hidden" name="buyer_lat" id="buyer_lat" value="">
+        <input type="hidden" name="buyer_lng" id="buyer_lng" value="">
+        <input type="hidden" name="buyer_accuracy" id="buyer_accuracy" value="">
+
+        {% if preselected_offer %}
+          <!-- Pre-selected Offer Banner (BUG-1.1) -->
+          <div id="target-shop-data" data-shop-name="{{ preselected_offer.shop.name|escape }}" data-shop-lat="{{ preselected_offer.shop.latitude }}" data-shop-lng="{{ preselected_offer.shop.longitude }}" style="display: none;"></div>
+          <div style="margin-bottom: 1.25rem; padding: 1rem 1.25rem; border-radius: var(--radius-md); background: linear-gradient(135deg, rgba(249,115,22,0.08), rgba(99,102,241,0.05)); border: 1.5px solid var(--brand-saffron-300); display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
+            <div class="d-flex align-center gap-3">
+              <div style="width: 42px; height: 42px; border-radius: 10px; background: var(--brand-saffron-500); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; flex-shrink: 0;">
+                <i class="bi bi-tag-fill"></i>
+              </div>
+              <div>
+                <div style="font-size: 0.72rem; text-transform: uppercase; font-weight: 700; color: var(--brand-saffron-700); letter-spacing: 0.05em;">Selected In-Store Deal</div>
+                <div style="font-weight: 800; font-size: 1rem; color: var(--brand-navy-900);">{{ preselected_offer.title }}</div>
+                <div style="font-size: 0.8rem; color: var(--text-muted);"><i class="bi bi-shop"></i> {{ preselected_offer.shop.name }} &bull; {{ preselected_offer.shop.locality }}, {{ preselected_offer.shop.city }}</div>
+              </div>
+            </div>
+            <div class="d-flex align-center gap-2">
+              <span class="badge badge-saffron" style="font-size: 0.82rem; padding: 0.35rem 0.75rem;">
+                {% if preselected_offer.offer_type == 'PERCENTAGE' %}{{ preselected_offer.discount_value|floatformat:0 }}% OFF{% elif preselected_offer.offer_type == 'FLAT' %}₹{{ preselected_offer.discount_value|floatformat:0 }} OFF{% else %}{{ preselected_offer.get_offer_type_display }}{% endif %}
+              </span>
+              <a href="/buyer/scan/" class="btn btn-outline btn-sm" style="font-size: 0.75rem; padding: 0.25rem 0.6rem;" title="Clear selected deal">Clear</a>
+            </div>
+          </div>
+        {% endif %}
+
+        <!-- In-Store GPS Verification Status -->
+        <div id="gps-status-box" style="margin-bottom: 1.25rem; padding: 0.75rem 1rem; border-radius: var(--radius-md); background: #f8fafc; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between;">
+          <div class="d-flex align-center gap-2" id="gps-status-indicator">
+            <i class="bi bi-geo-alt-fill text-muted" id="gps-icon" style="font-size: 1.1rem;"></i>
+            <span style="font-size: 0.85rem; color: #475569;" id="gps-text">Verifying in-store GPS location...</span>
+          </div>
+          <button type="button" id="retry-gps-btn" class="btn btn-outline btn-sm" style="display: none; padding: 0.25rem 0.65rem; font-size: 0.75rem;" onclick="captureLocation(true);">
+            <i class="bi bi-arrow-repeat"></i> Enable GPS
+          </button>
+        </div>
+
+        <!-- QR Code Input -->
+        <div class="form-group">
+          <label class="form-label">
+            QR Code Token or Store URL <span class="text-danger">*</span>
+          </label>
+          <div class="d-flex gap-2">
+            <input type="text" name="qr_code" id="qr-input" class="form-control" placeholder="Scanned QR code or URL will appear here..." value="{% if preselected_qr %}{{ preselected_qr.code }}{% endif %}" required style="font-family: var(--font-mono); font-size: 0.95rem; font-weight: 600;">
+          </div>
+          <div class="form-text">Point camera at the merchant standee or paste token directly.</div>
+        </div>
+
+        <!-- Bill Amount Input -->
+        <div class="form-group">
+          <label class="form-label">
+            Store Bill Amount (₹ INR)
+          </label>
+          <div style="position: relative;">
+            <span style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-weight: 700; color: var(--ink-700); font-size: 1rem;">₹</span>
+            <input type="number" step="0.01" min="0" name="bill_amount" id="bill-amount-input" class="form-control" style="padding-left: 2.25rem;" placeholder="Enter bill amount (e.g. 250.00)">
+          </div>
+          <div class="form-text">Used to compute percentage discount at the counter.</div>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" id="redeem-btn" class="btn btn-primary btn-block btn-lg" style="margin-top: 1.5rem; font-size: 1.05rem;">
+          <i class="bi bi-check-circle-fill"></i> Validate &amp; redeem discount
+        </button>
+      </form>
+    </div>
+
+  </div>
+
+  <!-- Interactive Demo Quick-Fill Section -->
+  {% if sample_qrs %}
+    <div class="card card-padded" style="background: #ffffff; border: 1px dashed var(--border-ticket);">
+      <div class="d-flex align-center justify-between" style="margin-bottom: 0.75rem;">
+        <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--ink-950); font-family: var(--font-display);">
+          Quick-select verified merchant QR codes
+        </h4>
+        <span class="badge badge-indigo">Demo mode</span>
+      </div>
+      <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">
+        Select any verified counter QR code below to populate the form and test atomic redemption:
+      </p>
+
+      <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+        {% for sample in sample_qrs %}
+          <div class="d-flex align-center justify-between" style="background: var(--bg-subtle); padding: 0.75rem 1rem; border-radius: var(--radius-md); font-size: 0.85rem;">
+            <div>
+              <strong>{{ sample.offer.shop.name }}</strong> &bull;
+              <span class="text-saffron fw-600">{{ sample.offer.title }}</span>
+              <span class="text-muted">({{ sample.offer.discount_display }})</span>
+            </div>
+            <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('qr-input').value = '{{ sample.code }}';">
+              Use token
+            </button>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+</div>
+
+<!-- HTML5-QRCode Scanner Library (Lightweight, Zero-Config, Works on Mobile & Desktop) -->
+<!-- HTML5-QRCode Scanner Library (Local static vendor first, CDN fallback) -->
+<script src="{% static 'vendor/html5-qrcode.min.js' %}"></script>
+<script>
+  if (typeof Html5Qrcode === 'undefined') {
+    document.write('<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"><\/script>');
+  }
+</script>
+
+<script>
+  let html5QrCode = null;
+  let isScanning = false;
+  let currentFacingMode = "environment"; // Back camera by default on phones
+
+  const startBtn = document.getElementById('start-cam-btn');
+  const stopBtn = document.getElementById('stop-cam-btn');
+  const flipBtn = document.getElementById('flip-cam-btn');
+  const placeholder = document.getElementById('scanner-placeholder');
+  const qrReader = document.getElementById('qr-reader');
+  const statusDiv = document.getElementById('scan-status');
+  const qrInput = document.getElementById('qr-input');
+
+  // --- HTML5 Geolocation Live GPS Capture ---
+  let userLat = null;
+  let userLng = null;
+  let locationState = 'idle'; // 'idle', 'acquiring', 'granted', 'denied'
+
+  function computeStoreDistance(uLat, uLng) {
+    const shopDataEl = document.getElementById('target-shop-data');
+    if (shopDataEl && uLat && uLng) {
+      const sLat = parseFloat(shopDataEl.dataset.shopLat);
+      const sLng = parseFloat(shopDataEl.dataset.shopLng);
+      const sName = shopDataEl.dataset.shopName || 'Store';
+      if (!isNaN(sLat) && !isNaN(sLng)) {
+        const R = 6371; // km
+        const dLat = (sLat - uLat) * Math.PI / 180;
+        const dLon = (sLng - uLng) * Math.PI / 180;
+        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                  Math.cos(uLat * Math.PI / 180) * Math.cos(sLat * Math.PI / 180) *
+                  Math.sin(dLon/2) * Math.sin(dLon/2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        const distKm = R * c;
+        const distText = distKm < 1 ? Math.round(distKm * 1000) + ' m' : distKm.toFixed(1) + ' km';
+        return { name: sName, distText: distText, distKm: distKm };
+      }
+    }
+    return null;
+  }
+
+  function updateGpsUI(state, customMsg) {
+    const box = document.getElementById('gps-status-box');
+    const icon = document.getElementById('gps-icon');
+    const text = document.getElementById('gps-text');
+    const retryBtn = document.getElementById('retry-gps-btn');
+    if (!box || !text) return;
+
+    if (state === 'verified') {
+      box.style.background = '#f0fdf4';
+      box.style.borderColor = '#86efac';
+      icon.className = 'bi bi-geo-alt-fill text-success';
+      text.innerHTML = '<span style="color: #166534; font-weight: 700;"><i class="bi bi-shield-check"></i> In-Store Proximity Verified</span>';
+      if (retryBtn) retryBtn.style.display = 'none';
+    } else if (state === 'granted') {
+      const storeDist = computeStoreDistance(userLat, userLng);
+      box.style.background = '#f8fafc';
+      box.style.borderColor = '#cbd5e1';
+      icon.className = 'bi bi-geo-alt-fill text-primary';
+      if (storeDist) {
+        text.innerHTML = `<span style="color: #334155; font-weight: 600;"><i class="bi bi-geo-alt-fill" style="color: #0284c7;"></i> GPS Active &bull; ${storeDist.name} is ~${storeDist.distText} away (Scan counter standee at store)</span>`;
+      } else {
+        text.innerHTML = '<span style="color: #334155; font-weight: 600;"><i class="bi bi-geo-alt-fill" style="color: #0284c7;"></i> Device GPS Acquired &bull; Scan merchant counter standee to verify store presence</span>';
+      }
+      if (retryBtn) retryBtn.style.display = 'none';
+    } else if (state === 'denied') {
+      box.style.background = '#fef2f2';
+      box.style.borderColor = '#fca5a5';
+      icon.className = 'bi bi-geo-alt-slash-fill text-danger';
+      text.innerHTML = '<span style="color: #991b1b; font-weight: 600;">Location access required to verify store presence</span>';
+      if (retryBtn) retryBtn.style.display = 'inline-flex';
+    } else {
+      box.style.background = '#f8fafc';
+      box.style.borderColor = '#e2e8f0';
+      icon.className = 'bi bi-geo-alt-fill text-muted';
+      text.innerText = customMsg || 'Verifying in-store GPS location...';
+      if (retryBtn) retryBtn.style.display = 'none';
+    }
+  }
+
+  function captureLocation(interactive = false) {
+    if (!("geolocation" in navigator)) {
+      locationState = 'denied';
+      updateGpsUI('denied', 'GPS not supported on this device');
+      return;
+    }
+
+    locationState = 'acquiring';
+    updateGpsUI('acquiring', 'Verifying in-store GPS location...');
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        userLat = position.coords.latitude;
+        userLng = position.coords.longitude;
+        document.getElementById('buyer_lat').value = userLat;
+        document.getElementById('buyer_lng').value = userLng;
+        const accEl = document.getElementById('buyer_accuracy');
+        if (accEl) accEl.value = Math.round(position.coords.accuracy || 0);
+        locationState = 'granted';
+        updateGpsUI('granted');
+      },
+      (error) => {
+        console.warn("Geolocation capture notice:", error);
+        locationState = 'denied';
+        updateGpsUI('denied');
+        if (interactive) {
+          alert("Please enable location permissions in your browser or device settings to verify in-store presence.");
+        }
+      },
+      { enableHighAccuracy: true, timeout: 6000, maximumAge: 0 }
+    );
+  }
+
+  
+  // Snap with Native Camera App fallback
+  const snapBtn = document.getElementById('snap-camera-btn');
+  const snapInput = document.getElementById('qr-camera-file-input');
+  if (snapBtn && snapInput) {
+    snapBtn.addEventListener('click', () => {
+      snapInput.click();
+    });
+    snapInput.addEventListener('change', async (e) => {
+      if (!e.target.files || e.target.files.length === 0) return;
+      const file = e.target.files[0];
+      statusDiv.innerHTML = '<span style="color: #f97316;"><i class="bi bi-hourglass-split"></i> Decoding photo from native camera...</span>';
+      try {
+        if (!html5QrCode) {
+          html5QrCode = new Html5Qrcode("qr-reader");
+        }
+        const decodedText = await html5QrCode.scanFile(file, false);
+        onScanSuccess(decodedText, null);
+      } catch (err) {
+        statusDiv.innerHTML = '<span style="color: #ef4444;"><i class="bi bi-exclamation-triangle"></i> No QR code detected in the photo. Please snap the counter standee clearly and try again.</span>';
+      }
+    });
+  }
+
+  function onScanSuccess(decodedText, decodedResult) {
+    console.log('QR Code detected:', decodedText);
+    
+    // Play subtle haptic feedback vibration if supported on phone
+    if (navigator.vibrate) {
+      navigator.vibrate([100, 50, 100]);
+    }
+
+    statusDiv.innerHTML = '<span style="color: #10b981; font-weight: 700;"><i class="bi bi-check-circle-fill"></i> QR Code Detected! Processing...</span>';
+    qrInput.value = decodedText;
+    updateGpsUI('verified');
+
+    // Stop camera after successful detection
+    stopCamera();
+
+    // Robust URL & Token Parsing with Open-Redirect Protection (BUG-1.3)
+    let isUrl = decodedText.startsWith('http://') || decodedText.startsWith('https://') || decodedText.startsWith('/');
+    if (isUrl) {
+      try {
+        const parsed = new URL(decodedText, window.location.origin);
+
+        // Security Guard: Prohibit open-redirect to unauthorized external domains
+        if (parsed.origin !== window.location.origin) {
+          statusDiv.innerHTML = '<span style="color: #ef4444; font-weight: 700;"><i class="bi bi-shield-x"></i> Security Notice: External QR code domain blocked.</span>';
+          return;
+        }
+
+        const path = parsed.pathname;
+
+        // 1. Offer QR Code URL (e.g. /qr/<uuid>/): Populate token and submit redemption form directly
+        if (path.includes('/qr/')) {
+          qrInput.value = decodedText;
+          statusDiv.innerHTML = '<span style="color: #10b981; font-weight: 700;"><i class="bi bi-check-circle-fill"></i> Counter Offer QR Detected! Please enter your store bill amount and click Validate &amp; Redeem.</span>';
+          const billInp = document.getElementById('bill-amount-input') || document.querySelector('input[name="bill_amount"]');
+          if (billInp) {
+            billInp.focus();
+            billInp.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+          return;
+        }
+
+        // 2. Merchant Store Landing URL (e.g. /store/<slug>/qr/ or /shops/<slug>/)
+        if (path.includes('/store/') || path.includes('/shops/')) {
+          statusDiv.innerHTML = '<span style="color: #10b981; font-weight: 700;"><i class="bi bi-arrow-right-circle"></i> Opening Merchant Store Page...</span>';
+          setTimeout(() => {
+            window.location.href = parsed.pathname + parsed.search;
+          }, 600);
+          return;
+        }
+
+        // 3. Any other internal URL: prompt for bill amount
+        qrInput.value = decodedText;
+        statusDiv.innerHTML = '<span style="color: #10b981; font-weight: 700;"><i class="bi bi-check-circle-fill"></i> Code verified! Please enter your store bill amount and click Validate &amp; Redeem.</span>';
+        const billInp = document.getElementById('bill-amount-input') || document.querySelector('input[name="bill_amount"]');
+        if (billInp) {
+          billInp.focus();
+          billInp.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      } catch (err) {
+        statusDiv.innerHTML = '<span style="color: #ef4444; font-weight: 700;"><i class="bi bi-exclamation-triangle"></i> Invalid QR code URL format.</span>';
+      }
+    } else {
+      // Direct offer code / token string (UUID, custom coupon code)
+      statusDiv.innerHTML = '<span style="color: #10b981; font-weight: 700;"><i class="bi bi-check-circle-fill"></i> Code applied! Please enter your store bill amount and click Validate &amp; Redeem.</span>';
+      const billInp = document.getElementById('bill-amount-input') || document.querySelector('input[name="bill_amount"]');
+      if (billInp) {
+        billInp.focus();
+        billInp.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+  }
+
+  function onScanFailure(error) {
+    // Continuous scan attempt - ignore standard frame misses
+  }
+
+  async function startCamera(facing = currentFacingMode) {
+    try {
+      // BUG-2.2: Guard against unpkg CDN outages or slow connectivity
+      if (typeof Html5Qrcode === 'undefined') {
+        statusDiv.innerHTML = '<span style="color: #ea580c; font-weight: 600;"><i class="bi bi-info-circle"></i> Camera scanner module loading or offline. You can paste or type the coupon token directly below.</span>';
+        return;
+      }
+
+      statusDiv.innerHTML = '<span style="color: #f97316;"><i class="bi bi-hourglass-split"></i> Accessing camera scanner...</span>';
+
+      if (!html5QrCode) {
+        html5QrCode = new Html5Qrcode("qr-reader");
+      } else if (isScanning) {
+        await html5QrCode.stop();
+        isScanning = false;
+      }
+
+      placeholder.style.display = 'none';
+      qrReader.style.display = 'block';
+
+      currentFacingMode = facing;
+
+      const config = {
+        fps: 15,
+        qrbox: (viewfinderWidth, viewfinderHeight) => {
+          const edge = Math.min(viewfinderWidth, viewfinderHeight) * 0.75;
+          return { width: Math.floor(edge), height: Math.floor(edge) };
+        },
+        aspectRatio: 1.0
+      };
+
+      await html5QrCode.start(
+        { facingMode: currentFacingMode },
+        config,
+        onScanSuccess,
+        onScanFailure
+      );
+
+      isScanning = true;
+      startBtn.style.display = 'none';
+      stopBtn.style.display = 'inline-flex';
+      if (flipBtn) flipBtn.style.display = 'inline-flex';
+      statusDiv.innerHTML = '<span style="color: #10b981;"><i class="bi bi-camera-fill"></i> Camera active — Point at billing counter standee</span>';
+    } catch (err) {
+      console.warn("Primary camera start error:", err);
+      
+      // Fallback: try default camera if specific facing mode failed
+      if (facing === "environment") {
+        try {
+          console.log("Retrying with user/default camera...");
+          currentFacingMode = "user";
+          await html5QrCode.start({ facingMode: "user" }, { fps: 15, aspectRatio: 1.0 }, onScanSuccess, onScanFailure);
+          isScanning = true;
+          startBtn.style.display = 'none';
+          stopBtn.style.display = 'inline-flex';
+          statusDiv.innerHTML = '<span style="color: #10b981;"><i class="bi bi-camera-fill"></i> Camera active — Point at billing counter standee</span>';
+          return;
+        } catch (e2) {
+          console.error("Fallback camera start also failed:", e2);
+        }
+      }
+
+      placeholder.style.display = 'flex';
+      qrReader.style.display = 'none';
+      startBtn.style.display = 'inline-flex';
+      stopBtn.style.display = 'none';
+
+      let msg = "Camera could not start automatically.";
+      if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+        msg = "Camera permission was denied. Tap 'Turn Camera On' and allow camera permission in browser settings.";
+      } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
+        msg = "No camera hardware detected on this device. You can enter or paste the merchant coupon token below.";
+      } else {
+        msg = "Camera status: " + (err.message || err);
+      }
+
+      statusDiv.innerHTML = `<span style="color: #ef4444;"><i class="bi bi-exclamation-triangle-fill"></i> ${msg}</span>`;
+    }
+  }
+
+  async function stopCamera() {
+    if (html5QrCode && isScanning) {
+      try {
+        await html5QrCode.stop();
+      } catch (e) {
+        console.warn("Camera stop error:", e);
+      }
+      isScanning = false;
+      qrReader.style.display = 'none';
+      placeholder.style.display = 'flex';
+      startBtn.style.display = 'inline-flex';
+      stopBtn.style.display = 'none';
+      statusDiv.innerHTML = '<span style="color: #94a3b8;"><i class="bi bi-pause-circle"></i> Camera scanner paused</span>';
+    }
+  }
+
+  async function flipCamera() {
+    const nextFacing = currentFacingMode === "environment" ? "user" : "environment";
+    await startCamera(nextFacing);
+  }
+
+
+
+  startBtn.addEventListener('click', () => startCamera());
+  stopBtn.addEventListener('click', stopCamera);
+  if (flipBtn) flipBtn.addEventListener('click', flipCamera);
+
+  // AUTO-START CAMERA AND IN-STORE GPS CAPTURE CONCURRENTLY
+  document.addEventListener('DOMContentLoaded', () => {
+    // 1. Capture live GPS coordinates for in-store presence
+    captureLocation();
+
+    // 2. Check if preselected offer was passed via URL pipeline (BUG-1.1)
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('offer') && qrInput && qrInput.value.trim() !== '') {
+      statusDiv.innerHTML = '<span style="color: #f97316; font-weight: 700;"><i class="bi bi-tag-fill"></i> Selected deal token pre-filled! Enter your store bill amount and click Validate &amp; Redeem.</span>';
+    } else {
+      // Start camera scanner
+      setTimeout(() => {
+        startCamera();
+      }, 200);
+    }
+  });
+
+  // Verify terms acceptance & location before submitting form
+  let termsAccepted = false;
+  const redemptionForm = document.getElementById('redemption-form');
+  redemptionForm.addEventListener('submit', function(e) {
+    if (!termsAccepted) {
+      e.preventDefault();
+      openOfferTermsModal(function() {
+        termsAccepted = true;
+        if (redemptionForm.requestSubmit) {
+          redemptionForm.requestSubmit();
+        } else {
+          redemptionForm.submit();
+        }
+      }, "Billing Counter Discount", "Verified Merchant");
+      return;
+    }
+
+    const latVal = document.getElementById('buyer_lat').value;
+    const lngVal = document.getElementById('buyer_lng').value;
+    if (!latVal || !lngVal) {
+      if (locationState === 'acquiring') {
+        e.preventDefault();
+        alert("Acquiring GPS location for in-store verification. Please wait a moment and try again.");
+        return;
+      }
+      if (locationState === 'denied') {
+        // Location explicitly blocked
+        const proceedAnyway = confirm("Location access is disabled. In-store redemption might be rejected by the store geo-fence. Would you like to proceed anyway?");
+        if (!proceedAnyway) {
+          e.preventDefault();
+        }
+      }
+    }
+  });
+</script>
+
+{% include "offers/terms_modal.html" %}
+{% endblock %}

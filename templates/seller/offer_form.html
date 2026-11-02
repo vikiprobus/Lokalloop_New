@@ -1,0 +1,184 @@
+{% extends "base/seller_base.html" %}
+
+{% block title %}Create Offer — {{ BRAND_NAME }} Business{% endblock %}
+{% block page_title %}Launch a Counter Promotion{% endblock %}
+
+{% block content %}
+<div class="card card-padded" style="max-width: 760px; background: #ffffff; border: 1px solid var(--border-light); box-shadow: var(--shadow-sm); border-radius: var(--radius-lg);">
+  
+  <div style="margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-light); padding-bottom: 1rem;">
+    <h3 style="font-size: 1.2rem; font-weight: 800; color: var(--brand-navy-900); margin: 0 0 0.25rem;">Campaign Parameters</h3>
+    <p style="font-size: 0.82rem; color: var(--text-muted); margin: 0;">
+      Promotional campaign for <strong>{{ shop.name }}</strong> ({{ shop.locality }}, {{ shop.city }}). 5 promotional credits will be deducted per completed counter redemption.
+    </p>
+  </div>
+
+  <form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <div class="form-group">
+      <label class="form-label">Offer Title / Headline <span class="text-danger">*</span></label>
+      <input type="text" name="title" class="form-control" placeholder="e.g. Flat 25% Off on All Bakery Items" required>
+      <div class="form-text">Clear headline seen by shoppers browsing nearby stores.</div>
+    </div>
+
+    <div class="d-grid grid-2 gap-2">
+      <div class="form-group">
+        <label class="form-label">Offer Type</label>
+        <select name="offer_type" id="id_offer_type" class="form-select" onchange="handleOfferTypeChange(this.value)">
+          <option value="PERCENTAGE">Percentage Discount (%)</option>
+          <option value="FLAT">Flat Cash Discount (₹ INR)</option>
+          <option value="BOGO">Buy 1 Get 1 Free</option>
+          <option value="SPECIAL">Special Combo / Exclusive</option>
+        </select>
+      </div>
+
+      <div class="form-group" id="discount_value_wrapper">
+        <label class="form-label" id="discount_value_label">Discount Percentage (%) <span class="text-danger">*</span></label>
+        <input type="number" step="1" min="1" max="100" name="discount_value" id="id_discount_value" class="form-control" value="20" required>
+        <div class="form-text" id="discount_value_help">Enter discount percentage between 1% and 100%.</div>
+      </div>
+
+      <div class="form-group" id="max_discount_wrapper">
+        <label class="form-label">Max Discount Cap (₹) <span class="text-muted">(Optional for %)</span></label>
+        <input type="number" step="10" min="1" name="max_discount" id="id_max_discount" class="form-control" placeholder="e.g. 200 (₹ cap)">
+      </div>
+    </div>
+
+    <div class="d-grid grid-3 gap-2">
+      <div class="form-group">
+        <label class="form-label">Min. Bill Amount (₹)</label>
+        <input type="number" step="50" min="0" name="min_purchase" class="form-control" value="400" placeholder="e.g. 500">
+        <div class="form-text">0 for no minimum bill.</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Max Redemptions Quota</label>
+        <input type="number" step="10" min="10" name="max_redemptions" class="form-control" value="100">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Duration (Days)</label>
+        <input type="number" step="5" min="1" max="365" name="days_valid" class="form-control" value="30">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Offer Description</label>
+      <textarea name="description" rows="3" class="form-control" placeholder="Describe which products or menu items qualify, dining in vs takeout, etc."></textarea>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Terms & Conditions</label>
+      <textarea name="terms" rows="2" class="form-control" placeholder="e.g. Valid on all days except public holidays. Cannot be combined with other ongoing offers."></textarea>
+    </div>
+
+    <div class="form-group">
+      <div class="d-flex align-center justify-between flex-wrap gap-2" style="margin-bottom: 0.5rem;">
+        <label class="form-label" style="font-weight: 700; color: var(--brand-navy-900); margin: 0;">Promo Banner Photography</label>
+        <span class="badge badge-neutral" style="font-size: 0.72rem; font-weight: 600;">
+          16:9 Landscape &bull; Rec: 1200&times;675 px &bull; Max 5 MB
+        </span>
+      </div>
+      
+      <!-- Preview box -->
+      <div style="margin-bottom: 0.75rem; border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--border-light); max-height: 180px; background: #0c1017;">
+        <img id="offer_banner_preview" src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=800" alt="Offer Banner" 
+             style="width: 100%; height: 160px; object-fit: cover; display: block;">
+      </div>
+
+      <div style="margin-bottom: 0.5rem;">
+        <label for="image_file" style="font-size: 0.85rem; font-weight: 600; color: var(--brand-navy-800); display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.35rem;">
+          <i class="bi bi-image"></i> Select Promo Image from Gallery / Device:
+        </label>
+        <input type="file" name="image_file" id="image_file" accept="image/*" class="form-control" 
+               onchange="previewOfferImage(this)" 
+               style="background: #ffffff; padding: 0.5rem; cursor: pointer;">
+        <div class="form-text" style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.35rem;">
+          Recommended: 16:9 landscape (1200&times;675 px, min 800 px wide). Supported formats: JPG, PNG, WEBP (up to 5 MB).
+        </div>
+      </div>
+
+      <details style="margin-top: 0.35rem; font-size: 0.82rem; color: var(--text-muted);">
+        <summary style="cursor: pointer; font-weight: 600; color: var(--brand-navy-700);">Or enter image web URL instead</summary>
+        <div style="margin-top: 0.5rem;">
+          <input type="text" name="image_url" class="form-control" placeholder="https://images.unsplash.com/..." value="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=800">
+        </div>
+      </details>
+    </div>
+
+    <div class="d-flex gap-2" style="margin-top: 1.5rem;">
+      <button type="submit" class="btn btn-primary btn-lg">
+        <i class="bi bi-rocket-takeoff-fill"></i> Publish Campaign & Generate Standee QR
+      </button>
+      <a href="/seller/offers/" class="btn btn-outline btn-lg">Cancel</a>
+    </div>
+
+  </form>
+
+</div>
+
+<script>
+  function handleOfferTypeChange(offerType) {
+    const valInput = document.getElementById('id_discount_value');
+    const valLabel = document.getElementById('discount_value_label');
+    const valHelp = document.getElementById('discount_value_help');
+    const maxDiscountWrapper = document.getElementById('max_discount_wrapper');
+    const maxDiscountInput = document.getElementById('id_max_discount');
+
+    if (offerType === 'PERCENTAGE') {
+      valLabel.innerHTML = 'Discount Percentage (%) <span class="text-danger">*</span>';
+      valHelp.innerText = 'Enter discount percentage between 1% and 100%.';
+      valInput.setAttribute('min', '1');
+      valInput.setAttribute('max', '100');
+      valInput.placeholder = 'e.g. 20';
+      if (valInput.value > 100) valInput.value = 100;
+      if (maxDiscountWrapper) maxDiscountWrapper.style.display = 'block';
+      if (maxDiscountInput) maxDiscountInput.disabled = false;
+    } else if (offerType === 'FLAT') {
+      valLabel.innerHTML = 'Flat Discount Amount (₹ INR) <span class="text-danger">*</span>';
+      valHelp.innerText = 'Enter flat rupee cash discount deducted at counter checkout.';
+      valInput.setAttribute('min', '1');
+      valInput.removeAttribute('max');
+      valInput.placeholder = 'e.g. 100';
+      if (maxDiscountWrapper) maxDiscountWrapper.style.display = 'none';
+      if (maxDiscountInput) { maxDiscountInput.disabled = true; maxDiscountInput.value = ''; }
+    } else if (offerType === 'BOGO') {
+      valLabel.innerHTML = 'Effective Value / Item Discount (%) <span class="text-danger">*</span>';
+      valHelp.innerText = 'Standard Buy-1-Get-1 is equivalent to 50% promotional value.';
+      valInput.setAttribute('min', '1');
+      valInput.setAttribute('max', '100');
+      valInput.value = valInput.value || 50;
+      if (maxDiscountWrapper) maxDiscountWrapper.style.display = 'none';
+      if (maxDiscountInput) { maxDiscountInput.disabled = true; maxDiscountInput.value = ''; }
+    } else if (offerType === 'SPECIAL') {
+      valLabel.innerHTML = 'Special Promo / Combo Value (₹ or %) <span class="text-danger">*</span>';
+      valHelp.innerText = 'Enter customized package promotion value.';
+      valInput.setAttribute('min', '1');
+      valInput.removeAttribute('max');
+      if (maxDiscountWrapper) maxDiscountWrapper.style.display = 'none';
+      if (maxDiscountInput) { maxDiscountInput.disabled = true; maxDiscountInput.value = ''; }
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const offerTypeSelect = document.getElementById('id_offer_type');
+    if (offerTypeSelect) {
+      handleOfferTypeChange(offerTypeSelect.value);
+    }
+  });
+
+  function previewOfferImage(input) {
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const preview = document.getElementById('offer_banner_preview');
+        if (preview) {
+          preview.src = e.target.result;
+        }
+      };
+      reader.readAsDataURL(input.files[0]);
+    }
+  }
+</script>
+{% endblock %}

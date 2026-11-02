@@ -1,0 +1,12 @@
+<div class="stat-card">
+  <div>
+    <span class="stat-label">{{ label }}</span>
+    <div class="stat-val">{{ value }}</div>
+    {% if subtext %}
+      <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 500;">{{ subtext }}</span>
+    {% endif %}
+  </div>
+  <div class="stat-icon" style="background-color: {{ bg_color|default:'var(--brand-indigo-50)' }}; color: {{ icon_color|default:'var(--brand-indigo-600)' }};">
+    <i class="bi {{ icon|default:'bi-graph-up' }}"></i>
+  </div>
+</div>

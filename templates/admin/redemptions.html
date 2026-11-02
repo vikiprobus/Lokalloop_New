@@ -1,0 +1,104 @@
+{% extends "base/admin_base.html" %}
+
+{% block title %}Redemptions Audit — {{ BRAND_NAME }} Console{% endblock %}
+{% block page_title %}Platform Redemptions Audit Log{% endblock %}
+
+{% block content %}
+<div class="card card-padded" style="margin-bottom: 1.5rem;">
+  <form method="GET" action="/admin-portal/redemptions/" class="admin-filter-bar">
+    <div style="flex: 1; min-width: 220px;">
+      <input type="text" name="q" value="{{ query }}" class="form-control" placeholder="Search by buyer username, store name, or idempotency key...">
+    </div>
+    <button type="submit" class="btn-admin-search"><i class="bi bi-search"></i> Search</button>
+    {% if query %}
+      <a href="/admin-portal/redemptions/" class="btn btn-outline" style="padding: 0.5rem 1rem;">
+        <i class="bi bi-arrow-counterclockwise"></i> Reset
+      </a>
+    {% endif %}
+  </form>
+</div>
+
+<!-- Results Header & Counter with Export -->
+<div class="d-flex align-center justify-between flex-wrap gap-2" style="margin-bottom: 0.75rem; padding: 0 0.25rem;">
+  <div style="font-size: 0.875rem; font-weight: 700; color: var(--brand-navy-900);">
+    Showing <span style="color: #ef4444;">{{ redemptions|length }}</span> of {{ total_redemptions_count }} redemptions
+    {% if has_filters %}
+      <span class="badge badge-indigo" style="font-size: 0.75rem; margin-left: 0.5rem;">
+        <i class="bi bi-funnel-fill"></i> Filter Active
+      </span>
+    {% endif %}
+  </div>
+  <div>
+    <a href="/admin-portal/redemptions/?q={{ query|urlencode }}&export=excel" 
+       class="btn-admin-excel" title="Download Excel Spreadsheet with current filters">
+      <i class="bi bi-file-earmark-excel-fill"></i> Export Excel (.xlsx)
+    </a>
+  </div>
+</div>
+
+<div class="card card-padded">
+  <div class="table-responsive">
+    <table class="table" style="font-size: 0.85rem;">
+      <thead>
+        <tr>
+          <th>ID & Reference</th>
+          <th>Store & Merchant</th>
+          <th>Shopper / Buyer</th>
+          <th>Offer Claimed</th>
+          <th>Bill Amount</th>
+          <th>Discount Saved</th>
+          <th>Credits & Points</th>
+          <th>GPS Proximity</th>
+          <th>Timestamp</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in redemptions %}
+          <tr>
+            <td>
+              <div style="font-family: var(--font-mono); font-weight: 700;">#{{ r.id }}</div>
+              <div style="font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-muted);">{{ r.idempotency_key }}</div>
+            </td>
+            <td>
+              <strong>{{ r.shop.name }}</strong>
+              <div style="font-size: 0.75rem; color: var(--text-muted);">Seller: {{ r.seller.username }}</div>
+            </td>
+            <td>
+              <div style="font-weight: 600;">{{ r.buyer.get_full_name|default:r.buyer.username }}</div>
+              <div style="font-size: 0.75rem; color: var(--text-muted);">{{ r.buyer.email }}</div>
+            </td>
+            <td>
+              <div>{{ r.offer.title }}</div>
+              <span class="badge badge-saffron" style="font-size: 0.7rem;">{{ r.offer.discount_display }}</span>
+            </td>
+            <td>₹{{ r.bill_amount|floatformat:2 }}</td>
+            <td class="text-success fw-700">₹{{ r.discount_given|floatformat:2 }}</td>
+            <td>
+              <div style="color: var(--color-danger); font-weight: 600;">-{{ r.credits_deducted }} Credits</div>
+              <div style="color: #d97706; font-weight: 700;">+{{ r.reward_points_earned }} Pts</div>
+            </td>
+            <td>
+              {% if r.is_geofence_verified %}
+                <span class="badge badge-success" title="Verified within physical store geofence">
+                  <i class="bi bi-geo-alt-fill"></i> In-Store ({% if r.redemption_distance_meters %}{{ r.redemption_distance_meters|floatformat:0 }}m{% else %}0m{% endif %})
+                </span>
+              {% elif r.redemption_distance_meters %}
+                <span class="badge badge-neutral">
+                  <i class="bi bi-geo-alt"></i> {{ r.redemption_distance_meters|floatformat:0 }}m
+                </span>
+              {% else %}
+                <span class="text-muted" style="font-size: 0.75rem;">GPS Bypassed</span>
+              {% endif %}
+            </td>
+            <td class="text-muted">{{ r.redeemed_at|date:"d M Y, h:i A" }}</td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="9" class="text-center text-muted" style="padding: 3rem 0;">No redemptions found.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,198 @@
+{% extends "base/admin_base.html" %}
+
+{% block title %}System Error Logs — {{ BRAND_NAME }} Console{% endblock %}
+{% block page_title %}System Error & Exception Diagnostic Logs{% endblock %}
+
+{% block content %}
+<!-- Top Metrics & Controls -->
+<div class="d-flex align-center justify-between flex-wrap gap-3" style="margin-bottom: 1.5rem;">
+  <div class="d-flex align-center gap-2">
+    <div style="font-size: 0.9rem; font-weight: 700; color: var(--brand-navy-900);">
+      Total Recorded Errors: <span style="color: #ef4444;">{{ total_logs_count }}</span>
+    </div>
+    {% if unresolved_count > 0 %}
+      <span class="badge" style="background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; font-size: 0.75rem; font-weight: 700;">
+        ⚠️ {{ unresolved_count }} Unresolved
+      </span>
+    {% else %}
+      <span class="badge badge-success" style="font-size: 0.75rem;">
+        <i class="bi bi-check-circle-fill"></i> All Clean
+      </span>
+    {% endif %}
+    <span class="badge" style="background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; font-size: 0.75rem;">
+      <i class="bi bi-clock-history"></i> Auto-clears after 15 days
+    </span>
+  </div>
+
+  <div class="d-flex align-center gap-2">
+    <!-- Cleanup actions -->
+    <form method="POST" action="/admin-portal/error-logs/clear/" style="display: inline;" onsubmit="return confirm('Clear all resolved error logs?');">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="resolved">
+      <button type="submit" class="btn btn-outline btn-sm" style="font-size: 0.8rem;">
+        <i class="bi bi-trash"></i> Clean Resolved
+      </button>
+    </form>
+    <form method="POST" action="/admin-portal/error-logs/clear/" style="display: inline;" onsubmit="return confirm('Purge ALL error logs? This cannot be undone.');">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="all">
+      <button type="submit" class="btn btn-outline btn-sm" style="font-size: 0.8rem; color: #dc2626; border-color: #fca5a5;">
+        <i class="bi bi-x-octagon"></i> Purge All
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- Filter Bar -->
+<div class="card card-padded" style="margin-bottom: 1.5rem;">
+  <form method="GET" action="/admin-portal/error-logs/" class="admin-filter-bar">
+    
+    <!-- Search Input -->
+    <div style="flex: 1; min-width: 220px;">
+      <input type="text" name="q" value="{{ query }}" class="form-control" placeholder="Search error type, message, request path...">
+    </div>
+
+    <!-- Severity Level Filter -->
+    <div>
+      <select name="level" class="admin-filter-select" onchange="this.form.submit()">
+        <option value="all">All Severity Levels</option>
+        {% for val, label in level_choices %}
+          <option value="{{ val }}" {% if selected_level == val %}selected{% endif %}>
+            {{ label }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <!-- Resolution Status Filter -->
+    <div>
+      <select name="status" class="admin-filter-select" onchange="this.form.submit()">
+        <option value="all" {% if selected_status == 'all' %}selected{% endif %}>All Statuses</option>
+        <option value="unresolved" {% if selected_status == 'unresolved' %}selected{% endif %}>Unresolved Only</option>
+        <option value="resolved" {% if selected_status == 'resolved' %}selected{% endif %}>Resolved</option>
+      </select>
+    </div>
+
+    <!-- Submit Search Button -->
+    <button type="submit" class="btn-admin-search">
+      <i class="bi bi-search"></i> Search
+    </button>
+
+    {% if has_filters %}
+      <a href="/admin-portal/error-logs/" class="btn btn-outline" style="padding: 0.5rem 1rem;">
+        <i class="bi bi-arrow-counterclockwise"></i> Reset
+      </a>
+    {% endif %}
+  </form>
+</div>
+
+<!-- Logs Table -->
+<div class="card card-padded">
+  <div class="table-responsive">
+    <table class="table" style="font-size: 0.85rem;">
+      <thead>
+        <tr>
+          <th>Level & ID</th>
+          <th>Exception Type</th>
+          <th>Message</th>
+          <th>Request Context</th>
+          <th>Logged At</th>
+          <th>Status & Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for log in logs %}
+          <tr style="background: {% if not log.is_resolved %}rgba(254, 226, 226, 0.25){% else %}transparent{% endif %};">
+            <td>
+              <div class="d-flex align-center gap-1">
+                {% if log.level == 'CRITICAL' %}
+                  <span class="badge" style="background: #991b1b; color: #fff; font-size: 0.7rem; font-weight: 800;">CRITICAL</span>
+                {% elif log.level == 'ERROR' %}
+                  <span class="badge" style="background: #ef4444; color: #fff; font-size: 0.7rem; font-weight: 800;">ERROR</span>
+                {% elif log.level == 'WARNING' %}
+                  <span class="badge" style="background: #f59e0b; color: #fff; font-size: 0.7rem; font-weight: 800;">WARN</span>
+                {% else %}
+                  <span class="badge badge-neutral" style="font-size: 0.7rem;">{{ log.level }}</span>
+                {% endif %}
+                <span class="text-muted" style="font-family: monospace; font-size: 0.75rem;">#{{ log.id }}</span>
+                {% if log.incident_id %}
+                  <div style="margin-top: 0.25rem;">
+                    <span class="badge" style="background: #e2e8f0; color: #0f172a; font-family: monospace; font-size: 0.7rem; font-weight: 800; padding: 2px 6px;" title="Customer Incident Reference ID">{{ log.incident_id }}</span>
+                  </div>
+                {% endif %}
+              </div>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: var(--brand-navy-900); font-family: monospace;">
+                {{ log.error_type }}
+              </div>
+            </td>
+            <td style="max-width: 320px;">
+              <div style="font-weight: 600; color: #334155; line-height: 1.4; word-break: break-word;">
+                {{ log.message|truncatechars:120 }}
+              </div>
+              {% if log.traceback %}
+                <button type="button" class="btn btn-sm btn-outline" style="padding: 0.15rem 0.45rem; font-size: 0.7rem; margin-top: 0.35rem; color: #ef4444; border-color: #fca5a5;" onclick="toggleTraceback('tb-{{ log.id }}')">
+                  <i class="bi bi-code-slash"></i> View Traceback
+                </button>
+                <div id="tb-{{ log.id }}" style="display: none; margin-top: 0.5rem; background: #0f172a; color: #f8fafc; padding: 0.75rem; border-radius: 6px; font-family: monospace; font-size: 0.72rem; max-height: 250px; overflow-y: auto; white-space: pre-wrap;">
+                  {{ log.traceback }}
+                </div>
+              {% endif %}
+            </td>
+            <td>
+              <div style="font-family: monospace; font-size: 0.75rem; color: #0284c7;">
+                <strong>{{ log.method }}</strong> {{ log.path }}
+              </div>
+              <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem;">
+                User: <strong>{{ log.user.username|default:"Anonymous" }}</strong> &bull; IP: {{ log.ip_address|default:"127.0.0.1" }}
+              </div>
+            </td>
+            <td class="text-muted" style="white-space: nowrap;">
+              {{ log.created_at|date:"d M Y, h:i A" }}
+            </td>
+            <td style="white-space: nowrap;">
+              {% if log.is_resolved %}
+                <span class="badge badge-success" style="font-size: 0.72rem; margin-bottom: 0.25rem;">
+                  <i class="bi bi-check2"></i> Resolved
+                </span>
+                <div>
+                  <form method="POST" action="/admin-portal/error-logs/{{ log.id }}/resolve/" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline btn-sm" style="font-size: 0.7rem; padding: 0.15rem 0.45rem;">
+                      Re-open
+                    </button>
+                  </form>
+                </div>
+              {% else %}
+                <form method="POST" action="/admin-portal/error-logs/{{ log.id }}/resolve/" style="display: inline;">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-sm btn-primary" style="font-size: 0.75rem; padding: 0.25rem 0.6rem; background: #10b981; border-color: #059669;">
+                    <i class="bi bi-check2"></i> Mark Resolved
+                  </button>
+                </form>
+              {% endif %}
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="6" class="text-center text-muted" style="padding: 3rem 0;">
+              <i class="bi bi-check2-circle" style="font-size: 2.2rem; color: #10b981; display: block; margin-bottom: 0.5rem;"></i>
+              No application errors matching your filter criteria. Platform running smoothly!
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  function toggleTraceback(id) {
+    const el = document.getElementById(id);
+    if (el) {
+      el.style.display = (el.style.display === 'none' || el.style.display === '') ? 'block' : 'none';
+    }
+  }
+</script>
+{% endblock %}

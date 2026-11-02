@@ -1,0 +1,382 @@
+{% extends "base/buyer_base.html" %}
+
+{% block title %}Rewards Store & Points Passbook — {{ BRAND_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 1.5rem; padding-bottom: 3.5rem;">
+  
+  <div class="d-flex align-center justify-between flex-wrap gap-2" style="margin-bottom: 2rem;">
+    <div>
+      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+        <span class="badge badge-saffron" style="font-size: 0.72rem; letter-spacing: 0.04em;">LOYALTY WALLET</span>
+        <span style="font-size: 0.8rem; color: var(--text-muted);">&bull;</span>
+        <span style="font-size: 0.8rem; font-weight: 600; color: var(--brand-navy-800);">Tier: {{ account.tier_name }}</span>
+      </div>
+      <h1 style="font-size: 1.75rem; font-weight: 800; color: var(--brand-navy-900); letter-spacing: -0.02em; margin: 0;">
+        Rewards Store &amp; Points Passbook
+      </h1>
+      <p style="font-size: 0.88rem; color: var(--text-muted); margin: 0.2rem 0 0;">
+        Burn points for shopping vouchers, unlock free gifts, and submit ₹10,000+ purchases for bumper perks
+      </p>
+    </div>
+    <div>
+      <button type="button" onclick="document.getElementById('bumperSubmissionCard').scrollIntoView({behavior: 'smooth'})" class="btn btn-outline btn-sm" style="font-weight: 700; border-color: #f59e0b; color: #b45309; background: #fef3c7;">
+        <i class="bi bi-star-fill text-saffron"></i> Submit ₹10,000+ Bill
+      </button>
+    </div>
+  </div>
+
+  <!-- Wallet Header Stats Grid -->
+  <div class="d-grid grid-3 gap-3" style="margin-bottom: 2.25rem;">
+    
+    <div class="card card-padded" style="background: #fffbeb; border: 1px solid #fef3c7; box-shadow: var(--shadow-sm);">
+      <span style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; color: #92400e; letter-spacing: 0.04em;">Available Points Balance</span>
+      <div style="font-size: 2.5rem; font-weight: 900; color: #78350f; line-height: 1.2; margin: 0.35rem 0 0.25rem; font-variant-numeric: tabular-nums;">
+        {{ account.current_points }} <span style="font-size: 1.1rem; font-weight: 700;">Pts</span>
+      </div>
+      <span style="font-size: 0.8rem; color: #92400e; font-weight: 600; font-variant-numeric: tabular-nums;">Approx. ₹{{ account.current_points }} value in partner stores</span>
+    </div>
+
+    <div class="card card-padded" style="background: #ffffff; border: 1px solid var(--border-light); box-shadow: var(--shadow-sm);">
+      <span class="stat-label">Membership Tier</span>
+      <div style="font-size: 1.75rem; font-weight: 800; color: var(--brand-navy-900); margin: 0.35rem 0 0.25rem; display: flex; align-items: center; gap: 0.4rem;">
+        <i class="bi bi-award text-saffron"></i> {{ account.tier_name }}
+      </div>
+      <span style="font-size: 0.8rem; color: var(--text-muted); font-variant-numeric: tabular-nums;">Lifetime earned: {{ account.lifetime_earned }} Pts</span>
+    </div>
+
+    <div class="card card-padded" style="background: #ffffff; border: 1px solid var(--border-light); box-shadow: var(--shadow-sm);">
+      <span class="stat-label">Total Points Redeemed</span>
+      <div style="font-size: 1.75rem; font-weight: 800; color: var(--brand-navy-900); margin: 0.35rem 0 0.25rem; font-variant-numeric: tabular-nums;">
+        {{ account.lifetime_spent }} <span style="font-size: 1rem; color: var(--text-muted); font-weight: 600;">Pts</span>
+      </div>
+      <span style="font-size: 0.8rem; color: var(--text-muted);">Points used for rewards</span>
+    </div>
+
+  </div>
+
+  <!-- SECTION 1: Dynamic Reward Burn Catalog Store -->
+  <div style="margin-bottom: 2.5rem;">
+    <div class="d-flex align-center justify-between" style="margin-bottom: 1.25rem;">
+      <div>
+        <h2 style="font-size: 1.35rem; font-weight: 800; color: var(--brand-navy-900); margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+          <i class="bi bi-gift-fill" style="color: #ec4899;"></i> Reward Burn Catalog
+        </h2>
+        <p style="font-size: 0.825rem; color: var(--text-muted); margin: 0.2rem 0 0;">
+          Redeem your accumulated points for exclusive instant vouchers &amp; merchandise
+        </p>
+      </div>
+      <span class="badge badge-neutral">{{ catalog_items|length }} Rewards Available</span>
+    </div>
+
+    <div class="d-grid grid-3 gap-3">
+      {% for item in catalog_items %}
+        <div class="card card-padded" style="background: #ffffff; border: 1px solid var(--border-light); display: flex; flex-direction: column; justify-content: space-between; border-radius: 16px; transition: transform 0.2s, box-shadow 0.2s;">
+          <div>
+            <div class="d-flex align-center justify-between" style="margin-bottom: 0.75rem;">
+              <span class="badge {% if item.reward_type == 'FOOD_BEVERAGE' %}badge-success{% elif item.reward_type == 'MERCHANDISE' %}badge-warning{% else %}badge-primary{% endif %}" style="font-size: 0.7rem; font-weight: 700;">
+                {{ item.get_reward_type_display }}
+              </span>
+              <div style="background: #fffbeb; color: #b45309; padding: 0.2rem 0.6rem; border-radius: 9999px; font-weight: 800; font-size: 0.85rem; border: 1px solid #fde68a;">
+                {{ item.points_required }} Pts
+              </div>
+            </div>
+
+            <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--brand-navy-900); margin: 0 0 0.4rem;">
+              {{ item.title }}
+            </h3>
+            <p style="font-size: 0.825rem; color: var(--text-muted); line-height: 1.4; margin-bottom: 1rem;">
+              {{ item.description|default:"Exclusive reward coupon valid across verified partner outlets." }}
+            </p>
+          </div>
+
+          <div style="border-top: 1px solid var(--border-light); padding-top: 0.85rem; margin-top: 0.5rem;">
+            {% if account.current_points >= item.points_required %}
+              <form method="POST" action="{% url 'buyer_redeem_catalog_reward' item.id %}" onsubmit="return confirm('Burn {{ item.points_required }} points for \'{{ item.title|escapejs }}\'?');">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary btn-sm" style="width: 100%; font-weight: 700; border-radius: 8px;">
+                  <i class="bi bi-fire"></i> Redeem with {{ item.points_required }} Points
+                </button>
+              </form>
+            {% else %}
+              <button type="button" class="btn btn-neutral btn-sm" disabled style="width: 100%; opacity: 0.65; cursor: not-allowed; border-radius: 8px;">
+                Need {{ item.points_required }} Pts (Short by {{ item.shortfall|default:item.points_required }} Pts)
+              </button>
+            {% endif %}
+          </div>
+        </div>
+      {% empty %}
+        <div style="grid-column: 1 / -1; padding: 2.5rem; text-align: center; background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 16px;">
+          <i class="bi bi-gift" style="font-size: 2rem; color: #94a3b8; display: block; margin-bottom: 0.5rem;"></i>
+          <div style="font-weight: 700; color: #475569;">No active catalog rewards at the moment</div>
+          <div style="font-size: 0.8rem; color: #94a3b8;">Our admin team regularly refreshes points burn vouchers. Check back shortly!</div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- SECTION 2: My Claimed Vouchers -->
+  {% if claimed_rewards %}
+    <div style="margin-bottom: 2.5rem;">
+      <h2 style="font-size: 1.25rem; font-weight: 800; color: var(--brand-navy-900); margin: 0 0 1rem; display: flex; align-items: center; gap: 0.5rem;">
+        <i class="bi bi-ticket-perforated-fill" style="color: #6366f1;"></i> My Claimed Reward Vouchers
+      </h2>
+      <div class="d-grid grid-3 gap-3">
+        {% for claim in claimed_rewards %}
+          <div class="card card-padded" style="background: linear-gradient(135deg, #f8fafc, #ffffff); border: 2px dashed #cbd5e1; border-radius: 14px;">
+            <div class="d-flex align-center justify-between" style="margin-bottom: 0.5rem;">
+              <span class="badge badge-success" style="font-size: 0.7rem;">{{ claim.get_status_display }}</span>
+              <span style="font-size: 0.75rem; color: var(--text-muted);">{{ claim.claimed_at|date:"d M Y" }}</span>
+            </div>
+            <div style="font-weight: 800; color: var(--brand-navy-900); font-size: 1.05rem; margin-bottom: 0.4rem;">
+              {{ claim.catalog_item.title }}
+            </div>
+            <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 0.5rem 0.75rem; text-align: center; margin: 0.5rem 0;">
+              <div style="font-size: 0.68rem; font-weight: 700; color: #1e40af; text-transform: uppercase; letter-spacing: 0.05em;">Voucher Code</div>
+              <div style="font-family: monospace; font-size: 1.25rem; font-weight: 900; letter-spacing: 0.1em; color: #1d4ed8;">
+                {{ claim.voucher_code }}
+              </div>
+            </div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); text-align: center;">
+              Show this code at counter &bull; Spent {{ claim.points_spent }} Pts
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- SECTION 3: Bumper Rewards for ₹10,000+ Purchases -->
+  <div id="bumperSubmissionCard" style="margin-bottom: 2.5rem; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border-radius: 20px; padding: 2rem; color: #ffffff; box-shadow: 0 15px 35px rgba(15, 23, 42, 0.25); position: relative; overflow: hidden;">
+    <div style="position: absolute; right: -20px; top: -20px; width: 140px; height: 140px; background: radial-gradient(circle, rgba(245,158,11,0.25) 0%, rgba(245,158,11,0) 70%); border-radius: 50%;"></div>
+    
+    <div style="max-width: 680px; margin-bottom: 1.5rem;">
+      <span class="badge" style="background: #f59e0b; color: #000; font-weight: 800; font-size: 0.72rem; letter-spacing: 0.05em; margin-bottom: 0.5rem;">BUMPER REWARDS</span>
+      <h2 style="font-size: 1.6rem; font-weight: 900; color: #ffffff; margin: 0 0 0.4rem; letter-spacing: -0.01em;">
+        High-Value Purchases (₹10,000+) &bull; Unlock 100 Bonus Points + VIP Meal
+      </h2>
+      <p style="font-size: 0.88rem; color: #cbd5e1; line-height: 1.5; margin: 0;">
+        Did you make a large purchase of ₹10,000 or more at any verified LokalLoop partner store? Submit your bill receipt for instant counter verification and receive <strong>100 Bonus Loyalty Points</strong> plus a <strong>Complimentary Breakfast / Gourmet Coffee / Lunch Voucher</strong>!
+      </p>
+
+      <!-- 3-Step Verification Timeline -->
+      <div style="display: inline-flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; margin-top: 0.85rem; padding: 0.5rem 0.9rem; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); border-radius: 999px; font-size: 0.78rem; font-weight: 700;">
+        <span style="color: #f59e0b;"><i class="bi bi-check-circle-fill"></i> 1. Submitted</span>
+        <span style="color: #64748b;">➔</span>
+        <span style="color: #38bdf8;"><i class="bi bi-shop"></i> 2. Store Verified</span>
+        <span style="color: #64748b;">➔</span>
+        <span style="color: #4ade80;"><i class="bi bi-gift-fill"></i> 3. VIP Voucher Unlocked</span>
+      </div>
+    </div>
+
+    <!-- Submission Form -->
+    <div style="background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 16px; padding: 1.5rem; margin-bottom: 1.5rem;">
+      <h3 style="font-size: 1rem; font-weight: 800; color: #f8fafc; margin: 0 0 1rem; display: flex; align-items: center; gap: 0.5rem;">
+        <i class="bi bi-receipt text-saffron"></i> Submit Purchase Receipt for Verification
+      </h3>
+
+      <form method="POST" action="{% url 'buyer_submit_bumper_bill' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="d-grid grid-2 gap-3" style="margin-bottom: 1rem;">
+          <div>
+            <label style="display: block; font-size: 0.78rem; font-weight: 700; color: #cbd5e1; margin-bottom: 0.35rem;">
+              Partner Store Outlet *
+            </label>
+            <select name="shop_id" required style="width: 100%; padding: 0.65rem 0.85rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: #0f172a; color: #ffffff; font-size: 0.85rem;">
+              <option value="" disabled selected>-- Select Outlet --</option>
+              {% for s in available_shops %}
+                <option value="{{ s.id }}">{{ s.name }} ({{ s.locality }}, {{ s.city }})</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div>
+            <label style="display: block; font-size: 0.78rem; font-weight: 700; color: #cbd5e1; margin-bottom: 0.35rem;">
+              Bill / Invoice Number *
+            </label>
+            <input type="text" name="bill_number" required placeholder="e.g. INV-9842" style="width: 100%; padding: 0.65rem 0.85rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: #0f172a; color: #ffffff; font-size: 0.85rem;">
+          </div>
+
+          <div>
+            <label style="display: block; font-size: 0.78rem; font-weight: 700; color: #cbd5e1; margin-bottom: 0.35rem;">
+              Purchase / Bill Date *
+            </label>
+            <input type="date" name="bill_date" max="{{ today_str }}" required style="width: 100%; padding: 0.65rem 0.85rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: #0f172a; color: #ffffff; font-size: 0.85rem;">
+          </div>
+
+          <div>
+            <label style="display: block; font-size: 0.78rem; font-weight: 700; color: #cbd5e1; margin-bottom: 0.35rem;">
+              Bill Amount (₹10,000 to ₹1,00,000) *
+            </label>
+            <input type="number" name="bill_amount" min="10000" max="100000" step="0.01" required placeholder="₹10,000 to ₹1,00,000" style="width: 100%; padding: 0.65rem 0.85rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: #0f172a; color: #ffffff; font-size: 0.85rem;">
+          </div>
+        </div>
+
+        <div style="margin-bottom: 1.25rem;">
+          <label style="display: block; font-size: 0.78rem; font-weight: 700; color: #cbd5e1; margin-bottom: 0.35rem;">
+            Bill Receipt Snapshot / Photo (Required) *
+          </label>
+          <input type="file" name="bill_image" accept="image/*" required style="width: 100%; padding: 0.5rem; font-size: 0.85rem; color: #cbd5e1; background: rgba(0,0,0,0.2); border-radius: 8px; border: 1px dashed rgba(255,255,255,0.25);">
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="background: linear-gradient(135deg, #f59e0b, #d97706); border: none; font-weight: 800; padding: 0.7rem 1.5rem; border-radius: 10px; color: #000;">
+          <i class="bi bi-shield-check"></i> Submit for Verification &amp; Claim 100 Pts
+        </button>
+      </form>
+    </div>
+
+    <!-- Past Submissions History -->
+    {% if bumper_submissions %}
+      <div>
+        <h4 style="font-size: 0.9rem; font-weight: 700; color: #e2e8f0; margin: 0 0 0.75rem;">
+          My Bumper Bill Submissions ({{ bumper_submissions|length }})
+        </h4>
+        <div class="table-responsive">
+          <table class="table" style="color: #ffffff;">
+            <thead>
+              <tr style="border-bottom: 1px solid rgba(255,255,255,0.15);">
+                <th style="color: #94a3b8; font-size: 0.75rem;">Submitted</th>
+                <th style="color: #94a3b8; font-size: 0.75rem;">Store</th>
+                <th style="color: #94a3b8; font-size: 0.75rem;">Bill # / Date</th>
+                <th style="color: #94a3b8; font-size: 0.75rem;">Amount</th>
+                <th style="color: #94a3b8; font-size: 0.75rem;">Status</th>
+                <th style="color: #94a3b8; font-size: 0.75rem;">Reward Allocation</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for sub in bumper_submissions %}
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+                  <td style="font-size: 0.82rem; color: #cbd5e1;">{{ sub.submitted_at|date:"d M Y" }}</td>
+                  <td style="font-weight: 600; color: #ffffff;">{{ sub.shop.name }}</td>
+                  <td>
+                    <div style="font-family: monospace; color: #cbd5e1;">#{{ sub.bill_number }}</div>
+                    {% if sub.bill_date %}
+                      <div style="font-size: 0.72rem; color: #94a3b8;">Purchased: {{ sub.bill_date|date:"d M Y" }}</div>
+                    {% endif %}
+                  </td>
+                  <td style="font-weight: 800; color: #f59e0b;">₹{{ sub.bill_amount }}</td>
+                  <td>
+                    {% if sub.status == 'APPROVED' %}
+                      <span class="badge badge-success">APPROVED</span>
+                    {% elif sub.status == 'STORE_VERIFIED' %}
+                      <span class="badge" style="background: #0284c7; color: #ffffff; font-weight: 700;">STORE VERIFIED</span>
+                    {% elif sub.status == 'REJECTED' %}
+                      <span class="badge badge-danger">REJECTED</span>
+                    {% else %}
+                      <span class="badge badge-warning">AWAITING STORE</span>
+                    {% endif %}
+
+                    <!-- 3-Step Timeline -->
+                    <div style="display: flex; align-items: center; gap: 0.25rem; font-size: 0.68rem; margin-top: 0.35rem; color: #94a3b8;">
+                      <span style="color: #22c55e; font-weight: 700;">Submitted</span>
+                      <span style="color: #64748b;">➔</span>
+                      {% if sub.status == 'STORE_VERIFIED' or sub.status == 'APPROVED' %}
+                        <span style="color: #38bdf8; font-weight: 700;">Store Verified</span>
+                      {% elif sub.status == 'REJECTED' and sub.rejection_stage == 'STORE' %}
+                        <span style="color: #f87171; font-weight: 700;">Store Declined</span>
+                      {% else %}
+                        <span>Store Review</span>
+                      {% endif %}
+                      <span style="color: #64748b;">➔</span>
+                      {% if sub.status == 'APPROVED' %}
+                        <span style="color: #4ade80; font-weight: 700;">VIP Voucher</span>
+                      {% elif sub.status == 'REJECTED' and sub.rejection_stage == 'ADMIN' %}
+                        <span style="color: #f87171; font-weight: 700;">Admin Declined</span>
+                      {% else %}
+                        <span>VIP Voucher</span>
+                      {% endif %}
+                    </div>
+                  </td>
+                  <td>
+                    {% if sub.status == 'APPROVED' %}
+                      <div style="font-size: 0.85rem; font-weight: 700; color: #22c55e;">
+                        +100 Pts &bull; VIP Code: <span style="font-family: monospace; color: #ffffff; background: rgba(255,255,255,0.15); padding: 0.15rem 0.4rem; border-radius: 4px;">{{ sub.voucher_code }}</span>
+                      </div>
+                      <div style="font-size: 0.72rem; color: #94a3b8;">{{ sub.voucher_details }}</div>
+                    {% elif sub.status == 'STORE_VERIFIED' %}
+                      <div style="font-size: 0.78rem; color: #38bdf8; font-weight: 600;">
+                        <i class="bi bi-hourglass-split"></i> Verified by store! Waiting for central admin clearance.
+                      </div>
+                    {% elif sub.status == 'REJECTED' %}
+                      <span style="font-size: 0.75rem; color: #f87171;">
+                        Declined ({% if sub.rejection_stage == 'STORE' %}Store{% else %}Platform{% endif %}): {{ sub.rejection_reason|default:"Declined" }}
+                      </span>
+                    {% else %}
+                      <span style="font-size: 0.75rem; color: #94a3b8;">
+                        <i class="bi bi-clock"></i> Waiting for store counter verification
+                      </span>
+                    {% endif %}
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    {% endif %}
+
+  </div>
+
+  <!-- SECTION 4: Rewards Ledger Transactions Table -->
+  <div class="card card-padded" style="background: #ffffff; border: 1px solid var(--border-light); box-shadow: var(--shadow-sm); border-radius: 16px;">
+    <div class="d-flex align-center justify-between" style="margin-bottom: 1.25rem; border-bottom: 1px solid var(--border-light); padding-bottom: 0.85rem;">
+      <div>
+        <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--brand-navy-900); margin: 0;">
+          Points Passbook Ledger
+        </h3>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0.15rem 0 0;">Complete audit history of points earned, spent, and bumper rewards</p>
+      </div>
+      <span class="badge badge-neutral" style="font-variant-numeric: tabular-nums;">{{ transactions|length }} Entries</span>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Date &amp; Time</th>
+            <th>Activity Description</th>
+            <th>Transaction Type</th>
+            <th>Points Delta</th>
+            <th>Balance After</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for tx in transactions %}
+            <tr>
+              <td class="text-muted" style="font-variant-numeric: tabular-nums; font-size: 0.82rem; white-space: nowrap;">
+                {{ tx.created_at|date:"d M Y, h:i A" }}
+              </td>
+              <td>
+                <div style="font-weight: 600; color: var(--brand-navy-900);">{{ tx.notes }}</div>
+                {% if tx.redemption %}
+                  <span style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-top: 0.1rem;">
+                    Store: {{ tx.redemption.shop.name }} ({{ tx.redemption.shop.locality }})
+                  </span>
+                {% endif %}
+              </td>
+              <td>
+                <span class="badge {% if tx.points > 0 %}badge-success{% else %}badge-neutral{% endif %}">
+                  {{ tx.get_transaction_type_display }}
+                </span>
+              </td>
+              <td style="font-weight: 800; font-size: 0.95rem; font-variant-numeric: tabular-nums; color: {% if tx.points > 0 %}var(--color-success){% else %}var(--text-muted){% endif %};">
+                {% if tx.points > 0 %}+{{ tx.points }}{% else %}{{ tx.points }}{% endif %} Pts
+              </td>
+              <td style="font-weight: 700; font-variant-numeric: tabular-nums; color: var(--brand-navy-900);">
+                {{ tx.balance_after }} Pts
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="5" class="text-center text-muted" style="padding: 2.5rem 1rem;">
+                No points transactions yet. Scan an in-store offer to earn your first loyalty reward!
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

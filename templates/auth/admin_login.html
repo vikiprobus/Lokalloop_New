@@ -1,0 +1,69 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Administrator Sign In — LokalLoop Governance</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="{% static 'css/design_tokens.css' %}">
+  <link rel="stylesheet" href="{% static 'css/main.css' %}">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+<body style="background: radial-gradient(circle at 50% 20%, #1e293b, #090d16); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem;">
+
+  <div style="width: 100%; max-width: 440px;">
+    
+    <div style="text-align: center; margin-bottom: 2rem;">
+      <div style="width: 52px; height: 52px; border-radius: var(--radius-md); background: linear-gradient(135deg, #ef4444, #991b1b); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1.6rem; margin: 0 auto 1rem; box-shadow: 0 8px 24px rgba(239, 68, 68, 0.3);">
+        <i class="bi bi-shield-lock-fill"></i>
+      </div>
+      <h1 style="color: #fff; font-size: 1.6rem; font-weight: 800; font-family: var(--font-display);">LokalLoop Console</h1>
+      <p style="color: #94a3b8; font-size: 0.85rem; margin-top: 0.25rem;">Authorized personnel and platform governance</p>
+    </div>
+
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}" style="margin-bottom: 1.5rem;">
+          <span>{{ message }}</span>
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    <div class="card" style="background: #0f172a; border: 1px solid rgba(255,255,255,0.1); box-shadow: var(--shadow-xl);">
+      <div class="card-body" style="padding: 2rem;">
+        <form method="POST">
+          {% csrf_token %}
+
+          <div class="form-group">
+            <label class="form-label" style="color: #cbd5e1;">Admin identifier or username</label>
+            <input type="text" name="identifier" class="form-control" style="background: #1e293b; border-color: #334155; color: #fff;" placeholder="Enter admin username or email" required autofocus>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" style="color: #cbd5e1;">Security password</label>
+            <input type="password" name="password" class="form-control" style="background: #1e293b; border-color: #334155; color: #fff;" placeholder="••••••••" required>
+          </div>
+
+          {% include "components/captcha_field.html" with is_dark=True %}
+
+          <button type="submit" class="btn btn-block btn-lg" style="background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff; margin-top: 1rem; font-weight: 700;">
+            Authenticate administrator
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 1.5rem;">
+      <a href="/" style="color: #64748b; font-size: 0.85rem;">Return to public website</a>
+    </div>
+
+  </div>
+
+</body>
+</html>

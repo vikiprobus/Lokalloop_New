@@ -1,0 +1,38 @@
+{% extends "base/seller_base.html" %}
+
+{% block title %}Merchant Notifications — {{ BRAND_NAME }} Business{% endblock %}
+{% block page_title %}Alerts & Activity Updates{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 800px; background: #ffffff; border: 1px solid var(--border-light); box-shadow: var(--shadow-sm); overflow: hidden; border-radius: var(--radius-lg);">
+  <div style="display: flex; flex-direction: column;">
+    {% for n in notifications %}
+      <div style="padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border-light); display: flex; align-items: flex-start; gap: 1rem; {% if not n.is_read %}background: #f0fdf4;{% endif %}">
+        <div style="width: 40px; height: 40px; border-radius: var(--radius-md); background: #ecfdf5; color: var(--color-success); display: flex; align-items: center; justify-content: center; font-size: 1.15rem; flex-shrink: 0; border: 1px solid #a7f3d0;">
+          <i class="bi bi-bell-fill"></i>
+        </div>
+        <div style="flex: 1;">
+          <div class="d-flex align-center justify-between" style="margin-bottom: 0.25rem;">
+            <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--brand-navy-900); margin: 0;">{{ n.title }}</h4>
+            <span style="font-size: 0.75rem; color: var(--text-muted); font-variant-numeric: tabular-nums;">{{ n.created_at|date:"d M, h:i A" }}</span>
+          </div>
+          <p style="font-size: 0.88rem; color: var(--text-main); line-height: 1.5; margin: 0 0 0.5rem;">{{ n.message }}</p>
+          {% if n.link_url %}
+            <a href="{{ n.link_url }}" class="btn btn-outline btn-sm" style="font-size: 0.78rem; padding: 0.25rem 0.65rem;">
+              View Details
+            </a>
+          {% endif %}
+        </div>
+      </div>
+    {% empty %}
+      <div style="padding: 3.5rem 1.5rem; text-align: center; color: var(--text-muted);">
+        <div style="width: 52px; height: 52px; border-radius: 50%; background: var(--bg-subtle); display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem; color: var(--text-muted); font-size: 1.5rem;">
+          <i class="bi bi-bell-slash"></i>
+        </div>
+        <h4 style="font-size: 1.05rem; font-weight: 700; color: var(--brand-navy-900); margin: 0 0 0.25rem;">No merchant notifications</h4>
+        <p style="font-size: 0.85rem; margin: 0;">You are up to date on all store alerts and customer redemptions.</p>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

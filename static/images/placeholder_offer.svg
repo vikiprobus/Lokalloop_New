@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="100%" height="100%">
+  <defs>
+    <linearGradient id="offerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e1b4b"/>
+      <stop offset="50%" stop-color="#312e81"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="ticketGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#f97316"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="450" fill="url(#offerGrad)"/>
+  <circle cx="680" cy="90" r="130" fill="#f59e0b" opacity="0.1"/>
+  <circle cx="120" cy="360" r="160" fill="#6366f1" opacity="0.08"/>
+  
+  <!-- Voucher / Ticket Icon -->
+  <g transform="translate(400, 180) scale(2.2)">
+    <rect x="-30" y="-18" width="60" height="36" rx="4" fill="url(#ticketGrad)"/>
+    <circle cx="-30" cy="0" r="6" fill="#1e1b4b"/>
+    <circle cx="30" cy="0" r="6" fill="#1e1b4b"/>
+    <line x1="-12" y1="-14" x2="-12" y2="14" stroke="#ffffff" stroke-dasharray="3,2" stroke-width="1.5" opacity="0.7"/>
+    <!-- Percentage symbol -->
+    <text x="6" y="6" font-family="-apple-system, sans-serif" font-size="18" font-weight="900" fill="#ffffff" text-anchor="middle">%</text>
+  </g>
+
+  <!-- Title & Subtitle -->
+  <text x="400" y="290" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="24" font-weight="800" fill="#ffffff" text-anchor="middle" letter-spacing="0.5">EXCLUSIVE COUNTER OFFER</text>
+  <text x="400" y="320" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="600" fill="#cbd5e1" text-anchor="middle">Instant Discount at Merchant Checkout</text>
+</svg>

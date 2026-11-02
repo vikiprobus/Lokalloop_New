@@ -1,0 +1,445 @@
+{% extends "base/public_base.html" %}
+{% load static %}
+
+{% block title %}LokalLoop — Discover Local. Save More. Shop Nearby.{% endblock %}
+
+{% block content %}
+<!-- Modern Dark Ambient Hero Section -->
+<section class="hero-dark-wrapper" style="padding: 4.5rem 0 4rem;">
+  <div class="container">
+    <div class="d-grid grid-2 gap-4 align-center">
+      
+      <!-- Left Hero Text & Action -->
+      <div>
+        <div class="d-flex align-center gap-2" style="margin-bottom: 1.25rem; flex-wrap: wrap;">
+          <span class="hero-pill">
+            <i class="bi bi-geo-alt-fill" style="color: #f97316;"></i> Local Shops
+          </span>
+          <span class="hero-pill">
+            <i class="bi bi-tag-fill" style="color: #f59e0b;"></i> Exclusive Offers
+          </span>
+          <span class="hero-pill">
+            <i class="bi bi-gift-fill" style="color: #10b981;"></i> Earn Rewards
+          </span>
+        </div>
+
+        <h1 style="font-size: clamp(2.4rem, 5vw, 3.8rem); font-weight: 800; line-height: 1.1; color: #ffffff; margin-bottom: 1.25rem; font-family: var(--font-display); letter-spacing: -0.03em;">
+          Shop Local.<br>
+          <span style="color: #f97316;">Save More.</span>
+        </h1>
+
+        <p style="font-size: clamp(1rem, 2vw, 1.18rem); color: #94a3b8; line-height: 1.6; margin-bottom: 2rem; max-width: 500px;">
+          Discover nearby stores, unlock exclusive offers and earn rewards — all in one place. Walk in, scan at counter, and save instantly.
+        </p>
+
+        <!-- CTA Buttons Row -->
+        <div class="d-flex align-center gap-3" style="flex-wrap: wrap; margin-bottom: 2.25rem;">
+          <a href="/explore/" class="btn" style="background: #f97316; color: #fff; font-weight: 700; border-radius: var(--radius-full); padding: 0.85rem 1.75rem; font-size: 1rem; box-shadow: 0 4px 16px rgba(249,115,22,0.4); display: inline-flex; align-items: center; gap: 0.5rem;">
+            Explore Shops <i class="bi bi-arrow-right"></i>
+          </a>
+          <a href="/buyer/register/" class="btn" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: #ffffff; font-weight: 600; border-radius: var(--radius-full); padding: 0.85rem 1.6rem; font-size: 1rem;">
+            Join LokalLoop
+          </a>
+          <a href="#how-it-works" class="d-flex align-center gap-2" style="color: #94a3b8; font-size: 0.88rem; font-weight: 600; text-decoration: none; padding: 0.5rem; transition: color 0.15s ease;" onmouseover="this.style.color='#f8fafc'" onmouseout="this.style.color='#94a3b8'">
+            <i class="bi bi-compass-fill" style="font-size: 1.3rem; color: #f97316;"></i> How It Works (1-Min Guide)
+          </a>
+        </div>
+      </div>
+
+      <!-- Right 3D Visual Artwork / Store Showcase Graphic -->
+      <div style="position: relative; display: flex; justify-content: center;">
+        <div class="hero-showcase-container" style="position: relative; width: 100%; max-width: 480px; border-radius: 24px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.7); border: 2px solid rgba(255,255,255,0.1);">
+          <img src="/media/shops/banners/hero_showcase.jpg" alt="Neighborhood Cafe & Store" style="width: 100%; height: 380px; object-fit: cover;" onerror="this.src='/static/images/placeholder_shop.svg'">
+          <div style="position: absolute; inset: 0; background: linear-gradient(180deg, rgba(11,15,25,0.2) 30%, rgba(11,15,25,0.92) 100%);"></div>
+          
+          <div style="position: absolute; bottom: 20px; left: 20px; right: 20px;">
+            <div class="d-flex align-center gap-2" style="margin-bottom: 0.35rem;">
+              <span class="badge" style="background: #10b981; color: #fff; font-weight: 700;">Live Local Deal</span>
+              <span style="font-size: 0.8rem; color: #cbd5e1;">📍 Pune (Koregaon Park) &bull; 0.8 km</span>
+            </div>
+            <div style="font-size: 1.3rem; font-weight: 800; color: #ffffff; font-family: var(--font-display);">Artisan Brew Coffee & Roasters</div>
+            <div style="font-size: 0.95rem; color: #fbbf24; font-weight: 700; margin-top: 0.2rem;">Flat 25% OFF on bills above ₹400 &bull; +50 pts</div>
+          </div>
+        </div>
+
+        <!-- 3D Holographic Floating Pin Element -->
+        <div class="hero-floating-badge" style="position: absolute; top: -14px; right: 8px; background: rgba(17, 24, 39, 0.9); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.15); border-radius: 18px; padding: 0.85rem 1.15rem; display: flex; align-items: center; gap: 0.75rem; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+          <div style="width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg, #f97316, #ea580c); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1.2rem;">
+            <i class="bi bi-geo-alt-fill"></i>
+          </div>
+          <div>
+            <div style="font-size: 0.72rem; color: #94a3b8; font-weight: 600; text-transform: uppercase;">Instant Discovery</div>
+            <div style="font-size: 0.92rem; font-weight: 800; color: #ffffff;">150+ Nearby Shops</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Floating Capsule Search Bar (Interactive with GPS & City Selector) -->
+    <div style="margin-top: 3.5rem; position: relative; z-index: 10;">
+      <form action="/explore/" method="GET" class="search-capsule-bar">
+        <input type="hidden" name="lat" id="hero-lat">
+        <input type="hidden" name="lng" id="hero-lng">
+        <!-- City Dropdown -->
+        <div class="capsule-item" style="padding-left: 0.25rem;">
+          <i class="bi bi-geo-alt-fill" style="color: #f97316;"></i>
+          <select name="city" id="hero-city-select" aria-label="Select City">
+            <option value="Pune" selected>Pune</option>
+            <option value="Bengaluru">Bengaluru</option>
+            <option value="Mumbai">Mumbai</option>
+          </select>
+        </div>
+
+        <div class="search-capsule-divider"></div>
+
+        <!-- Locality Selector -->
+        <div class="capsule-item">
+          <i class="bi bi-building" style="color: #94a3b8;"></i>
+          <input type="text" name="locality" placeholder="Locality (e.g. Koregaon Park)" style="width: 170px;" aria-label="Locality">
+        </div>
+
+        <div class="search-capsule-divider"></div>
+
+        <!-- Search Input -->
+        <div class="capsule-item" style="flex: 1;">
+          <input type="text" name="q" placeholder="Search stores, cafes, products..." style="width: 100%;" aria-label="Search stores">
+        </div>
+
+        <!-- Near Me GPS Button -->
+        <button type="button" class="btn-near-me find-nearest-trigger" id="hero-find-nearest-btn" title="Detect GPS Location">
+          <i class="bi bi-crosshair2" style="color: #f97316;"></i> Near Me
+        </button>
+
+        <!-- Submit Round Search Button -->
+        <button type="submit" class="btn-search-round" aria-label="Search button">
+          <i class="bi bi-search"></i>
+        </button>
+      </form>
+    </div>
+
+  </div>
+</section>
+
+<!-- Popular Categories Section (Pastel Circles & Modern Cards) -->
+<section style="padding: 4.5rem 0 3.5rem; background: #ffffff;">
+  <div class="container">
+    <div class="d-flex align-center justify-between" style="margin-bottom: 2.25rem;">
+      <div>
+        <div class="section-accent-title">SHOP BY CATEGORY</div>
+        <h2 style="font-size: 2rem; font-weight: 800; color: var(--ink-950); font-family: var(--font-display);">Popular Categories</h2>
+      </div>
+      <a href="/explore/" style="font-weight: 700; color: #f97316; font-size: 0.92rem; display: inline-flex; align-items: center; gap: 0.35rem; text-decoration: none;">
+        View All <i class="bi bi-arrow-right"></i>
+      </a>
+    </div>
+
+    <!-- Category Grid with Soft Pastel Backgrounds -->
+    <div class="d-grid grid-4 gap-3">
+      <a href="/explore/?category=food-dining" class="cat-card-modern">
+        <div class="cat-icon-bubble" style="background: #fff3ea; color: #ea580c;">
+          <i class="bi bi-cup-hot-fill"></i>
+        </div>
+        <div>
+          <h4 style="font-size: 1rem; font-weight: 700; color: var(--ink-950); margin-bottom: 0.2rem;">Food &amp; Dining</h4>
+          <span style="font-size: 0.78rem; color: var(--text-muted); font-weight: 600;">Cafes &bull; Bakeries &bull; Diners</span>
+        </div>
+      </a>
+
+      <a href="/explore/?category=fashion-retail" class="cat-card-modern">
+        <div class="cat-icon-bubble" style="background: #fdf2f8; color: #db2777;">
+          <i class="bi bi-bag-heart-fill"></i>
+        </div>
+        <div>
+          <h4 style="font-size: 1rem; font-weight: 700; color: var(--ink-950); margin-bottom: 0.2rem;">Fashion</h4>
+          <span style="font-size: 0.78rem; color: var(--text-muted); font-weight: 600;">Boutiques &bull; Apparel</span>
+        </div>
+      </a>
+
+      <a href="/explore/?category=grocery-essentials" class="cat-card-modern">
+        <div class="cat-icon-bubble" style="background: #ecfdf5; color: #059669;">
+          <i class="bi bi-basket-fill"></i>
+        </div>
+        <div>
+          <h4 style="font-size: 1rem; font-weight: 700; color: var(--ink-950); margin-bottom: 0.2rem;">Groceries</h4>
+          <span style="font-size: 0.78rem; color: var(--text-muted); font-weight: 600;">Supermarts &bull; Organic</span>
+        </div>
+      </a>
+
+      <a href="/explore/?category=electronics" class="cat-card-modern">
+        <div class="cat-icon-bubble" style="background: #eff6ff; color: #2563eb;">
+          <i class="bi bi-laptop-fill"></i>
+        </div>
+        <div>
+          <h4 style="font-size: 1rem; font-weight: 700; color: var(--ink-950); margin-bottom: 0.2rem;">Electronics</h4>
+          <span style="font-size: 0.78rem; color: var(--text-muted); font-weight: 600;">Gadgets &bull; Accessories</span>
+        </div>
+      </a>
+
+      <a href="/explore/?category=health-wellness" class="cat-card-modern">
+        <div class="cat-icon-bubble" style="background: #f0fdf4; color: #16a34a;">
+          <i class="bi bi-heart-pulse-fill"></i>
+        </div>
+        <div>
+          <h4 style="font-size: 1rem; font-weight: 700; color: var(--ink-950); margin-bottom: 0.2rem;">Health &amp; Wellness</h4>
+          <span style="font-size: 0.78rem; color: var(--text-muted); font-weight: 600;">Pharmacies &bull; Nutrition</span>
+        </div>
+      </a>
+
+      <a href="/explore/?category=beauty-personal-care" class="cat-card-modern">
+        <div class="cat-icon-bubble" style="background: #faf5ff; color: #9333ea;">
+          <i class="bi bi-scissors"></i>
+        </div>
+        <div>
+          <h4 style="font-size: 1rem; font-weight: 700; color: var(--ink-950); margin-bottom: 0.2rem;">Salons &amp; Spas</h4>
+          <span style="font-size: 0.78rem; color: var(--text-muted); font-weight: 600;">Styling &bull; Grooming</span>
+        </div>
+      </a>
+
+      <a href="/explore/?category=home-lifestyle" class="cat-card-modern">
+        <div class="cat-icon-bubble" style="background: #fefce8; color: #ca8a04;">
+          <i class="bi bi-house-door-fill"></i>
+        </div>
+        <div>
+          <h4 style="font-size: 1rem; font-weight: 700; color: var(--ink-950); margin-bottom: 0.2rem;">Home &amp; Living</h4>
+          <span style="font-size: 0.78rem; color: var(--text-muted); font-weight: 600;">Decor &bull; Kitchenware</span>
+        </div>
+      </a>
+
+      <a href="/explore/" class="cat-card-modern">
+        <div class="cat-icon-bubble" style="background: #f1f5f9; color: #475569;">
+          <i class="bi bi-grid-fill"></i>
+        </div>
+        <div>
+          <h4 style="font-size: 1rem; font-weight: 700; color: var(--ink-950); margin-bottom: 0.2rem;">All Categories</h4>
+          <span style="font-size: 0.78rem; color: var(--text-muted); font-weight: 600;">Browse All Outlets</span>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Shops Near You Section (Matching Nearby Shops in Mockup) -->
+<section style="padding: 4.5rem 0; background: var(--bg-page); border-top: 1px solid var(--border-light);">
+  <div class="container">
+    <div class="d-flex align-center justify-between" style="margin-bottom: 2.25rem;">
+      <div>
+        <div class="section-accent-title">NEARBY SHOPS</div>
+        <h2 style="font-size: 2rem; font-weight: 800; color: var(--ink-950); font-family: var(--font-display);">Shops Near You</h2>
+        <p style="font-size: 0.95rem; color: var(--text-muted); margin-top: 0.25rem;">Verified local merchants open today</p>
+      </div>
+      <a href="/explore/" style="font-weight: 700; color: #f97316; font-size: 0.92rem; display: inline-flex; align-items: center; gap: 0.35rem; text-decoration: none;">
+        View All <i class="bi bi-arrow-right"></i>
+      </a>
+    </div>
+
+    <div class="d-grid grid-3 gap-3">
+      {% for shop in featured_shops %}
+        {% include "components/shop_card.html" with shop=shop %}
+      {% empty %}
+        <div style="grid-column: 1 / -1;">
+          {% include "components/empty_state.html" with title="No shops loaded yet" description="Seed demo data to view realistic Indian outlets." %}
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Featured Offers Section (Matching Best Deals Near You in Mockup) -->
+<section style="padding: 4.5rem 0; background: #ffffff; border-top: 1px solid var(--border-light); border-bottom: 1px solid var(--border-light);">
+  <div class="container">
+    <div class="d-flex align-center justify-between" style="margin-bottom: 2.25rem;">
+      <div>
+        <div class="section-accent-title">FEATURED OFFERS</div>
+        <h2 style="font-size: 2rem; font-weight: 800; color: var(--ink-950); font-family: var(--font-display);">Best Deals Near You</h2>
+        <p style="font-size: 0.95rem; color: var(--text-muted); margin-top: 0.25rem;">Scan and redeem at checkout billing counters</p>
+      </div>
+      <a href="/explore/?type=offers" style="font-weight: 700; color: #f97316; font-size: 0.92rem; display: inline-flex; align-items: center; gap: 0.35rem; text-decoration: none;">
+        View All Deals <i class="bi bi-arrow-right"></i>
+      </a>
+    </div>
+
+    <div class="d-grid grid-3 gap-3">
+      {% for offer in featured_offers %}
+        {% include "components/offer_card.html" with offer=offer %}
+      {% empty %}
+        <div style="grid-column: 1 / -1;">
+          {% include "components/empty_state.html" with title="No active offers currently" description="Check back soon or explore our registered shops." %}
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- How It Works: 5-Step Retail Journey Infographic (Matching Mockup) -->
+<section id="how-it-works" style="padding: 5rem 0; background: var(--bg-page);">
+  <div class="container">
+    <div class="text-center" style="max-width: 650px; margin: 0 auto 3.5rem;">
+      <div class="section-accent-title">HOW IT WORKS</div>
+      <h2 style="font-size: 2.25rem; font-weight: 800; font-family: var(--font-display); color: var(--ink-950);">
+        It's Simple. Start Saving Today.
+      </h2>
+      <p style="color: var(--text-muted); font-size: 1rem; margin-top: 0.5rem;">
+        No coupons to pre-pay. Walk in, discover authentic discounts, and scan to save at checkout.
+      </p>
+    </div>
+
+    <!-- 5 Steps Grid with Connecting Logic -->
+    <div class="d-grid steps-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.25rem; margin-bottom: 3.5rem;">
+      
+      <!-- Step 1 -->
+      <div class="step-card-modern">
+        <div class="step-number-tag">1</div>
+        <div style="font-size: 1.75rem; color: #2563eb; margin-bottom: 0.75rem;"><i class="bi bi-search"></i></div>
+        <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--ink-950); margin-bottom: 0.35rem;">Discover</h3>
+        <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;">Find nearby stores &amp; exclusive counter offers on LokalLoop.</p>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="step-card-modern">
+        <div class="step-number-tag">2</div>
+        <div style="font-size: 1.75rem; color: #f97316; margin-bottom: 0.75rem;"><i class="bi bi-geo-alt"></i></div>
+        <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--ink-950); margin-bottom: 0.35rem;">Explore</h3>
+        <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;">Check store profiles, valid timings and available deals.</p>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="step-card-modern">
+        <div class="step-number-tag">3</div>
+        <div style="font-size: 1.75rem; color: #10b981; margin-bottom: 0.75rem;"><i class="bi bi-qr-code-scan"></i></div>
+        <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--ink-950); margin-bottom: 0.35rem;">Scan</h3>
+        <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;">Scan the merchant QR code standee at the billing counter.</p>
+      </div>
+
+      <!-- Step 4 -->
+      <div class="step-card-modern">
+        <div class="step-number-tag">4</div>
+        <div style="font-size: 1.75rem; color: #8b5cf6; margin-bottom: 0.75rem;"><i class="bi bi-percent"></i></div>
+        <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--ink-950); margin-bottom: 0.35rem;">Redeem</h3>
+        <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;">Instant discount applied right on your billing total.</p>
+      </div>
+
+      <!-- Step 5 -->
+      <div class="step-card-modern">
+        <div class="step-number-tag">5</div>
+        <div style="font-size: 1.75rem; color: #f59e0b; margin-bottom: 0.75rem;"><i class="bi bi-gift"></i></div>
+        <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--ink-950); margin-bottom: 0.35rem;">Earn</h3>
+        <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;">Earn loyalty points and unlock exclusive repeat perks.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Merchant Growth Pitch Banner (Dark Curved Container from Mockup) -->
+<section style="padding: 2rem 0 5rem;">
+  <div class="container">
+    <div class="merchant-cta-banner">
+      <div class="d-grid grid-2 gap-4 align-center">
+        <div>
+          <span style="display: inline-block; background: rgba(249, 115, 22, 0.2); color: #f97316; font-size: 0.8rem; font-weight: 700; padding: 0.35rem 0.85rem; border-radius: var(--radius-full); margin-bottom: 1rem; border: 1px solid rgba(249, 115, 22, 0.3);">
+            FOR BUSINESS OWNERS
+          </span>
+          <h2 style="font-size: 2.25rem; font-weight: 800; color: #ffffff; margin-bottom: 1rem; font-family: var(--font-display); line-height: 1.2;">
+            Are You a Local Business Owner?
+          </h2>
+          <p style="font-size: 1rem; color: #94a3b8; line-height: 1.6; margin-bottom: 1.75rem;">
+            Join hundreds of local merchants growing with LokalLoop. Attract new customers, drive foot traffic, and build lasting customer loyalty with zero upfront tech cost.
+          </p>
+          <div class="d-flex align-center gap-3" style="flex-wrap: wrap;">
+            <a href="/seller/register/" class="btn" style="background: #f97316; color: #ffffff; font-weight: 700; border-radius: var(--radius-full); padding: 0.85rem 1.75rem; box-shadow: 0 4px 16px rgba(249,115,22,0.4); text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;">
+              Register as Merchant <i class="bi bi-arrow-right"></i>
+            </a>
+            <a href="/for-sellers/" style="color: #cbd5e1; font-weight: 600; font-size: 0.92rem; text-decoration: none; padding: 0.5rem;">
+              Learn More &rarr;
+            </a>
+          </div>
+        </div>
+
+        <div style="text-align: center;">
+          <div style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; padding: 2rem; backdrop-filter: blur(8px); display: inline-block; max-width: 320px;">
+            <div style="width: 60px; height: 60px; border-radius: 16px; background: linear-gradient(135deg, #f97316, #ea580c); display: flex; align-items: center; justify-content: center; font-size: 2rem; color: #fff; margin: 0 auto 1rem;">
+              <i class="bi bi-shop"></i>
+            </div>
+            <div style="font-size: 1.15rem; font-weight: 800; color: #fff; font-family: var(--font-display); margin-bottom: 0.35rem;">Physical Counter QR Standee</div>
+            <div style="font-size: 0.825rem; color: #94a3b8; line-height: 1.4;">Instant setup &bull; Zero monthly listing fees &bull; 50 free promotional credits upon activation</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Frequently Asked Questions (FAQ Section) -->
+<section id="faq" style="padding: 4.5rem 0; background: #ffffff; border-top: 1px solid var(--border-light);">
+  <div class="container container-narrow">
+    <div class="text-center" style="margin-bottom: 3rem;">
+      <span class="badge badge-indigo" style="margin-bottom: 0.5rem;">Got Questions?</span>
+      <h2 style="font-size: 2.25rem; font-weight: 800; color: var(--ink-950); font-family: var(--font-display);">
+        Frequently Asked Questions
+      </h2>
+      <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 0.5rem;">
+        Everything you need to know about in-store discounts, QR redemption, and merchant credits.
+      </p>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 1rem;">
+      <div class="card card-padded" style="background: var(--bg-subtle); border-radius: var(--radius-md);">
+        <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--brand-navy-900); margin-bottom: 0.4rem;">
+          How do I claim a discount at the billing counter?
+        </h3>
+        <p style="font-size: 0.9rem; color: var(--text-main); line-height: 1.5; margin: 0;">
+          Simply present your smartphone at checkout and scan the merchant's physical acrylic QR standee using your camera or the in-app scanner. The green verified voucher screen will confirm your discount instantly to the cashier.
+        </p>
+      </div>
+
+      <div class="card card-padded" style="background: var(--bg-subtle); border-radius: var(--radius-md);">
+        <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--brand-navy-900); margin-bottom: 0.4rem;">
+          Do customers need to pay or buy coupons in advance?
+        </h3>
+        <p style="font-size: 0.9rem; color: var(--text-main); line-height: 1.5; margin: 0;">
+          No. LokalLoop never charges customers for coupons or vouchers. All discounts are free to browse and claim directly when paying your bill at the store counter.
+        </p>
+      </div>
+
+      <div class="card card-padded" style="background: var(--bg-subtle); border-radius: var(--radius-md);">
+        <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--brand-navy-900); margin-bottom: 0.4rem;">
+          How do promotional credits work for retail merchants?
+        </h3>
+        <p style="font-size: 0.9rem; color: var(--text-main); line-height: 1.5; margin: 0;">
+          Merchants only consume small promotional credits (₹5 per successful visit) when a paying customer actually redeems a discount. No upfront ad spend or monthly listing fees are charged.
+        </p>
+      </div>
+
+      <div class="card card-padded" style="background: var(--bg-subtle); border-radius: var(--radius-md);">
+        <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--brand-navy-900); margin-bottom: 0.4rem;">
+          Which cities are currently supported?
+        </h3>
+        <p style="font-size: 0.9rem; color: var(--text-main); line-height: 1.5; margin: 0;">
+          We are currently active across high-street offline retail corridors in <strong>Bengaluru</strong> (Indiranagar, Koramangala), <strong>Mumbai</strong> (Bandra West), and <strong>Pune</strong> (Koregaon Park).
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Community Feedback & Authentic Reviews Notice -->
+<section style="padding: 4rem 0; background: var(--bg-page); border-top: 1px solid var(--border-light);">
+  <div class="container container-narrow text-center">
+    <div style="background: #ffffff; border: 1.5px dashed var(--border-ticket); border-radius: var(--radius-lg); padding: 2.5rem 2rem;">
+      <div style="width: 50px; height: 50px; border-radius: 50%; background: var(--brand-indigo-50); color: var(--brand-indigo-600); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin: 0 auto 1rem;">
+        <i class="bi bi-star"></i>
+      </div>
+      <h3 style="font-size: 1.25rem; font-weight: 800; color: var(--brand-navy-900); margin-bottom: 0.5rem;">
+        Genuine Verified Reviews Coming Soon
+      </h3>
+      <p style="font-size: 0.9rem; color: var(--text-muted); max-width: 500px; margin: 0 auto 1.5rem; line-height: 1.6;">
+        In adherence to ethical commerce standards, we only publish 100% verified customer and merchant reviews following physical store visits. We never generate artificial or automated reviews.
+      </p>
+      <a href="/explore/" class="btn btn-outline btn-sm">
+        <i class="bi bi-shop"></i> Visit a local store and share feedback
+      </a>
+    </div>
+  </div>
+</section>
+{% endblock %}

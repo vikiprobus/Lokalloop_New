@@ -1,0 +1,707 @@
+{% extends "base/public_base.html" %}
+
+{% block title %}Shopper Registration — Zero-Personal-Data — {{ BRAND_NAME }}{% endblock %}
+{% block meta_description %}Quick, private, and frictionless registration. Unlock exclusive local store discounts and counter loyalty rewards.{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* Senior-Developer Custom Design System for Shopper Registration */
+  .auth-wrapper {
+    padding-top: 3rem;
+    padding-bottom: 5rem;
+    min-height: calc(100vh - 200px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: 
+      radial-gradient(circle at 50% 0%, rgba(249, 115, 22, 0.08) 0%, transparent 60%),
+      radial-gradient(circle at 100% 100%, rgba(99, 102, 241, 0.04) 0%, transparent 50%),
+      var(--bg-body, #f8fafc);
+  }
+
+  .auth-card {
+    max-width: 520px;
+    width: 100%;
+    margin: 0 auto;
+    background: #ffffff;
+    border-radius: 24px;
+    border: 1px solid rgba(226, 232, 240, 0.85);
+    box-shadow: 
+      0 20px 40px -15px rgba(15, 23, 42, 0.07),
+      0 0 0 1px rgba(15, 23, 42, 0.02),
+      0 1px 3px 0 rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  /* Refined Hero Header */
+  .auth-header {
+    background: linear-gradient(145deg, #0f172a 0%, #1e1b4b 60%, #1e293b 100%);
+    color: #ffffff;
+    padding: 2.25rem 2rem 2rem;
+    text-align: center;
+    position: relative;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .auth-header::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(249, 115, 22, 0.4), transparent);
+  }
+
+  .header-badge-row {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+  }
+
+  .pill-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.32rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.74rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    backdrop-filter: blur(8px);
+    transition: transform 0.15s ease;
+  }
+
+  .pill-badge-saffron {
+    background: rgba(249, 115, 22, 0.16);
+    color: #fed7aa;
+    border: 1px solid rgba(249, 115, 22, 0.35);
+  }
+
+  .pill-badge-emerald {
+    background: rgba(16, 185, 129, 0.15);
+    color: #a7f3d0;
+    border: 1px solid rgba(16, 185, 129, 0.32);
+  }
+
+  .auth-title {
+    font-family: var(--font-display, 'Outfit', sans-serif);
+    font-size: 1.85rem;
+    font-weight: 800;
+    color: #ffffff;
+    margin: 0 0 0.4rem;
+    letter-spacing: -0.025em;
+    line-height: 1.2;
+  }
+
+  .auth-subtitle {
+    font-size: 0.88rem;
+    color: #94a3b8;
+    margin: 0;
+    line-height: 1.5;
+    font-weight: 400;
+  }
+
+  /* Form Body & Structure */
+  .auth-body {
+    padding: 2rem 2.25rem 2.25rem;
+  }
+
+  @media (max-width: 576px) {
+    .auth-body {
+      padding: 1.5rem 1.25rem 1.75rem;
+    }
+    .auth-header {
+      padding: 1.75rem 1.25rem 1.5rem;
+    }
+  }
+
+  .form-section-title {
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin-bottom: 0.85rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 1px solid #f1f5f9;
+  }
+
+  .form-group-custom {
+    margin-bottom: 1.15rem;
+  }
+
+  .form-label-custom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 0.4rem;
+    letter-spacing: -0.01em;
+  }
+
+  .form-label-custom .req-star {
+    color: #ef4444;
+    margin-left: 2px;
+  }
+
+  /* Premium Form Controls */
+  .input-custom {
+    width: 100%;
+    height: 46px;
+    padding: 0.65rem 1rem;
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: #0f172a;
+    background: #ffffff;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 12px;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    box-sizing: border-box;
+  }
+
+  .input-custom::placeholder {
+    color: #94a3b8;
+    font-weight: 400;
+  }
+
+  .input-custom:hover {
+    border-color: #cbd5e1;
+  }
+
+  .input-custom:focus {
+    outline: none;
+    border-color: #f97316;
+    box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.12);
+    background: #ffffff;
+  }
+
+  /* Custom Select with SVG chevron */
+  .select-custom {
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b' stroke-width='2.5'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1rem 1rem;
+    padding-right: 2.5rem;
+    cursor: pointer;
+  }
+
+  /* Demographics Card */
+  .demographics-card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 1rem 1.15rem;
+    margin-bottom: 1.15rem;
+  }
+
+  .age-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    background: #eef2ff;
+    color: #4338ca;
+    font-size: 0.78rem;
+    font-weight: 800;
+    padding: 0.2rem 0.65rem;
+    border-radius: 9999px;
+    border: 1px solid #c7d2fe;
+    letter-spacing: -0.01em;
+  }
+
+  /* Security Recovery Box */
+  .security-recovery-card {
+    background: linear-gradient(180deg, #fffaf5 0%, #ffffff 100%);
+    border: 1.5px solid #fed7aa;
+    border-radius: 16px;
+    padding: 1.25rem;
+    margin-bottom: 1.35rem;
+    box-shadow: 0 2px 8px rgba(249, 115, 22, 0.04);
+  }
+
+  .security-card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.35rem;
+  }
+
+  .security-card-header i {
+    color: #ea580c;
+    font-size: 1.2rem;
+  }
+
+  .security-card-title {
+    font-size: 0.92rem;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: -0.01em;
+  }
+
+  .security-card-desc {
+    font-size: 0.78rem;
+    color: #64748b;
+    line-height: 1.45;
+    margin: 0 0 1rem;
+  }
+
+  /* Password Strength Meter */
+  .password-meter-bar {
+    height: 4px;
+    width: 100%;
+    background: #e2e8f0;
+    border-radius: 2px;
+    margin-top: 0.45rem;
+    overflow: hidden;
+  }
+
+  .password-meter-fill {
+    height: 100%;
+    width: 0%;
+    border-radius: 2px;
+    transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s ease;
+  }
+
+  /* Primary Button */
+  .btn-submit-premium {
+    width: 100%;
+    height: 50px;
+    border-radius: 12px;
+    border: none;
+    background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+    color: #ffffff;
+    font-size: 1.02rem;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    cursor: pointer;
+    box-shadow: 0 8px 20px -3px rgba(249, 115, 22, 0.38);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    margin-top: 1rem;
+  }
+
+  .btn-submit-premium:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 12px 24px -4px rgba(249, 115, 22, 0.45);
+    background: linear-gradient(135deg, #fb923c 0%, #ea580c 100%);
+  }
+
+  .btn-submit-premium:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 12px -2px rgba(249, 115, 22, 0.4);
+  }
+
+  /* Auto Detect Pill Button */
+  .btn-autodetect {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    background: #fff7ed;
+    color: #ea580c;
+    border: 1px solid #fed7aa;
+    padding: 0.22rem 0.6rem;
+    border-radius: 6px;
+    font-size: 0.74rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .btn-autodetect:hover {
+    background: #ffedd5;
+    border-color: #fdba74;
+  }
+
+  /* Eye Toggle Button */
+  .btn-eye-toggle {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.05rem;
+    transition: color 0.15s ease;
+  }
+
+  .btn-eye-toggle:hover {
+    color: #475569;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+  <div class="auth-card">
+    
+    <!-- Refined Hero Header -->
+    <div class="auth-header">
+      <div class="header-badge-row">
+        <span class="pill-badge pill-badge-saffron">
+          <i class="bi bi-gift-fill"></i> +25 WELCOME POINTS
+        </span>
+        <span class="pill-badge pill-badge-emerald">
+          <i class="bi bi-shield-check"></i> ZERO-PERSONAL DATA
+        </span>
+      </div>
+      <h1 class="auth-title">Shopper Registration</h1>
+      <p class="auth-subtitle">
+        Instant private pass to unlock exclusive neighborhood discounts.
+      </p>
+    </div>
+
+    <!-- Form Body -->
+    <div class="auth-body">
+      <form method="POST" id="shopperRegisterForm">
+        {% csrf_token %}
+        {{ form.website }}
+        <input type="hidden" name="state" id="id_state" value="Maharashtra">
+        <input type="hidden" name="age" id="id_age" value="{{ form.age.value|default:'' }}">
+        <input type="hidden" name="shopper_id" id="id_shopper_id" value="">
+
+        <!-- SECTION 1: IDENTITY & PROFILE -->
+        <div class="form-section-title">
+          <i class="bi bi-person-badge text-saffron"></i> Shopper Demographics
+        </div>
+
+        <div class="d-grid grid-2 gap-2" style="margin-bottom: 1.15rem;">
+          <div class="form-group-custom" style="margin-bottom: 0;">
+            <label class="form-label-custom" for="id_first_name">
+              <span>First Name<span class="req-star">*</span></span>
+            </label>
+            <input type="text" name="first_name" id="id_first_name" class="input-custom" placeholder="e.g. Vikram" value="{{ form.first_name.value|default:'' }}" required autocomplete="given-name">
+          </div>
+          
+          <div class="form-group-custom" style="margin-bottom: 0;">
+            <label class="form-label-custom" for="id_gender">
+              <span>Gender<span class="req-star">*</span></span>
+            </label>
+            <select name="gender" id="id_gender" class="input-custom select-custom" required>
+              <option value="" disabled {% if not form.gender.value %}selected{% endif %}>-- Select --</option>
+              <option value="MALE" {% if form.gender.value == 'MALE' %}selected{% endif %}>Male</option>
+              <option value="FEMALE" {% if form.gender.value == 'FEMALE' %}selected{% endif %}>Female</option>
+              <option value="OTHER" {% if form.gender.value == 'OTHER' %}selected{% endif %}>Other</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Birth Month, Year & Dynamic Age Pill -->
+        <div class="demographics-card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.65rem;">
+            <span style="font-size: 0.82rem; font-weight: 700; color: #1e293b; display: flex; align-items: center; gap: 0.35rem;">
+              <i class="bi bi-calendar-event text-saffron"></i> Birth Month &amp; Year
+            </span>
+            <div id="ageBadge" class="age-pill">
+              Age: <span id="calculatedAge">--</span> yrs
+            </div>
+          </div>
+
+          <div class="d-grid grid-2 gap-2">
+            <div>
+              <label class="form-label-custom" for="id_birth_month" style="font-size: 0.76rem; color: #64748b; margin-bottom: 0.25rem;">Month</label>
+              <select name="birth_month" id="id_birth_month" class="input-custom select-custom" style="height: 42px; font-size: 0.85rem;" required>
+                <option value="" disabled {% if not form.birth_month.value %}selected{% endif %}>-- Month --</option>
+                <option value="1" {% if form.birth_month.value == 1 %}selected{% endif %}>01 - Jan</option>
+                <option value="2" {% if form.birth_month.value == 2 %}selected{% endif %}>02 - Feb</option>
+                <option value="3" {% if form.birth_month.value == 3 %}selected{% endif %}>03 - Mar</option>
+                <option value="4" {% if form.birth_month.value == 4 %}selected{% endif %}>04 - Apr</option>
+                <option value="5" {% if form.birth_month.value == 5 %}selected{% endif %}>05 - May</option>
+                <option value="6" {% if form.birth_month.value == 6 %}selected{% endif %}>06 - Jun</option>
+                <option value="7" {% if form.birth_month.value == 7 %}selected{% endif %}>07 - Jul</option>
+                <option value="8" {% if form.birth_month.value == 8 %}selected{% endif %}>08 - Aug</option>
+                <option value="9" {% if form.birth_month.value == 9 %}selected{% endif %}>09 - Sep</option>
+                <option value="10" {% if form.birth_month.value == 10 %}selected{% endif %}>10 - Oct</option>
+                <option value="11" {% if form.birth_month.value == 11 %}selected{% endif %}>11 - Nov</option>
+                <option value="12" {% if form.birth_month.value == 12 %}selected{% endif %}>12 - Dec</option>
+              </select>
+            </div>
+            <div>
+              <label class="form-label-custom" for="id_birth_year" style="font-size: 0.76rem; color: #64748b; margin-bottom: 0.25rem;">Year</label>
+              <input type="number" name="birth_year" id="id_birth_year" class="input-custom" style="height: 42px; font-size: 0.85rem;" min="1920" max="2026" placeholder="e.g. 1998" value="{{ form.birth_year.value|default:'' }}" required>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 2: LOCATION -->
+        <div class="form-section-title">
+          <i class="bi bi-geo-alt text-saffron"></i> Preferred Retail Hub
+        </div>
+
+        <div class="form-group-custom">
+          <div class="form-label-custom">
+            <span>Maharashtra District<span class="req-star">*</span></span>
+            <button type="button" id="detectGpsBtn" class="btn-autodetect" title="Detect nearby district using GPS">
+              <i class="bi bi-crosshair2"></i> Auto-Detect
+            </button>
+          </div>
+          <select id="districtSelect" name="district" class="input-custom select-custom" required>
+            {% for dist in maharashtra_districts %}
+              <option value="{{ dist }}" {% if form.district.value == dist or dist == 'Pune' and not form.district.value %}selected{% endif %}>
+                {{ dist }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <!-- SECTION 3: CREDENTIALS & SECURITY -->
+        <div class="form-section-title">
+          <i class="bi bi-shield-lock text-saffron"></i> Access &amp; Protection
+        </div>
+
+        <!-- Password -->
+        <div class="form-group-custom">
+          <label class="form-label-custom" for="id_password">
+            <span>Create Password<span class="req-star">*</span></span>
+          </label>
+          <div style="position: relative;">
+            <input type="password" name="password" id="id_password" class="input-custom" placeholder="Create strong password" required autocomplete="new-password" style="padding-right: 44px;">
+            <button type="button" id="togglePassBtn" class="btn-eye-toggle" aria-label="Toggle password visibility">
+              <i class="bi bi-eye"></i>
+            </button>
+          </div>
+          
+          <div class="password-meter-bar">
+            <div id="strengthBar" class="password-meter-fill"></div>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.72rem; color: #64748b; margin-top: 0.35rem;">
+            <span>Min 8 chars with uppercase, number &amp; symbol</span>
+            <span id="strengthText" style="font-weight: 700;"></span>
+          </div>
+        </div>
+
+        <!-- Confirm Password -->
+        <div class="form-group-custom">
+          <label class="form-label-custom" for="id_confirm_password">
+            <span>Confirm Password<span class="req-star">*</span></span>
+          </label>
+          <div style="position: relative;">
+            <input type="password" name="confirm_password" id="id_confirm_password" class="input-custom" placeholder="Re-enter password" required autocomplete="new-password" style="padding-right: 44px;">
+            <button type="button" id="toggleConfirmPassBtn" class="btn-eye-toggle" aria-label="Toggle confirm password visibility">
+              <i class="bi bi-eye"></i>
+            </button>
+          </div>
+          <div id="matchError" class="text-danger" style="font-size: 0.76rem; font-weight: 600; margin-top: 0.3rem; display: none;">
+            <i class="bi bi-exclamation-circle-fill"></i> Passwords do not match.
+          </div>
+        </div>
+
+        <!-- Security Recovery Question -->
+        <div class="form-group-custom">
+          <label class="form-label-custom" for="id_security_question">
+            <span>Security Recovery Question<span class="req-star">*</span></span>
+          </label>
+          <select name="security_question" id="id_security_question" class="input-custom select-custom" required>
+            <option value="What is your favorite childhood street/place?">What is your favorite childhood street/place?</option>
+            <option value="What was the name of your first school?">What was the name of your first school?</option>
+            <option value="What is your favorite regional dish/food?">What is your favorite regional dish/food?</option>
+            <option value="What is your memorable vehicle/cycle name?">What is your memorable vehicle/cycle name?</option>
+          </select>
+        </div>
+
+        <!-- Secret Answer -->
+        <div class="form-group-custom">
+          <label class="form-label-custom" for="id_security_answer">
+            <span>Secret Answer<span class="req-star">*</span></span>
+          </label>
+          <input type="text" name="security_answer" id="id_security_answer" class="input-custom" placeholder="Your secret answer" required autocomplete="off">
+        </div>
+
+        <!-- CAPTCHA Verification -->
+        {% include "components/captcha_field.html" %}
+
+        <!-- Primary CTA Submit Button -->
+        <button type="submit" id="submitBtn" class="btn-submit-premium">
+          <i class="bi bi-shield-check" style="font-size: 1.15rem;"></i>
+          <span>Activate Pass &amp; Meet Gennie</span>
+        </button>
+
+      </form>
+    </div>
+
+    <!-- Card Footer -->
+    <div style="padding: 1.25rem 2rem; background: #f8fafc; border-top: 1px solid #e2e8f0; text-align: center; font-size: 0.85rem; color: #64748b;">
+      Already have a Shopper ID? 
+      <a href="/buyer/login/" style="font-weight: 700; color: #ea580c; text-decoration: none; margin-left: 0.2rem;">
+        Sign In with Public ID &rarr;
+      </a>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // DOM References & Elements
+  const birthMonthSelect = document.getElementById('id_birth_month');
+  const birthYearInput = document.getElementById('id_birth_year');
+  const calculatedAgeSpan = document.getElementById('calculatedAge');
+  const hiddenAge = document.getElementById('id_age');
+  const districtSelect = document.getElementById('districtSelect');
+  const passwordInput = document.getElementById('id_password');
+  const confirmPasswordInput = document.getElementById('id_confirm_password');
+  const togglePassBtn = document.getElementById('togglePassBtn');
+  const toggleConfirmPassBtn = document.getElementById('toggleConfirmPassBtn');
+  const strengthBar = document.getElementById('strengthBar');
+  const strengthText = document.getElementById('strengthText');
+  const matchError = document.getElementById('matchError');
+  const detectGpsBtn = document.getElementById('detectGpsBtn');
+
+  // Real-time Age Calculation
+  function updateAge() {
+    const bYearVal = (birthYearInput.value || '').trim();
+    const bMonthVal = birthMonthSelect.value;
+    if (!bYearVal || !bMonthVal) {
+      calculatedAgeSpan.textContent = '--';
+      hiddenAge.value = '';
+      return;
+    }
+
+    const today = new Date();
+    const curYear = today.getFullYear();
+    const curMonth = today.getMonth() + 1;
+    const bYear = parseInt(bYearVal, 10);
+    const bMonth = parseInt(bMonthVal, 10);
+
+    if (isNaN(bYear) || isNaN(bMonth)) {
+      calculatedAgeSpan.textContent = '--';
+      hiddenAge.value = '';
+      return;
+    }
+
+    let age = curYear - bYear;
+    if (curMonth < bMonth) {
+      age--;
+    }
+    if (age < 0) age = 0;
+
+    calculatedAgeSpan.textContent = age;
+    hiddenAge.value = age;
+  }
+
+  birthMonthSelect.addEventListener('change', updateAge);
+  birthYearInput.addEventListener('input', updateAge);
+
+  // Password Visibility Toggle
+  function toggleInputVisibility(inputEl, btnEl) {
+    const isPass = inputEl.getAttribute('type') === 'password';
+    inputEl.setAttribute('type', isPass ? 'text' : 'password');
+    btnEl.innerHTML = isPass ? '<i class="bi bi-eye-slash"></i>' : '<i class="bi bi-eye"></i>';
+  }
+  
+  if (togglePassBtn && passwordInput) {
+    togglePassBtn.addEventListener('click', () => toggleInputVisibility(passwordInput, togglePassBtn));
+  }
+  if (toggleConfirmPassBtn && confirmPasswordInput) {
+    toggleConfirmPassBtn.addEventListener('click', () => toggleInputVisibility(confirmPasswordInput, toggleConfirmPassBtn));
+  }
+
+  // Real-time Password Strength Meter
+  passwordInput.addEventListener('input', function() {
+    const p = this.value;
+    let score = 0;
+    if (p.length >= 8) score++;
+    if (/[A-Z]/.test(p)) score++;
+    if (/[a-z]/.test(p)) score++;
+    if (/[0-9]/.test(p)) score++;
+    if (/[@#$%!&*^~_+=\-]/.test(p)) score++;
+
+    if (!p) {
+      strengthBar.style.width = '0%';
+      strengthText.textContent = '';
+      return;
+    }
+
+    if (p.length < 8) {
+      strengthBar.style.width = '25%';
+      strengthBar.style.backgroundColor = '#ef4444';
+      strengthText.textContent = 'Too short (<8 chars)';
+      strengthText.style.color = '#ef4444';
+    } else if (score <= 2) {
+      strengthBar.style.width = '50%';
+      strengthBar.style.backgroundColor = '#f97316';
+      strengthText.textContent = 'Fair';
+      strengthText.style.color = '#f97316';
+    } else if (score <= 4) {
+      strengthBar.style.width = '75%';
+      strengthBar.style.backgroundColor = '#eab308';
+      strengthText.textContent = 'Good';
+      strengthText.style.color = '#eab308';
+    } else {
+      strengthBar.style.width = '100%';
+      strengthBar.style.backgroundColor = '#10b981';
+      strengthText.textContent = 'Strong ✓';
+      strengthText.style.color = '#10b981';
+    }
+  });
+
+  // Real-time Password Match Verification
+  function checkMatch() {
+    if (confirmPasswordInput.value && passwordInput.value !== confirmPasswordInput.value) {
+      matchError.style.display = 'block';
+      confirmPasswordInput.style.borderColor = '#ef4444';
+    } else {
+      matchError.style.display = 'none';
+      confirmPasswordInput.style.borderColor = '';
+    }
+  }
+  confirmPasswordInput.addEventListener('input', checkMatch);
+  passwordInput.addEventListener('input', checkMatch);
+
+  // Auto-detect Maharashtra district via GPS
+  if (detectGpsBtn) {
+    detectGpsBtn.addEventListener('click', function() {
+      if (!navigator.geolocation) {
+        alert("Geolocation is not supported by your browser.");
+        return;
+      }
+      detectGpsBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Locating...';
+      navigator.geolocation.getCurrentPosition(function(pos) {
+        detectGpsBtn.innerHTML = '<i class="bi bi-check2-circle"></i> Detected';
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+        
+        let matched = 'Pune';
+        if (lat >= 18.8 && lat <= 19.4 && lng >= 72.7 && lng <= 73.2) {
+          matched = 'Mumbai City';
+        } else if (lat >= 19.1 && lat <= 20.3 && lng >= 73.0 && lng <= 74.0) {
+          matched = 'Thane';
+        } else if (lat >= 19.6 && lat <= 20.5 && lng >= 73.5 && lng <= 74.5) {
+          matched = 'Nashik';
+        } else if (lat >= 20.8 && lat <= 21.5 && lng >= 78.8 && lng <= 79.5) {
+          matched = 'Nagpur';
+        } else if (lat >= 19.5 && lat <= 20.2 && lng >= 75.0 && lng <= 75.8) {
+          matched = 'Chhatrapati Sambhajinagar';
+        }
+
+        districtSelect.value = matched;
+      }, function() {
+        detectGpsBtn.innerHTML = '<i class="bi bi-crosshair2"></i> Auto-Detect';
+        alert("Could not retrieve GPS coordinates. Please choose your district from the dropdown.");
+      }, { timeout: 6000 });
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    updateAge();
+  });
+</script>
+{% endblock %}

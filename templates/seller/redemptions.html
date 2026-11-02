@@ -1,0 +1,72 @@
+{% extends "base/seller_base.html" %}
+
+{% block title %}Store Redemptions — {{ BRAND_NAME }} Business{% endblock %}
+{% block page_title %}Customer In-Store Checkouts{% endblock %}
+
+{% block content %}
+<div class="card card-padded" style="margin-bottom: 2rem; background: #ffffff; border: 1px solid var(--border-light); box-shadow: var(--shadow-sm);">
+  <div class="d-flex align-center justify-between flex-wrap gap-2">
+    <div>
+      <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--brand-navy-900); margin: 0;">Verified Counter Redemptions Log</h3>
+      <p style="font-size: 0.82rem; color: var(--text-muted); margin: 0.15rem 0 0;">
+        Real-time transaction record of shoppers scanning your counter QR code at checkout
+      </p>
+    </div>
+    <div class="d-flex align-center gap-2">
+      <span class="badge badge-success" style="font-variant-numeric: tabular-nums;">{{ redemptions|length }} Total Checkouts</span>
+      <a href="/seller/redemptions/?export=excel" class="btn-merchant-excel" title="Download Excel Spreadsheet of redemptions">
+        <i class="bi bi-file-earmark-excel-fill"></i> Export Excel (.xlsx)
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="card card-padded" style="background: #ffffff; border: 1px solid var(--border-light); box-shadow: var(--shadow-sm);">
+  <div class="table-responsive">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Redemption ID</th>
+          <th>Shopper Identity</th>
+          <th>Offer Claimed</th>
+          <th>Bill Amount</th>
+          <th>Discount Provided</th>
+          <th>Credits Deducted</th>
+          <th>Date & Time</th>
+          <th>Audit Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in redemptions %}
+          <tr>
+            <td style="font-family: var(--font-mono); font-size: 0.78rem; font-weight: 700; color: var(--text-muted); font-variant-numeric: tabular-nums;">
+              #{{ r.id }}
+            </td>
+            <td>
+              <div style="font-weight: 700; color: var(--brand-navy-900);">{{ r.buyer.buyer_profile.nickname|default:"Shopper" }}</div>
+              <div style="font-size: 0.75rem; color: var(--text-muted); font-family: monospace;">{{ r.buyer.buyer_profile.public_unique_id|default:"-" }}</div>
+            </td>
+            <td>
+              <div style="font-weight: 600; color: var(--brand-navy-800);">{{ r.offer.title }}</div>
+              <span class="badge badge-saffron" style="font-size: 0.7rem; font-weight: 700;">{{ r.offer.discount_display }}</span>
+            </td>
+            <td style="font-variant-numeric: tabular-nums; font-weight: 600;">₹{{ r.bill_amount|floatformat:2 }}</td>
+            <td class="text-success" style="font-weight: 700; font-variant-numeric: tabular-nums;">₹{{ r.discount_given|floatformat:2 }}</td>
+            <td style="color: var(--color-danger); font-weight: 700; font-variant-numeric: tabular-nums;">-{{ r.credits_deducted }} Cr</td>
+            <td class="text-muted" style="font-variant-numeric: tabular-nums; font-size: 0.82rem; white-space: nowrap;">{{ r.redeemed_at|date:"d M Y, h:i A" }}</td>
+            <td>
+              <span class="badge badge-success"><i class="bi bi-shield-check"></i> Verified</span>
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="8" class="text-center text-muted" style="padding: 3rem 0;">
+              No customer checkouts recorded yet. Display your counter QR standee at your cash register to start!
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

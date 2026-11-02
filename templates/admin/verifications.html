@@ -1,0 +1,215 @@
+{% extends "base/admin_base.html" %}
+
+{% block title %}Merchant Document Compliance — {{ BRAND_NAME }} Console{% endblock %}
+{% block page_title %}Statutory Document Verification & Compliance{% endblock %}
+
+{% block content %}
+<!-- Metrics Bar -->
+<div class="d-grid grid-4 gap-3" style="margin-bottom: 1.75rem;">
+  <a href="/admin-portal/verifications/?status=PENDING" style="text-decoration: none;">
+    <div class="card card-padded" style="border-left: 4px solid #f59e0b; background: {% if status_filter == 'PENDING' %}#1e293b{% endif %};">
+      <div style="font-size: 0.8rem; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Pending Review</div>
+      <div style="font-size: 1.8rem; font-weight: 900; color: #f59e0b; margin-top: 0.35rem;">{{ pending_count }}</div>
+      <div style="font-size: 0.75rem; color: #64748b; margin-top: 0.2rem;">Awaiting admin moderation</div>
+    </div>
+  </a>
+
+  <a href="/admin-portal/verifications/?status=APPROVED" style="text-decoration: none;">
+    <div class="card card-padded" style="border-left: 4px solid #10b981; background: {% if status_filter == 'APPROVED' %}#1e293b{% endif %};">
+      <div style="font-size: 0.8rem; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Verified & Compliant</div>
+      <div style="font-size: 1.8rem; font-weight: 900; color: #10b981; margin-top: 0.35rem;">{{ approved_count }}</div>
+      <div style="font-size: 0.75rem; color: #64748b; margin-top: 0.2rem;">Authorized retail outlets</div>
+    </div>
+  </a>
+
+  <a href="/admin-portal/verifications/?status=REJECTED" style="text-decoration: none;">
+    <div class="card card-padded" style="border-left: 4px solid #ef4444; background: {% if status_filter == 'REJECTED' %}#1e293b{% endif %};">
+      <div style="font-size: 0.8rem; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Action Required</div>
+      <div style="font-size: 1.8rem; font-weight: 900; color: #ef4444; margin-top: 0.35rem;">{{ rejected_count }}</div>
+      <div style="font-size: 0.75rem; color: #64748b; margin-top: 0.2rem;">Flagged for invalid docs</div>
+    </div>
+  </a>
+
+  <a href="/admin-portal/verifications/?status=ALL" style="text-decoration: none;">
+    <div class="card card-padded" style="border-left: 4px solid #38bdf8; background: {% if status_filter == 'ALL' %}#1e293b{% endif %};">
+      <div style="font-size: 0.8rem; font-weight: 700; color: #94a3b8; text-transform: uppercase;">All Records</div>
+      <div style="font-size: 1.8rem; font-weight: 900; color: #38bdf8; margin-top: 0.35rem;">{{ verifications|length }}</div>
+      <div style="font-size: 0.75rem; color: #64748b; margin-top: 0.2rem;">Audit trail complete</div>
+    </div>
+  </a>
+</div>
+
+<!-- Search & Filter Bar -->
+<div class="card card-padded" style="margin-bottom: 1.5rem; background: #1e293b; border: 1px solid #334155;">
+  <form method="GET" action="/admin-portal/verifications/" class="admin-filter-bar" style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+    <div style="flex: 1; min-width: 240px;">
+      <input type="text" name="q" value="{{ query }}" class="form-control" placeholder="Search Shop Name, PAN, GSTIN, Shop Act or FSSAI..." style="background: #0f172a; border-color: #334155; color: #fff;">
+    </div>
+
+    <div>
+      <select name="status" class="form-select" onchange="this.form.submit()" style="background: #0f172a; border-color: #334155; color: #fff; min-width: 180px;">
+        <option value="ALL" {% if status_filter == 'ALL' %}selected{% endif %}>All Compliance Statuses</option>
+        <option value="PENDING" {% if status_filter == 'PENDING' %}selected{% endif %}>Pending Review</option>
+        <option value="APPROVED" {% if status_filter == 'APPROVED' %}selected{% endif %}>Verified / Approved</option>
+        <option value="REJECTED" {% if status_filter == 'REJECTED' %}selected{% endif %}>Action Required / Rejected</option>
+      </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary" style="font-weight: 700;">
+      <i class="bi bi-search"></i> Filter
+    </button>
+  </form>
+</div>
+
+<!-- Verifications List -->
+<div class="card" style="background: #1e293b; border: 1px solid #334155;">
+  <div style="overflow-x: auto;">
+    <table class="table" style="margin-bottom: 0; color: #cbd5e1; width: 100%; border-collapse: collapse;">
+      <thead>
+        <tr style="border-bottom: 1px solid #334155; background: #0f172a; font-size: 0.78rem; text-transform: uppercase; color: #94a3b8; text-align: left;">
+          <th style="padding: 1rem 1.25rem;">Outlet / Merchant</th>
+          <th style="padding: 1rem 1.25rem;">Shop Act License</th>
+          <th style="padding: 1rem 1.25rem;">FSSAI / FDA Drug License</th>
+          <th style="padding: 1rem 1.25rem;">Business PAN & GSTIN</th>
+          <th style="padding: 1rem 1.25rem;">Status</th>
+          <th style="padding: 1rem 1.25rem; text-align: right;">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for v in verifications %}
+        <tr style="border-bottom: 1px solid #334155; vertical-align: top;">
+          <td style="padding: 1.25rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+              <strong style="color: #fff; font-size: 0.95rem;">{{ v.shop.name }}</strong>
+              {% if v.shop.seller.seller_profile.merchant_id %}
+                <span class="badge" style="background: #0f172a; color: #38bdf8; font-family: monospace; font-size: 0.72rem; border: 1px solid #334155;">{{ v.shop.seller.seller_profile.merchant_id }}</span>
+              {% endif %}
+            </div>
+            <div style="font-size: 0.75rem; color: #64748b;">
+              Category: <span style="color: #38bdf8;">{{ v.shop.category.name }}</span>
+              {% if v.shop.subcategory %} → {{ v.shop.subcategory.name }}{% endif %}
+            </div>
+            <div style="font-size: 0.75rem; color: #94a3b8; margin-top: 0.15rem;">
+              {{ v.shop.locality }}, {{ v.shop.city }}
+            </div>
+            <div style="margin-top: 0.4rem;">
+              {% if v.shop.seller.seller_profile.agreement_accepted %}
+                <span class="badge" style="background: rgba(16,185,129,0.12); color: #34d399; font-size: 0.7rem; border: 1px solid rgba(16,185,129,0.25);" title="Merchant Digital Agreement accepted during onboarding">
+                  <i class="bi bi-shield-check"></i> Agreement Signed
+                </span>
+                {% if v.shop.seller.seller_profile.agreement_accepted_at %}
+                  <span style="font-size: 0.68rem; color: #64748b; margin-left: 0.25rem;">{{ v.shop.seller.seller_profile.agreement_accepted_at|date:"d M Y" }}</span>
+                {% endif %}
+              {% endif %}
+            </div>
+          </td>
+
+          <td style="padding: 1.25rem;">
+            <div style="font-family: monospace; font-weight: 700; color: #fff; font-size: 0.9rem;">
+              {{ v.shop_act_license_number|default:"—" }}
+            </div>
+            <div style="font-size: 0.72rem; color: #94a3b8; margin-top: 0.2rem;">
+              Valid Till: 
+              {% if v.shop_act_valid_till %}
+                <span style="color: #38bdf8; font-weight: 600;">{{ v.shop_act_valid_till|date:"d M Y" }}</span>
+              {% else %}
+                <span style="color: #64748b;">Not Specified</span>
+              {% endif %}
+            </div>
+            <span style="font-size: 0.7rem; color: #64748b;">Gumasta / Municipal</span>
+          </td>
+
+          <td style="padding: 1.25rem;">
+            {% if v.fssai_license_number %}
+              <div style="margin-bottom: 0.35rem;">
+                <span class="badge" style="background: rgba(249,115,22,0.15); color: #f97316; border: 1px solid rgba(249,115,22,0.3); font-size: 0.7rem;">FSSAI</span>
+                <span style="font-family: monospace; font-weight: 700; color: #fff; margin-left: 0.25rem; font-size: 0.85rem;">{{ v.fssai_license_number }}</span>
+                {% if v.fssai_valid_till %}
+                  <div style="font-size: 0.72rem; color: #94a3b8; margin-top: 0.15rem;">
+                    Valid Till: <span style="color: #f97316; font-weight: 600;">{{ v.fssai_valid_till|date:"d M Y" }}</span>
+                  </div>
+                {% endif %}
+              </div>
+            {% endif %}
+            {% if v.fda_license_number %}
+              <div>
+                <span class="badge" style="background: rgba(168,85,247,0.15); color: #c084fc; border: 1px solid rgba(168,85,247,0.3); font-size: 0.7rem;">FDA</span>
+                <span style="font-family: monospace; font-weight: 700; color: #fff; margin-left: 0.25rem; font-size: 0.85rem;">{{ v.fda_license_number }}</span>
+                {% if v.fda_valid_till %}
+                  <div style="font-size: 0.72rem; color: #94a3b8; margin-top: 0.15rem;">
+                    Valid Till: <span style="color: #c084fc; font-weight: 600;">{{ v.fda_valid_till|date:"d M Y" }}</span>
+                  </div>
+                {% endif %}
+              </div>
+            {% endif %}
+            {% if not v.fssai_license_number and not v.fda_license_number %}
+              <span style="font-size: 0.78rem; color: #64748b;">Not Required for Category</span>
+            {% endif %}
+          </td>
+
+          <td style="padding: 1.25rem;">
+            <div>
+              <span style="font-size: 0.75rem; color: #94a3b8;">PAN:</span>
+              <strong style="font-family: monospace; color: #38bdf8; font-size: 0.88rem;">{{ v.business_pan|default:"—" }}</strong>
+            </div>
+            <div style="margin-top: 0.2rem;">
+              <span style="font-size: 0.75rem; color: #94a3b8;">GSTIN:</span>
+              <strong style="font-family: monospace; color: #cbd5e1; font-size: 0.82rem;">{{ v.gst_number|default:"Turnover Exempt" }}</strong>
+            </div>
+          </td>
+
+          <td style="padding: 1.25rem;">
+            {% if v.status == 'APPROVED' %}
+              <span class="badge" style="background: rgba(16,185,129,0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.3); padding: 0.35rem 0.65rem;">
+                <i class="bi bi-shield-fill-check"></i> Compliant
+              </span>
+            {% elif v.status == 'PENDING' %}
+              <span class="badge" style="background: rgba(245,158,11,0.15); color: #f59e0b; border: 1px solid rgba(245,158,11,0.3); padding: 0.35rem 0.65rem;">
+                <i class="bi bi-clock-history"></i> Pending
+              </span>
+            {% else %}
+              <span class="badge" style="background: rgba(239,68,68,0.15); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); padding: 0.35rem 0.65rem;">
+                <i class="bi bi-exclamation-triangle-fill"></i> Flagged
+              </span>
+            {% endif %}
+            {% if v.admin_notes %}
+              <div style="font-size: 0.72rem; color: #94a3b8; margin-top: 0.35rem; font-style: italic;">
+                Note: {{ v.admin_notes }}
+              </div>
+            {% endif %}
+          </td>
+
+          <td style="padding: 1.25rem; text-align: right;">
+            <div style="display: inline-flex; gap: 0.4rem;">
+              <form method="POST" action="/admin-portal/verifications/{{ v.id }}/update/" style="display: inline-block;">
+                {% csrf_token %}
+                <input type="hidden" name="status" value="APPROVED">
+                <button type="submit" class="btn btn-sm btn-success" title="Approve Compliance" style="font-size: 0.78rem; font-weight: 700;">
+                  <i class="bi bi-check-lg"></i> Approve
+                </button>
+              </form>
+
+              <form method="POST" action="/admin-portal/verifications/{{ v.id }}/update/" style="display: inline-block;">
+                {% csrf_token %}
+                <input type="hidden" name="status" value="REJECTED">
+                <input type="hidden" name="admin_notes" value="License verification document discrepancy. Please re-submit valid Shop Act or License.">
+                <button type="submit" class="btn btn-sm btn-outline-danger" title="Reject / Flag" style="font-size: 0.78rem; font-weight: 700; color: #ef4444; border-color: #ef4444;">
+                  <i class="bi bi-x-lg"></i> Flag
+                </button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="6" style="padding: 2.5rem; text-align: center; color: #64748b;">
+            <i class="bi bi-shield-check" style="font-size: 2rem; display: block; margin-bottom: 0.5rem; opacity: 0.5;"></i>
+            No merchant verification records found matching current criteria.
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

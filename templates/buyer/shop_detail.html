@@ -1,0 +1,238 @@
+{% extends "base/buyer_base.html" %}
+{% load static %}
+
+{% block title %}{{ shop.name }} — Buyer Portal | {{ BRAND_NAME }}{% endblock %}
+
+{% block extra_css %}
+<!-- Leaflet Map CSS (Local Vendor) -->
+<link rel="stylesheet" href="{% static 'vendor/leaflet/leaflet.css' %}" />
+<style>
+  @media (max-width: 768px) {
+    .shop-detail-grid {
+      grid-template-columns: 1fr !important;
+    }
+    .shop-detail-left-col {
+      grid-column: span 1 !important;
+    }
+    .shop-banner-box {
+      height: auto !important;
+      min-height: 280px !important;
+      position: relative !important;
+    }
+    .shop-banner-box .banner-bg-img {
+      position: absolute !important;
+      inset: 0 !important;
+      height: 100% !important;
+      object-fit: cover !important;
+    }
+    .shop-banner-overlay-content {
+      position: relative !important;
+      bottom: auto !important;
+      left: auto !important;
+      right: auto !important;
+      padding: 1.25rem 1rem !important;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 1.5rem; padding-bottom: 3.5rem;">
+  
+  <!-- Breadcrumb -->
+  <div style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.4rem;">
+    <a href="/buyer/dashboard/" style="color: var(--text-muted); text-decoration: none;">Dashboard</a>
+    <i class="bi bi-chevron-right" style="font-size: 0.7rem;"></i>
+    <a href="/buyer/explore/?type=shops" style="color: var(--text-muted); text-decoration: none;">Shops</a>
+    <i class="bi bi-chevron-right" style="font-size: 0.7rem;"></i>
+    <span style="color: var(--brand-navy-900); font-weight: 600;">{{ shop.name }}</span>
+  </div>
+
+  <!-- Store Banner -->
+  <div class="card" style="margin-bottom: 2rem; overflow: hidden; border: 1px solid var(--border-light); box-shadow: var(--shadow-sm); border-radius: var(--radius-lg);">
+    <div class="shop-banner-box" style="height: 240px; position: relative;">
+      <img src="{{ shop.banner_image_url }}" alt="{{ shop.name }}" class="banner-bg-img" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='/static/images/placeholder_shop.svg'">
+      <div style="position: absolute; inset: 0; background: linear-gradient(180deg, rgba(12, 16, 23, 0.2) 30%, rgba(12, 16, 23, 0.88) 100%);"></div>
+      
+      <div class="shop-banner-overlay-content" style="position: absolute; bottom: 20px; left: 20px; right: 20px; display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 1rem; color: #fff;">
+        <div class="d-flex align-center gap-3">
+          <img src="{{ shop.logo_image_url }}" alt="{{ shop.name }} Logo" style="width: 64px; height: 64px; border-radius: var(--radius-md); border: 2px solid #ffffff; background: #ffffff; object-fit: cover; box-shadow: var(--shadow-md);">
+          <div>
+            <div class="d-flex align-center gap-2 flex-wrap">
+              <h1 style="font-size: 1.75rem; font-weight: 800; color: #ffffff; margin: 0; letter-spacing: -0.02em;">{{ shop.name }}</h1>
+              <span class="badge badge-success" style="font-size: 0.75rem;"><i class="bi bi-patch-check-fill"></i> Verified Store</span>
+              {% if user_distance_display %}
+                <span class="badge" style="background: rgba(249, 115, 22, 0.95); color: #fff; font-size: 0.78rem; font-weight: 700;">
+                  <i class="bi bi-geo-alt-fill"></i> {{ user_distance_display }} away
+                </span>
+              {% endif %}
+            </div>
+            <p style="font-size: 0.88rem; color: #cbd5e1; margin: 0.25rem 0 0;">
+              {{ shop.locality }}, {{ shop.city }} &bull; <i class="bi bi-star-fill" style="color: #fde047;"></i> <span style="font-variant-numeric: tabular-nums;">{{ shop.rating }}</span>
+            </p>
+          </div>
+        </div>
+
+        <div class="d-flex align-center gap-2 flex-wrap">
+          {% if shop.latitude and shop.longitude %}
+            <a href="https://www.google.com/maps/dir/?api=1&destination={{ shop.latitude }},{{ shop.longitude }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm" style="color: #ffffff; border-color: rgba(255,255,255,0.4); background: rgba(12,16,23,0.5);">
+              <i class="bi bi-cursor-fill text-saffron"></i> Directions
+            </a>
+          {% elif shop.address or shop.locality %}
+            <a href="https://www.google.com/maps/search/?api=1&query={{ shop.name|urlencode }}+{{ shop.locality|urlencode }}+{{ shop.city|urlencode }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm" style="color: #ffffff; border-color: rgba(255,255,255,0.4); background: rgba(12,16,23,0.5);">
+              <i class="bi bi-cursor-fill text-saffron"></i> Directions
+            </a>
+          {% endif %}
+          <a href="/buyer/scan/" class="btn btn-primary btn-sm">
+            <i class="bi bi-qr-code-scan"></i> Open Counter Scanner
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="d-grid grid-3 gap-4 shop-detail-grid">
+    <!-- Offers & Description -->
+    <div class="shop-detail-left-col" style="grid-column: span 2;">
+      <div class="card card-padded" style="margin-bottom: 2rem; background: #ffffff; border: 1px solid var(--border-light);">
+        <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--brand-navy-900); margin-bottom: 0.5rem;">About the Outlet</h3>
+        <p style="font-size: 0.92rem; line-height: 1.6; color: var(--text-main); margin: 0;">{{ shop.description }}</p>
+      </div>
+
+      <div style="margin-bottom: 2rem;">
+        <div class="d-flex align-center justify-between" style="margin-bottom: 1.25rem;">
+          <h3 style="font-size: 1.3rem; font-weight: 800; color: var(--brand-navy-900); letter-spacing: -0.01em; margin: 0;">
+            Available In-Store Deals ({{ active_offers|length }})
+          </h3>
+          <span class="badge badge-saffron">{{ active_offers|length }} Active</span>
+        </div>
+        <div class="d-grid grid-2 gap-3">
+          {% for offer in active_offers %}
+            {% include "components/offer_card.html" with offer=offer %}
+          {% empty %}
+            <div style="grid-column: 1 / -1;">
+              {% include "components/empty_state.html" with title="No active offers currently" description="Check back soon for new in-store promotions." %}
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Sidebar info -->
+    <div>
+      <div class="card card-padded" style="background: #ffffff; border: 1px solid var(--border-light);">
+        <div class="d-flex align-center justify-between" style="border-bottom: 1px solid var(--border-light); padding-bottom: 0.5rem; margin-bottom: 0.85rem;">
+          <h4 style="font-size: 1.05rem; font-weight: 700; color: var(--brand-navy-900); margin: 0;">Outlet Information</h4>
+          {% if user_distance_display %}
+            <span class="badge badge-saffron" style="font-size: 0.72rem;">{{ user_distance_display }} away</span>
+          {% endif %}
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 0.85rem; font-size: 0.88rem;">
+          <div>
+            <span class="text-muted" style="display: block; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;">Address</span>
+            <div style="line-height: 1.4;"><i class="bi bi-geo-alt text-saffron"></i> {{ shop.full_address }}</div>
+          </div>
+          <div>
+            <span class="text-muted" style="display: block; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;">Store Hours</span>
+            <div style="font-variant-numeric: tabular-nums;"><i class="bi bi-clock"></i> {{ shop.timing_display }}</div>
+          </div>
+          <div>
+            <span class="text-muted" style="display: block; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;">Contact Telephone</span>
+            <div style="font-weight: 600; font-variant-numeric: tabular-nums;"><i class="bi bi-telephone text-success"></i> {{ shop.phone }}</div>
+          </div>
+        </div>
+
+        <div id="buyerShopDetailMap" style="height: 180px; border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--border-light); margin-top: 1rem; margin-bottom: 0.5rem; position: relative; z-index: 1;">
+        </div>
+        <div style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--border-light); display: flex; flex-direction: column; gap: 0.5rem;">
+          <a href="https://www.google.com/maps/dir/?api=1&destination={{ shop.latitude }},{{ shop.longitude }}" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-block btn-sm">
+            <i class="bi bi-cursor-fill"></i> Launch Google Maps Navigation
+          </a>
+          <a href="https://maps.google.com/?q={{ shop.latitude }},{{ shop.longitude }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-block btn-sm">
+            <i class="bi bi-map"></i> Open in Google Maps
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Leaflet Map Engine (Local Vendor) -->
+<script src="{% static 'vendor/leaflet/leaflet.js' %}"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const mapEl = document.getElementById('buyerShopDetailMap');
+    if (!mapEl) return;
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    const lat = parseFloat("{{ shop.latitude|default:'0' }}");
+    const lng = parseFloat("{{ shop.longitude|default:'0' }}");
+    const safeShopName = escapeHtml("{{ shop.name|escapejs }}");
+    const safeLocality = escapeHtml("{{ shop.locality|default:''|escapejs }}");
+    const safeCity = escapeHtml("{{ shop.city|default:''|escapejs }}");
+    const safeAddress = safeLocality && safeCity ? `${safeLocality}, ${safeCity}` : (safeLocality || safeCity || 'Location Verified');
+
+    if (typeof L !== 'undefined' && lat && lng && !isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0) {
+      try {
+        const map = L.map('buyerShopDetailMap', {
+          scrollWheelZoom: false,
+          zoomControl: true,
+          attributionControl: false
+        }).setView([lat, lng], 15);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 19,
+          attribution: '&copy; OpenStreetMap'
+        }).addTo(map);
+
+        const pinHtml = '<div style="background: #f97316; color: white; width: 32px; height: 32px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.35); border: 2px solid white;"><i class="bi bi-shop" style="transform: rotate(45deg); font-size: 14px;"></i></div>';
+        
+        const shopIcon = L.divIcon({
+          className: 'll-shop-marker',
+          html: pinHtml,
+          iconSize: [32, 32],
+          iconAnchor: [16, 32],
+          popupAnchor: [0, -32]
+        });
+
+        const marker = L.marker([lat, lng], { icon: shopIcon }).addTo(map);
+        marker.bindPopup(`<div style="font-family: inherit; font-size: 0.85rem;"><strong style="color: #0f172a;">${safeShopName}</strong><br><span style="color: #64748b; font-size: 0.78rem;">${safeAddress}</span></div>`).openPopup();
+
+        setTimeout(function() {
+          map.invalidateSize();
+        }, 300);
+        return;
+      } catch (err) {
+        console.warn('Leaflet initialization fallback:', err);
+      }
+    }
+
+    // High quality offline fallback card with XSS-safe encoding
+    mapEl.innerHTML = `
+      <div style="width: 100%; height: 100%; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; color: #f8fafc; text-align: center; padding: 1rem;">
+        <div style="width: 44px; height: 44px; border-radius: 50%; background: rgba(249, 115, 22, 0.15); border: 2px solid #f97316; display: flex; align-items: center; justify-content: center; margin-bottom: 0.5rem;">
+          <i class="bi bi-geo-alt-fill" style="color: #f97316; font-size: 1.3rem;"></i>
+        </div>
+        <div style="font-weight: 700; font-size: 0.92rem; color: #ffffff; margin-bottom: 0.2rem;">${safeShopName}</div>
+        <div style="font-size: 0.78rem; color: #94a3b8; margin-bottom: 0.4rem;">${safeAddress}</div>
+        <div style="font-size: 0.72rem; color: #cbd5e1; background: rgba(255,255,255,0.08); padding: 0.2rem 0.6rem; border-radius: 9999px;">
+          📍 GPS: ${lat && !isNaN(lat) ? lat.toFixed(4) : 'N/A'}, ${lng && !isNaN(lng) ? lng.toFixed(4) : 'N/A'}
+        </div>
+      </div>
+    `;
+  });
+</script>
+{% endblock %}

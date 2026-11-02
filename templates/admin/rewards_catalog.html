@@ -1,0 +1,242 @@
+{% extends "base/admin_base.html" %}
+
+{% block title %}Reward Burn Catalog &bull; Admin Console{% endblock %}
+{% block page_title %}Dynamic Reward Burn Catalog{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 2rem;">
+  <div class="d-flex align-center justify-between flex-wrap gap-2" style="margin-bottom: 1.5rem;">
+    <div>
+      <h1 style="font-size: 1.5rem; font-weight: 800; color: var(--brand-navy-900); margin: 0 0 0.25rem;">
+        Dynamic Reward Burn Catalog
+      </h1>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">
+        Manage points burn vouchers, discount perks, and food/beverage merchandise without modifying code.
+      </p>
+    </div>
+    <div>
+      <button type="button" onclick="document.getElementById('createRewardCard').style.display = document.getElementById('createRewardCard').style.display === 'none' ? 'block' : 'none';" class="btn btn-primary btn-sm" style="font-weight: 700; background: linear-gradient(135deg, #ef4444, #dc2626); border: none;">
+        <i class="bi bi-plus-circle"></i> Add New Reward
+      </button>
+    </div>
+  </div>
+
+  <!-- Metric Overview Cards -->
+  <div class="d-grid grid-4 gap-3" style="margin-bottom: 1.75rem;">
+    <div class="admin-kpi-card">
+      <span class="stat-label">Active Catalog Rewards</span>
+      <div class="stat-value" style="color: #ef4444;">{{ active_rewards_count }}</div>
+      <span style="font-size: 0.78rem; color: var(--text-muted);">{{ catalog_items|length }} Total items configured</span>
+    </div>
+
+    <div class="admin-kpi-card">
+      <span class="stat-label">Total Vouchers Claimed</span>
+      <div class="stat-value" style="color: #6366f1;">{{ total_claims }}</div>
+      <span style="font-size: 0.78rem; color: var(--text-muted);">Lifetime buyer burns</span>
+    </div>
+
+    <div class="admin-kpi-card">
+      <span class="stat-label">Total Points Burned</span>
+      <div class="stat-value" style="color: #f59e0b;">{{ total_points_burned }} <span style="font-size: 1rem; color: var(--text-muted);">Pts</span></div>
+      <span style="font-size: 0.78rem; color: var(--text-muted);">Points redeemed by shoppers</span>
+    </div>
+
+    <div class="admin-kpi-card">
+      <span class="stat-label">Burn Velocity</span>
+      <div class="stat-value" style="color: #10b981;">Active</div>
+      <span style="font-size: 0.78rem; color: var(--text-muted);">Instant ledger settlement</span>
+    </div>
+  </div>
+
+  <!-- Create New Catalog Item Collapsible Card -->
+  <div id="createRewardCard" style="display: none; background: #ffffff; border: 1px solid var(--border-light); border-radius: 16px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: var(--shadow-sm);">
+    <h3 style="font-size: 1.1rem; font-weight: 800; color: var(--brand-navy-900); margin: 0 0 1rem; display: flex; align-items: center; gap: 0.5rem;">
+      <i class="bi bi-plus-square-fill" style="color: #ef4444;"></i> Create Dynamic Reward Catalog Item
+    </h3>
+    <form method="POST" action="{% url 'admin_rewards_catalog_create' %}">
+      {% csrf_token %}
+      <div class="d-grid grid-3 gap-3" style="margin-bottom: 1rem;">
+        <div>
+          <label style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--brand-navy-900); margin-bottom: 0.35rem;">
+            Reward Title * (e.g. ₹10 Off, Free Coffee Voucher)
+          </label>
+          <input type="text" name="title" required placeholder="e.g. ₹50 Shopping Voucher" class="form-control" style="width: 100%; padding: 0.55rem 0.8rem; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 0.85rem;">
+        </div>
+
+        <div>
+          <label style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--brand-navy-900); margin-bottom: 0.35rem;">
+            Points Required * (e.g. 50, 75, 100, 150)
+          </label>
+          <input type="number" name="points_required" min="1" required value="50" class="form-control" style="width: 100%; padding: 0.55rem 0.8rem; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 0.85rem;">
+        </div>
+
+        <div>
+          <label style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--brand-navy-900); margin-bottom: 0.35rem;">
+            Reward Type *
+          </label>
+          <select name="reward_type" class="form-control" style="width: 100%; padding: 0.55rem 0.8rem; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 0.85rem;">
+            {% for val, label in reward_types %}
+              <option value="{{ val }}">{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <div class="d-grid grid-3 gap-3" style="margin-bottom: 1rem;">
+        <div>
+          <label style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--brand-navy-900); margin-bottom: 0.35rem;">
+            Voucher Code Prefix
+          </label>
+          <input type="text" name="voucher_code_prefix" value="LL-VOUCHER" class="form-control" style="width: 100%; padding: 0.55rem 0.8rem; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 0.85rem;">
+        </div>
+
+        <div>
+          <label style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--brand-navy-900); margin-bottom: 0.35rem;">
+            Monetary Discount Value (₹)
+          </label>
+          <input type="number" name="discount_inr" step="0.01" value="0.00" class="form-control" style="width: 100%; padding: 0.55rem 0.8rem; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 0.85rem;">
+        </div>
+
+        <div>
+          <label style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--brand-navy-900); margin-bottom: 0.35rem;">
+            Available Stock (-1 for Unlimited)
+          </label>
+          <input type="number" name="stock" value="-1" class="form-control" style="width: 100%; padding: 0.55rem 0.8rem; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 0.85rem;">
+        </div>
+      </div>
+
+      <div style="margin-bottom: 1rem;">
+        <label style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--brand-navy-900); margin-bottom: 0.35rem;">
+          Description &amp; Redemption Terms
+        </label>
+        <textarea name="description" rows="2" placeholder="e.g. Applicable across all cafes and dining outlets. Present voucher code at counter." class="form-control" style="width: 100%; padding: 0.55rem 0.8rem; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 0.85rem;"></textarea>
+      </div>
+
+      <div style="display: flex; align-items: center; justify-content: space-between;">
+        <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; font-weight: 600; cursor: pointer;">
+          <input type="checkbox" name="is_active" checked style="width: 16px; height: 16px;">
+          <span>Publish immediately to Buyer Reward Store</span>
+        </label>
+        <button type="submit" class="btn btn-primary btn-sm" style="font-weight: 800; padding: 0.55rem 1.25rem;">
+          Save to Catalog
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Catalog Items Table -->
+  <div class="card card-padded" style="background: #ffffff; border: 1px solid var(--border-light); border-radius: 16px; margin-bottom: 2rem;">
+    <div class="d-flex align-center justify-between" style="margin-bottom: 1.25rem; border-bottom: 1px solid var(--border-light); padding-bottom: 0.85rem;">
+      <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--brand-navy-900); margin: 0;">
+        Configured Catalog Rewards ({{ catalog_items|length }})
+      </h3>
+      <span style="font-size: 0.8rem; color: var(--text-muted);">Admin can toggle availability in real-time</span>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Reward Item</th>
+            <th>Type</th>
+            <th>Points Cost</th>
+            <th>Discount Value</th>
+            <th>Stock</th>
+            <th>Claims</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in catalog_items %}
+            <tr>
+              <td>
+                <div style="font-weight: 800; color: var(--brand-navy-900); font-size: 0.95rem;">{{ item.title }}</div>
+                <div style="font-size: 0.78rem; color: var(--text-muted);">Prefix: <code style="color: #6366f1;">{{ item.voucher_code_prefix }}</code></div>
+              </td>
+              <td>
+                <span class="badge badge-neutral" style="font-size: 0.72rem;">{{ item.get_reward_type_display }}</span>
+              </td>
+              <td style="font-weight: 800; font-size: 1rem; color: #b45309;">
+                {{ item.points_required }} Pts
+              </td>
+              <td style="font-weight: 700; color: #16a34a;">
+                {% if item.discount_inr > 0 %}₹{{ item.discount_inr }}{% else %}Perk / Gift{% endif %}
+              </td>
+              <td>
+                {% if item.stock == -1 %}
+                  <span class="badge badge-success">Unlimited</span>
+                {% elif item.stock > 0 %}
+                  <span class="badge badge-neutral">{{ item.stock }} left</span>
+                {% else %}
+                  <span class="badge badge-danger">Out of Stock</span>
+                {% endif %}
+              </td>
+              <td style="font-weight: 700; color: var(--brand-navy-900);">
+                {{ item.claims_count }}
+              </td>
+              <td>
+                {% if item.is_active %}
+                  <span class="badge badge-success">ACTIVE</span>
+                {% else %}
+                  <span class="badge badge-neutral" style="color: #94a3b8;">DISABLED</span>
+                {% endif %}
+              </td>
+              <td>
+                <form method="POST" action="{% url 'admin_rewards_catalog_toggle' item.id %}" style="display: inline;">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-sm {% if item.is_active %}btn-outline{% else %}btn-primary{% endif %}" style="padding: 0.3rem 0.65rem; font-size: 0.75rem; font-weight: 700;">
+                    {% if item.is_active %}Deactivate{% else %}Activate{% endif %}
+                  </button>
+                </form>
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="8" class="text-center text-muted" style="padding: 2.5rem 1rem;">
+                No rewards in catalog yet. Click "+ Add New Reward" above to configure your first points burn offer!
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Recent Claims Audit Table -->
+  {% if recent_claims %}
+    <div class="card card-padded" style="background: #ffffff; border: 1px solid var(--border-light); border-radius: 16px;">
+      <h3 style="font-size: 1.1rem; font-weight: 800; color: var(--brand-navy-900); margin: 0 0 1rem;">
+        Recent Shopper Voucher Claims
+      </h3>
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Timestamp</th>
+              <th>Shopper</th>
+              <th>Reward Item</th>
+              <th>Voucher Code</th>
+              <th>Points Burned</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for claim in recent_claims %}
+              <tr>
+                <td style="font-size: 0.82rem; color: var(--text-muted);">{{ claim.claimed_at|date:"d M Y, h:i A" }}</td>
+                <td style="font-weight: 700; color: var(--brand-navy-900);">{{ claim.buyer.username }}</td>
+                <td>{{ claim.catalog_item.title }}</td>
+                <td><code style="font-weight: 800; color: #1e40af; background: #eff6ff; padding: 0.15rem 0.4rem; border-radius: 4px;">{{ claim.voucher_code }}</code></td>
+                <td style="font-weight: 800; color: #ef4444;">-{{ claim.points_spent }} Pts</td>
+                <td><span class="badge badge-success">{{ claim.get_status_display }}</span></td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}

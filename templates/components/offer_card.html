@@ -1,0 +1,67 @@
+<div class="offer-card" style="border-radius: 18px; border: 1px solid var(--border-light); overflow: hidden; background: #ffffff; box-shadow: var(--shadow-xs); transition: all 0.2s ease;">
+  <div style="position: relative; overflow: hidden; height: 165px;">
+    <img src="{{ offer.image_url }}" alt="{{ offer.title }}" class="offer-img" style="height: 100%; width: 100%; object-fit: cover;" onerror="this.src='/static/images/placeholder_offer.svg'">
+    
+    <!-- Discount Tag (Top Left Ribbon) -->
+    <div style="position: absolute; top: 12px; left: 12px; background: #f97316; color: #ffffff; font-weight: 800; font-size: 0.8rem; padding: 0.35rem 0.75rem; border-radius: var(--radius-full); box-shadow: 0 4px 10px rgba(249,115,22,0.4);">
+      {{ offer.discount_display }}
+    </div>
+
+    <!-- Reward Points Chip (Bottom Right) -->
+    <span style="position: absolute; bottom: 10px; right: 10px; background: rgba(11, 15, 25, 0.85); backdrop-filter: blur(6px); color: #fff; font-size: 0.75rem; padding: 0.25rem 0.6rem; border-radius: var(--radius-full); border: 1px solid rgba(255,255,255,0.15); font-weight: 700;">
+      <i class="bi bi-coin" style="color: #fbbf24;"></i> +{{ offer.reward_points_per_redemption }} pts
+    </span>
+  </div>
+
+  <div class="offer-body" style="padding: 1.25rem; display: flex; flex-direction: column; flex: 1;">
+    <div style="font-size: 0.78rem; font-weight: 700; color: #f97316; margin-bottom: 0.3rem; display: flex; align-items: center; gap: 0.35rem;">
+      <i class="bi bi-shop"></i>
+      <a href="{% if is_buyer %}/buyer/shops/{{ offer.shop.slug }}/{% else %}/shops/{{ offer.shop.slug }}/{% endif %}" style="color: inherit; text-decoration: none;">
+        {{ offer.shop.name }}
+      </a>
+    </div>
+
+    <h3 style="font-size: 1.08rem; font-weight: 700; color: var(--ink-950); margin-bottom: 0.45rem; line-height: 1.35; font-family: var(--font-display);">
+      <a href="{% if is_buyer %}/buyer/offers/{{ offer.slug }}/{% else %}/offers/{{ offer.slug }}/{% endif %}" style="color: inherit; text-decoration: none;">
+        {{ offer.title }}
+      </a>
+    </h3>
+
+    <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.85rem; display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;">
+      {% if offer.min_purchase > 0 %}
+        <span style="background: var(--bg-subtle); padding: 0.15rem 0.45rem; border-radius: 4px; font-weight: 600; color: var(--ink-700);">
+          Min bill ₹{{ offer.min_purchase|floatformat:0 }}
+        </span>
+      {% endif %}
+      <span>{{ offer.shop.locality }}, {{ offer.shop.city }}</span>
+    </div>
+
+    <!-- Claimed Counter Indicator -->
+    <div style="margin-bottom: 0.85rem;">
+      <div style="display: flex; justify-content: space-between; font-size: 0.72rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.25rem;">
+        <span>Claimed: {{ offer.current_redemptions }}/{{ offer.max_redemptions }}</span>
+        <span>{{ offer.remaining_redemptions }} left</span>
+      </div>
+      <div style="width: 100%; height: 5px; background-color: #f1f5f9; border-radius: var(--radius-full); overflow: hidden;">
+        <div style="width: {{ offer.percentage_claimed }}%; height: 100%; background: linear-gradient(90deg, #f97316, #f59e0b);"></div>
+      </div>
+    </div>
+
+    <!-- Perforated Voucher Tear-Line -->
+    <div class="offer-perforation" style="margin-top: auto; padding-top: 0.85rem; border-top: 1.5px dashed var(--border-light); display: flex; align-items: center; justify-content: space-between;">
+      <span style="font-size: 0.75rem; color: var(--text-muted); display: inline-flex; align-items: center; gap: 0.3rem;">
+        <i class="bi bi-clock"></i> Valid till {{ offer.end_date|date:"d M" }}
+      </span>
+
+      {% if is_buyer %}
+        <a href="/buyer/scan/?offer={{ offer.id }}" class="btn btn-sm" style="background: #f97316; color: #ffffff; border-radius: var(--radius-full); font-weight: 700; padding: 0.35rem 0.9rem; font-size: 0.78rem; text-decoration: none;">
+          Redeem
+        </a>
+      {% else %}
+        <a href="/offers/{{ offer.slug }}/" class="btn btn-sm" style="background: #f97316; color: #ffffff; border-radius: var(--radius-full); font-weight: 700; padding: 0.35rem 0.9rem; font-size: 0.78rem; text-decoration: none;">
+          Get Offer
+        </a>
+      {% endif %}
+    </div>
+  </div>
+</div>

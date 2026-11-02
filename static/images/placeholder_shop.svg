@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="50%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#334155"/>
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#f97316"/>
+      <stop offset="100%" stop-color="#fb923c"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="450" fill="url(#bgGrad)"/>
+  <circle cx="700" cy="80" r="140" fill="#f97316" opacity="0.08"/>
+  <circle cx="100" cy="380" r="180" fill="#3b82f6" opacity="0.06"/>
+  
+  <!-- Store Front Icon -->
+  <g transform="translate(400, 185) scale(2.2)" text-anchor="middle">
+    <path d="M -24 -12 L 24 -12 L 28 0 L -28 0 Z" fill="url(#accentGrad)"/>
+    <path d="M -20 0 L -20 24 L 20 24 L 20 0 Z" fill="#ffffff" opacity="0.15"/>
+    <rect x="-8" y="8" width="16" height="16" rx="2" fill="url(#accentGrad)" opacity="0.9"/>
+    <rect x="-18" y="4" width="7" height="10" rx="1" fill="#ffffff" opacity="0.5"/>
+    <rect x="11" y="4" width="7" height="10" rx="1" fill="#ffffff" opacity="0.5"/>
+  </g>
+
+  <!-- Brand Text -->
+  <text x="400" y="295" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="24" font-weight="800" fill="#ffffff" text-anchor="middle" letter-spacing="0.5">LOKALLOOP VERIFIED STORE</text>
+  <text x="400" y="325" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="600" fill="#94a3b8" text-anchor="middle">Neighborhood Merchant Outlet</text>
+</svg>

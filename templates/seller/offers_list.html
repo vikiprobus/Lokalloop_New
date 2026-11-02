@@ -1,0 +1,94 @@
+{% extends "base/seller_base.html" %}
+
+{% block title %}Manage Offers — {{ BRAND_NAME }} Business{% endblock %}
+{% block page_title %}Offers & In-Store Campaigns{% endblock %}
+
+{% block content %}
+<div class="card card-padded" style="margin-bottom: 2rem; background: #ffffff; border: 1px solid var(--border-light); box-shadow: var(--shadow-sm);">
+  <div class="d-flex align-center justify-between flex-wrap gap-2">
+    <div>
+      <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--brand-navy-900); margin: 0;">Store Promotional Campaigns</h3>
+      <p style="font-size: 0.82rem; color: var(--text-muted); margin: 0.15rem 0 0;">Launch targeted promotions to drive neighborhood shoppers to your checkout counter</p>
+    </div>
+    <div class="d-flex align-center gap-2">
+      <a href="/seller/offers/?export=excel" class="btn-merchant-excel" title="Download Excel Spreadsheet of campaigns">
+        <i class="bi bi-file-earmark-excel-fill"></i> Export Excel (.xlsx)
+      </a>
+      <a href="/seller/offers/create/" class="btn btn-primary">
+        <i class="bi bi-plus-lg"></i> Launch New Campaign
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="card card-padded" style="background: #ffffff; border: 1px solid var(--border-light); box-shadow: var(--shadow-sm);">
+  <div class="table-responsive">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Campaign Title</th>
+          <th>Discount</th>
+          <th>Redemptions</th>
+          <th>Valid Until</th>
+          <th>Status</th>
+          <th class="text-right">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for offer in offers %}
+          <tr>
+            <td>
+              <div style="font-weight: 700; font-size: 0.92rem; color: var(--brand-navy-900);">{{ offer.title }}</div>
+              <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.15rem; font-variant-numeric: tabular-nums;">
+                Min. Bill: ₹{{ offer.min_purchase|floatformat:0 }} &bull; Reward: +{{ offer.reward_points_per_redemption }} Pts
+              </div>
+            </td>
+            <td>
+              <span class="badge badge-saffron" style="font-size: 0.8rem; font-weight: 700;">{{ offer.discount_display }}</span>
+            </td>
+            <td>
+              <div style="font-weight: 700; font-variant-numeric: tabular-nums; font-size: 0.85rem;">{{ offer.current_redemptions }} / {{ offer.max_redemptions }}</div>
+              <div style="width: 100px; height: 5px; background: var(--bg-subtle); border-radius: 4px; overflow: hidden; margin-top: 0.25rem;">
+                <div style="width: {{ offer.percentage_claimed }}%; height: 100%; background: var(--brand-saffron-500);"></div>
+              </div>
+            </td>
+            <td class="text-muted" style="font-variant-numeric: tabular-nums; font-size: 0.82rem; white-space: nowrap;">{{ offer.end_date|date:"d M Y" }}</td>
+            <td>
+              {% if offer.status == 'ACTIVE' %}
+                <span class="badge badge-success"><i class="bi bi-record-fill" style="font-size: 0.6rem;"></i> Active</span>
+              {% elif offer.status == 'PAUSED' %}
+                <span class="badge badge-warning"><i class="bi bi-pause-fill"></i> Paused</span>
+              {% else %}
+                <span class="badge badge-neutral">{{ offer.status }}</span>
+              {% endif %}
+            </td>
+            <td class="text-right">
+              <div class="d-flex justify-end gap-1">
+                <a href="/seller/qr/?offer={{ offer.id }}" class="btn btn-outline btn-sm" title="View Counter QR Poster">
+                  <i class="bi bi-qr-code"></i> Counter Standee
+                </a>
+                <form method="POST" action="/seller/offers/{{ offer.id }}/toggle/" style="display: inline;">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-secondary btn-sm" title="Pause or Resume Offer">
+                    {% if offer.status == 'ACTIVE' %}
+                      <i class="bi bi-pause-fill"></i> Pause
+                    {% else %}
+                      <i class="bi bi-play-fill"></i> Resume
+                    {% endif %}
+                  </button>
+                </form>
+              </div>
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="6">
+              {% include "components/empty_state.html" with title="No campaigns launched yet" description="Launch your first in-store discount campaign to attract neighborhood footfalls." action_url="/seller/offers/create/" action_text="Create Your First Offer" %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

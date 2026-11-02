@@ -1,0 +1,392 @@
+{% extends "base/public_base.html" %}
+
+{% block title %}Counter Deals at {{ shop.name }} — LokalLoop{% endblock %}
+{% block meta_description %}You are at {{ shop.name }} in {{ shop.locality }}, {{ shop.city }}. View active in-store counter offers, claim instant checkout discounts, and earn reward points.{% endblock %}
+
+{% block content %}
+<div class="container container-narrow" style="padding-top: 1.5rem; padding-bottom: 4rem;">
+
+  <!-- Store Header Card with Verified Merchant Badge & Navigation -->
+  <div class="card" style="border: 1px solid var(--border-light); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: 1.75rem; box-shadow: var(--shadow-sm); background: #ffffff;">
+    <div style="background: linear-gradient(135deg, var(--ink-950) 0%, #1e293b 100%); color: #ffffff; padding: 2rem 1.5rem; position: relative;">
+      
+      <div class="d-flex align-center justify-between flex-wrap gap-2" style="margin-bottom: 0.75rem;">
+        <span class="badge badge-saffron" style="font-size: 0.75rem; letter-spacing: 0.04em;">
+          📍 IN-STORE COUNTER STANDEE
+        </span>
+        {% if shop.is_approved %}
+          <span class="badge badge-success" style="font-size: 0.75rem;">
+            <i class="bi bi-patch-check-fill"></i> Verified Lokal Merchant
+          </span>
+        {% endif %}
+      </div>
+
+      <div class="d-flex align-center gap-3 flex-wrap">
+        {% if shop.logo_image_url %}
+          <img src="{{ shop.logo_image_url }}" alt="{{ shop.name }}" style="width: 64px; height: 64px; border-radius: 12px; object-fit: cover; border: 2px solid rgba(255,255,255,0.2); background: #fff;">
+        {% else %}
+          <div style="width: 64px; height: 64px; border-radius: 12px; background: var(--brand-saffron-500); display: flex; align-items: center; justify-content: center; font-size: 1.8rem; color: #fff;">
+            <i class="bi bi-shop"></i>
+          </div>
+        {% endif %}
+
+        <div style="flex: 1; min-width: 220px;">
+          <h1 style="font-size: 1.85rem; font-weight: 800; color: #ffffff; margin: 0 0 0.25rem; letter-spacing: -0.02em;">
+            {{ shop.name }}
+          </h1>
+          <div style="font-size: 0.88rem; color: #cbd5e1; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+            <span><i class="bi bi-geo-alt-fill text-saffron"></i> {{ shop.locality }}, {{ shop.city }}</span>
+            <span>&bull;</span>
+            <span class="badge badge-neutral" style="background: rgba(255,255,255,0.1); color: #f1f5f9; font-size: 0.75rem;">{{ shop.category.name }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons Bar -->
+      <div style="display: flex; gap: 0.5rem; margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1); flex-wrap: wrap;">
+        {% if shop.latitude and shop.longitude %}
+          <a href="https://www.google.com/maps/dir/?api=1&destination={{ shop.latitude }},{{ shop.longitude }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline" style="color: #fff; border-color: rgba(255,255,255,0.3); font-size: 0.8rem; background: transparent;">
+            <i class="bi bi-compass"></i> Google Maps Directions
+          </a>
+        {% endif %}
+        {% if shop.phone %}
+          <a href="tel:{{ shop.phone }}" class="btn btn-sm btn-outline" style="color: #fff; border-color: rgba(255,255,255,0.3); font-size: 0.8rem; background: transparent;">
+            <i class="bi bi-telephone"></i> Call Store
+          </a>
+        {% endif %}
+        <a href="/shops/{{ shop.slug }}/" class="btn btn-sm btn-outline" style="color: #fff; border-color: rgba(255,255,255,0.3); font-size: 0.8rem; background: transparent;">
+          <i class="bi bi-info-circle"></i> Full Store Profile
+        </a>
+      </div>
+
+    </div>
+
+    <!-- Standee Welcome Banner -->
+    <div style="background: #fffbeb; border-bottom: 1px solid #fef3c7; padding: 0.85rem 1.25rem; font-size: 0.88rem; color: #92400e; display: flex; align-items: center; gap: 0.5rem;">
+      <span style="font-size: 1.2rem;">🎉</span>
+      <div>
+        <strong>You are at {{ shop.name }}!</strong> Select any active in-store offer below to claim your discount voucher at checkout.
+      </div>
+    </div>
+  </div>
+
+  {% if redemption_voucher %}
+    <!-- LIVE GENERATED VOUCHER SLIP (Cashier Presentable & Real-Time Waiting Screen) -->
+    <div id="redemptionVoucherCard" class="card" style="border: 2px solid {% if redemption_voucher.status == 'PENDING_APPROVAL' %}#f59e0b{% elif redemption_voucher.status == 'CANCELLED' %}#ef4444{% else %}#10b981{% endif %}; border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 2rem; background: #ffffff; box-shadow: var(--shadow-md);">
+      
+      <!-- Card Header with Dynamic Live Status -->
+      <div id="voucherHeader" style="background: {% if redemption_voucher.status == 'PENDING_APPROVAL' %}#f59e0b{% elif redemption_voucher.status == 'CANCELLED' %}#ef4444{% else %}#10b981{% endif %}; color: #ffffff; padding: 1.25rem; text-align: center;">
+        <span class="badge" style="background: rgba(0,0,0,0.15); color: #fff; font-size: 0.75rem; letter-spacing: 0.05em;" id="voucherBadge">
+          {% if redemption_voucher.status == 'PENDING_APPROVAL' %}
+            ⏳ LIVE COUNTER REQUEST
+          {% elif redemption_voucher.status == 'CANCELLED' %}
+            ❌ REQUEST DECLINED
+          {% else %}
+            ✅ DISCOUNT APPROVED
+          {% endif %}
+        </span>
+        <h2 style="font-size: 1.45rem; font-weight: 800; margin: 0.35rem 0 0; color: #fff;" id="voucherTitle">
+          {% if redemption_voucher.status == 'PENDING_APPROVAL' %}
+            Waiting for Store Counter Approval...
+          {% elif redemption_voucher.status == 'CANCELLED' %}
+            Redemption Request Declined
+          {% else %}
+            Voucher Successfully Redeemed!
+          {% endif %}
+        </h2>
+      </div>
+
+      <div class="card-body" style="padding: 1.75rem 1.5rem; text-align: center;">
+        
+        <!-- 4-Digit Counter Token Box -->
+        <div style="background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 12px; padding: 1.25rem; max-width: 340px; margin: 0 auto 1.25rem;">
+          <div style="font-size: 0.75rem; text-transform: uppercase; color: #64748b; letter-spacing: 0.05em; font-weight: 700;">
+            Billing Counter Code (OTP)
+          </div>
+          <div style="font-size: 2.75rem; font-weight: 900; font-family: monospace; letter-spacing: 0.15em; color: var(--brand-navy-900); margin: 0.25rem 0;">
+            {{ redemption_voucher.verification_otp|default:"6824" }}
+          </div>
+          <div id="voucherOtpStatus" style="font-size: 0.8rem; font-weight: 700; color: {% if redemption_voucher.status == 'PENDING_APPROVAL' %}#d97706{% elif redemption_voucher.status == 'CANCELLED' %}#dc2626{% else %}#059669{% endif %}; display: flex; align-items: center; justify-content: center; gap: 0.35rem;">
+            {% if redemption_voucher.status == 'PENDING_APPROVAL' %}
+              <span class="spinner-border spinner-border-sm" style="display: inline-block; width: 0.9rem; height: 0.9rem; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: spin 0.75s linear infinite;"></span>
+              <span>Tell the cashier this 4-digit code to approve</span>
+            {% elif redemption_voucher.status == 'CANCELLED' %}
+              <i class="bi bi-x-circle-fill"></i> Not approved by store
+            {% else %}
+              <i class="bi bi-check-circle-fill"></i> Validated at checkout billing counter
+            {% endif %}
+          </div>
+        </div>
+
+        <div style="font-size: 1.15rem; font-weight: 800; color: var(--brand-navy-900); margin-bottom: 0.25rem;">
+          {{ redemption_voucher.offer.title }}
+        </div>
+        <div style="font-size: 0.95rem; color: #10b981; font-weight: 700; margin-bottom: 1rem;">
+          Bill Discount: -₹{{ redemption_voucher.discount_given|floatformat:2 }}
+        </div>
+
+        <div id="voucherPointsCallout" style="background: #fef3c7; border: 1px solid #fde68a; border-radius: 8px; padding: 0.65rem 1rem; font-size: 0.85rem; color: #92400e; display: inline-flex; align-items: center; gap: 0.4rem; margin-bottom: 1.25rem;">
+          <i class="bi bi-coin"></i> +{{ redemption_voucher.reward_points_earned }} Loyalty Reward Points on checkout!
+        </div>
+
+        <div>
+          <a href="/buyer/dashboard/" class="btn btn-dark btn-sm">
+            <i class="bi bi-wallet2"></i> View in Buyer Dashboard
+          </a>
+        </div>
+
+      </div>
+    </div>
+
+    {% if redemption_voucher.status == 'PENDING_APPROVAL' %}
+      <script>
+        // Real-Time Polling for Buyer Waiting Screen with Exponential Backoff & Max Retry (Bug 9.7)
+        (function() {
+          const redemptionId = {{ redemption_voucher.id }};
+          let consecutiveErrors = 0;
+          let isPolling = true;
+
+          function pollStatus() {
+            if (!isPolling) return;
+
+            fetch('/api/redemptions/' + redemptionId + '/status/')
+              .then(res => {
+                if (!res.ok) {
+                  throw new Error('HTTP ' + res.status);
+                }
+                return res.json();
+              })
+              .then(data => {
+                consecutiveErrors = 0;
+                if (data.is_approved) {
+                  isPolling = false;
+                  const card = document.getElementById('redemptionVoucherCard');
+                  const header = document.getElementById('voucherHeader');
+                  const badge = document.getElementById('voucherBadge');
+                  const title = document.getElementById('voucherTitle');
+                  const otpStatus = document.getElementById('voucherOtpStatus');
+
+                  if (card) card.style.borderColor = '#10b981';
+                  if (header) header.style.backgroundColor = '#10b981';
+                  if (badge) badge.textContent = '✅ DISCOUNT APPROVED';
+                  if (title) title.textContent = 'Voucher Successfully Redeemed!';
+                  if (otpStatus) {
+                    otpStatus.style.color = '#059669';
+                    otpStatus.innerHTML = '<i class="bi bi-check-circle-fill"></i> Validated & Approved by Cashier!';
+                  }
+                } else if (data.is_cancelled || data.is_expired) {
+                  isPolling = false;
+                  const card = document.getElementById('redemptionVoucherCard');
+                  const header = document.getElementById('voucherHeader');
+                  const badge = document.getElementById('voucherBadge');
+                  const title = document.getElementById('voucherTitle');
+                  const otpStatus = document.getElementById('voucherOtpStatus');
+
+                  if (card) card.style.borderColor = '#ef4444';
+                  if (header) header.style.backgroundColor = '#ef4444';
+                  if (badge) badge.textContent = data.is_expired ? '⌛ TOKEN EXPIRED' : '❌ REQUEST DECLINED';
+                  if (title) title.textContent = data.is_expired ? 'Redemption Token Expired' : 'Redemption Request Declined';
+                  if (otpStatus) {
+                    otpStatus.style.color = '#dc2626';
+                    otpStatus.innerHTML = data.is_expired ? '<i class="bi bi-clock-history"></i> 15-minute counter window expired. Please re-claim offer below.' : '<i class="bi bi-x-circle-fill"></i> Request declined by store counter.';
+                  }
+                } else {
+                  // Continue polling every 2.5 seconds when pending
+                  setTimeout(pollStatus, 2500);
+                }
+              })
+              .catch(err => {
+                consecutiveErrors++;
+                if (consecutiveErrors >= 10) {
+                  // Stop polling after 10 consecutive failures to prevent device drain
+                  isPolling = false;
+                  const otpStatus = document.getElementById('voucherOtpStatus');
+                  if (otpStatus) {
+                    otpStatus.innerHTML += '<div style="font-size:0.8rem;color:#f59e0b;margin-top:0.35rem;"><i class="bi bi-wifi-off"></i> Connection spotty. Please refresh page when counter verifies.</div>';
+                  }
+                } else {
+                  // Exponential backoff up to 10 seconds
+                  const backoffDelay = Math.min(10000, 2000 * Math.pow(1.5, consecutiveErrors));
+                  setTimeout(pollStatus, backoffDelay);
+                }
+              });
+          }
+
+          // Initial poll trigger
+          setTimeout(pollStatus, 2000);
+        })();
+      </script>
+    {% endif %}
+  {% endif %}
+
+  <!-- Active In-Store Offers List -->
+  <div style="margin-bottom: 1.25rem; display: flex; justify-content: space-between; align-items: center;">
+    <h2 style="font-size: 1.25rem; font-weight: 800; color: var(--brand-navy-900); margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+      <i class="bi bi-tag-fill text-saffron"></i> Available Counter Deals ({{ active_offers|length }})
+    </h2>
+    <span style="font-size: 0.8rem; color: var(--text-muted);">
+      Updated in real-time
+    </span>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 2rem;">
+    {% for offer in active_offers %}
+      <div class="card" style="border: 1px solid var(--border-light); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm); background: #ffffff; transition: transform 0.15s ease;">
+        <div class="card-body" style="padding: 1.25rem 1.5rem;">
+          
+          <div class="d-flex justify-between align-center flex-wrap gap-2" style="margin-bottom: 0.65rem;">
+            <span class="badge badge-saffron" style="font-size: 0.82rem; font-weight: 800; padding: 0.35rem 0.75rem;">
+              {{ offer.discount_display }}
+            </span>
+            <span style="font-size: 0.78rem; color: var(--text-muted);">
+              Valid until {{ offer.end_date|date:"d M Y" }}
+            </span>
+          </div>
+
+          <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--brand-navy-900); margin: 0 0 0.35rem;">
+            {{ offer.title }}
+          </h3>
+
+          <p style="font-size: 0.88rem; color: var(--text-muted); margin: 0 0 0.85rem; line-height: 1.5;">
+            {{ offer.description }}
+          </p>
+
+          <div class="d-flex justify-between align-center flex-wrap gap-2" style="padding-top: 0.85rem; border-top: 1px solid var(--border-light); font-size: 0.82rem;">
+            <div>
+              <span class="text-muted">Min Purchase:</span>
+              <strong style="color: var(--brand-navy-900);">
+                {% if offer.min_purchase > 0 %}₹{{ offer.min_purchase|floatformat:0 }}{% else %}No minimum{% endif %}
+              </strong>
+            </div>
+
+            <!-- 1-Click Claim Form -->
+            <form method="POST" action="/store/{{ shop.slug }}/qr/" id="claimForm-{{ offer.id }}">
+              {% csrf_token %}
+              <input type="hidden" name="claim_offer_id" value="{{ offer.id }}">
+              <input type="hidden" name="idempotency_key" value="{{ generated_idempotency_key }}">
+              <input type="hidden" name="buyer_lat" class="claim-buyer-lat" value="">
+              <input type="hidden" name="buyer_lng" class="claim-buyer-lng" value="">
+              <input type="hidden" name="buyer_accuracy" class="claim-buyer-acc" value="">
+
+              {% if user.is_authenticated %}
+                <button type="button" onclick="confirmOfferClaim('claimForm-{{ offer.id }}', '{{ offer.title|escapejs }}', '{{ shop.name|escapejs }}', '{{ offer.terms|escapejs }}')" class="btn btn-primary btn-sm" style="font-weight: 700; padding: 0.45rem 1rem;">
+                  <i class="bi bi-lightning-charge-fill"></i> Claim at Billing Counter
+                </button>
+              {% else %}
+                <button type="button" onclick="openGuestClaimModal('{{ offer.id }}', '{{ offer.title|escapejs }}', '{{ offer.discount_display|escapejs }}')" class="btn btn-primary btn-sm" style="font-weight: 700; padding: 0.45rem 1rem;">
+                  <i class="bi bi-gift-fill"></i> Claim Voucher (+{{ offer.reward_points|default:offer.dynamic_reward_points }} Pts)
+                </button>
+              {% endif %}
+            </form>
+          </div>
+
+        </div>
+      </div>
+    {% empty %}
+      <div class="card card-padded text-center" style="padding: 3rem 1.5rem;">
+        <i class="bi bi-tag" style="font-size: 2.5rem; color: #94a3b8; display: block; margin-bottom: 0.75rem;"></i>
+        <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--brand-navy-900); margin-bottom: 0.25rem;">
+          No Active Offers Right Now
+        </h3>
+        <p style="font-size: 0.88rem; color: var(--text-muted); margin: 0;">
+          The store manager has not launched any active campaigns today. Check back soon!
+        </p>
+      </div>
+    {% endfor %}
+  </div>
+
+  <!-- Shopper Security & Privacy Info Banner -->
+  <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 1.25rem; font-size: 0.82rem; color: var(--text-muted); line-height: 1.5;">
+    <div style="font-weight: 700; color: var(--brand-navy-900); margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.4rem;">
+      <i class="bi bi-shield-check" style="color: #10b981;"></i> 100% Privacy Protected at LokalLoop
+    </div>
+    We do not collect or share your personal phone number or email with store clerks. Claiming offers creates an anonymous token with guaranteed counter discounts.
+  </div>
+
+</div>
+
+<!-- Guest Shopper 1-Click Onboarding Modal -->
+<div id="guestClaimModal" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.75); z-index: 1050; align-items: center; justify-content: center; padding: 1rem;">
+  <div class="card" style="max-width: 440px; width: 100%; border-radius: var(--radius-lg); overflow: hidden; background: #ffffff; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3); border: none;">
+    <div style="background: var(--ink-950); color: #fff; padding: 1.5rem 1.25rem; text-align: center; position: relative;">
+      <span class="badge badge-saffron" style="font-size: 0.72rem; margin-bottom: 0.35rem;">
+        🎁 +25 WELCOME POINTS ON SIGNUP
+      </span>
+      <h3 style="font-size: 1.35rem; font-weight: 800; margin: 0 0 0.25rem; color: #fff;">
+        Claim Your Counter Deal
+      </h3>
+      <div id="modalOfferTitle" style="font-size: 0.85rem; color: #94a3b8;">
+        Instant Anonymous Shopper Pass
+      </div>
+      <button type="button" onclick="closeGuestClaimModal()" style="position: absolute; right: 12px; top: 12px; background: none; border: none; color: #94a3b8; font-size: 1.5rem; cursor: pointer;">
+        &times;
+      </button>
+    </div>
+
+    <div class="card-body" style="padding: 1.5rem;">
+      <p style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 1.25rem; text-align: center;">
+        No phone number or email required! Get an instant district shopper ID in 5 seconds to redeem this discount.
+      </p>
+
+      <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+        <a id="modalInstantRegisterLink" href="/buyer/register/" class="btn btn-primary btn-block btn-lg" style="font-weight: 700; text-align: center;">
+          <i class="bi bi-shield-lock-fill"></i> Get 5-Sec Shopper Pass (+50 Pts)
+        </a>
+
+        <a id="modalSignInLink" href="/buyer/login/" class="btn btn-outline btn-block" style="text-align: center; font-weight: 600;">
+          Already have an ID? Sign In
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function openGuestClaimModal(offerId, offerTitle, discountDisplay) {
+    const modal = document.getElementById('guestClaimModal');
+    const titleEl = document.getElementById('modalOfferTitle');
+    const regLink = document.getElementById('modalInstantRegisterLink');
+    const loginLink = document.getElementById('modalSignInLink');
+
+    titleEl.textContent = discountDisplay + ' — ' + offerTitle;
+    const returnUrl = encodeURIComponent('/store/{{ shop.slug }}/qr/?claim_offer=' + offerId);
+    regLink.href = '/buyer/register/?next=' + returnUrl;
+    loginLink.href = '/buyer/login/?next=' + returnUrl;
+
+    modal.style.display = 'flex';
+  }
+
+  function closeGuestClaimModal() {
+    document.getElementById('guestClaimModal').style.display = 'none';
+  }
+
+  window.addEventListener('click', function(e) {
+    const modal = document.getElementById('guestClaimModal');
+    if (e.target === modal) {
+      closeGuestClaimModal();
+    }
+  });
+
+  function confirmOfferClaim(formId, offerTitle, shopName, offerTerms) {
+    openOfferTermsModal(function() {
+      const form = document.getElementById(formId);
+      if (form) form.submit();
+    }, offerTitle, shopName, offerTerms);
+  }
+
+  // Auto-acquire in-store GPS coordinates for billing counter claim verification (BUG-GEO-01)
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      function(pos) {
+        document.querySelectorAll('.claim-buyer-lat').forEach(el => el.value = pos.coords.latitude);
+        document.querySelectorAll('.claim-buyer-lng').forEach(el => el.value = pos.coords.longitude);
+        document.querySelectorAll('.claim-buyer-acc').forEach(el => el.value = Math.round(pos.coords.accuracy || 0));
+      },
+      function() {},
+      { enableHighAccuracy: true, timeout: 6000 }
+    );
+  }
+</script>
+
+{% include "offers/terms_modal.html" %}
+{% endblock %}

@@ -1,0 +1,1127 @@
+{% extends "base/public_base.html" %}
+{% load static %}
+
+{% block title %}Register Your Store — {{ BRAND_NAME }} Merchant Suite{% endblock %}
+
+{% block extra_css %}
+<!-- Free & Open-Source Leaflet.js Map CSS -->
+<link rel="stylesheet" href="{% static 'vendor/leaflet/leaflet.css' %}" />
+<style>
+  .wizard-step {
+    display: none;
+  }
+  .wizard-step.active {
+    display: block;
+    animation: fadeInStep 0.3s ease-in-out;
+  }
+  @keyframes fadeInStep {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .step-pill {
+    flex: 1;
+    text-align: center;
+    position: relative;
+    padding: 0.75rem 0.5rem;
+    cursor: pointer;
+    transition: all 0.25s ease;
+  }
+  .step-pill .step-circle {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #e2e8f0;
+    color: #64748b;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 0.85rem;
+    margin-bottom: 0.35rem;
+    transition: all 0.25s ease;
+  }
+  .step-pill .step-title {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #64748b;
+    display: block;
+    line-height: 1.2;
+    transition: color 0.25s ease;
+  }
+
+  .step-pill.active .step-circle {
+    background: #ea580c;
+    color: #fff;
+    box-shadow: 0 0 0 4px rgba(234, 88, 12, 0.2);
+  }
+  .step-pill.active .step-title {
+    color: #0f172a;
+    font-weight: 800;
+  }
+
+  .step-pill.completed .step-circle {
+    background: #10b981;
+    color: #fff;
+  }
+  .step-pill.completed .step-title {
+    color: #059669;
+  }
+
+  #merchantMap {
+    height: 240px;
+    width: 100%;
+    border-radius: 10px;
+    border: 1.5px solid #cbd5e1;
+    z-index: 1;
+    margin-top: 0.5rem;
+  }
+
+  .compliance-notice {
+    display: none;
+    padding: 0.65rem 0.85rem;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    margin-top: 0.6rem;
+    line-height: 1.35;
+    animation: fadeInStep 0.25s ease;
+  }
+  .compliance-fssai {
+    background: rgba(249, 115, 22, 0.1);
+    border: 1px solid rgba(249, 115, 22, 0.3);
+    color: #c2410c;
+  }
+  .compliance-fda {
+    background: rgba(168, 85, 247, 0.1);
+    border: 1px solid rgba(168, 85, 247, 0.3);
+    color: #7e22ce;
+  }
+
+  @media (max-width: 640px) {
+    .container-narrow {
+      padding-top: 1rem !important;
+      padding-bottom: 2.5rem !important;
+      padding-left: 0.5rem !important;
+      padding-right: 0.5rem !important;
+    }
+    .card {
+      border-radius: 14px !important;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08) !important;
+    }
+    .card-header {
+      padding: 1.25rem 0.85rem 0.75rem !important;
+    }
+    .card-header h2 {
+      font-size: 1.25rem !important;
+    }
+    .card-body {
+      padding: 1.15rem 0.85rem !important;
+    }
+    .step-pill {
+      padding: 0.45rem 0.15rem !important;
+    }
+    .step-pill .step-circle {
+      width: 26px !important;
+      height: 26px !important;
+      font-size: 0.75rem !important;
+      margin-bottom: 0.2rem !important;
+    }
+    .step-pill .step-title {
+      font-size: 0.65rem !important;
+      line-height: 1.15 !important;
+      word-break: break-word !important;
+    }
+    #merchantMap {
+      height: 200px !important;
+    }
+    .step-nav-buttons {
+      display: flex !important;
+      flex-direction: column-reverse !important;
+      gap: 0.65rem !important;
+      margin-top: 1.5rem !important;
+    }
+    .step-nav-buttons .btn {
+      width: 100% !important;
+      white-space: normal !important;
+      text-align: center !important;
+      padding: 0.75rem 1rem !important;
+      font-size: 0.95rem !important;
+      justify-content: center !important;
+    }
+    .d-grid.grid-2 {
+      grid-template-columns: 1fr !important;
+      gap: 0.75rem !important;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container container-narrow" style="padding-top: 2.5rem; padding-bottom: 4rem;">
+  
+  <div class="card" style="max-width: 680px; margin: 0 auto; box-shadow: var(--shadow-xl); border: 1px solid var(--border-light); border-radius: var(--radius-lg); background: #ffffff; overflow: hidden;">
+    
+    <!-- Top Progress Bar -->
+    <div style="height: 6px; width: 100%; background: #f1f5f9; position: relative;">
+      <div id="wizardProgressBar" style="height: 100%; width: 25%; background: linear-gradient(90deg, #ea580c, #10b981); transition: width 0.35s ease;"></div>
+    </div>
+
+    <!-- Header -->
+    <div class="card-header" style="flex-direction: column; text-align: center; gap: 0.4rem; background: #ffffff; padding: 1.75rem 2rem 1rem; border-bottom: none;">
+      <div style="display: inline-flex; align-items: center; gap: 0.4rem; margin: 0 auto; background: #ecfdf5; border: 1px solid #a7f3d0; color: #047857; padding: 4px 12px; border-radius: 999px; font-size: 0.75rem; font-weight: 800; letter-spacing: 0.04em;">
+        <i class="bi bi-gift-fill text-emerald"></i> 50 FREE PROMOTIONAL CREDITS ON ACTIVATION
+      </div>
+      <h2 style="font-size: 1.65rem; font-weight: 900; color: var(--brand-navy-900); margin: 0.35rem 0 0; letter-spacing: -0.02em;">
+        Merchant Onboarding &amp; Store Setup
+      </h2>
+      <p style="font-size: 0.85rem; color: #64748b; margin: 0;">Connect your counter to thousands of verified shoppers across Maharashtra</p>
+    </div>
+
+    <!-- Step Indicator Breadcrumbs -->
+    <div style="display: flex; border-bottom: 1px solid #f1f5f9; background: #f8fafc; padding: 0.25rem 0.5rem;">
+      <div class="step-pill active" id="stepPill1" onclick="jumpToStep(1)">
+        <div class="step-circle" id="circle1">1</div>
+        <span class="step-title">Business Category</span>
+      </div>
+      <div class="step-pill" id="stepPill2" onclick="jumpToStep(2)">
+        <div class="step-circle" id="circle2">2</div>
+        <span class="step-title">Location &amp; Pin</span>
+      </div>
+      <div class="step-pill" id="stepPill3" onclick="jumpToStep(3)">
+        <div class="step-circle" id="circle3">3</div>
+        <span class="step-title">Ownership</span>
+      </div>
+      <div class="step-pill" id="stepPill4" onclick="jumpToStep(4)">
+        <div class="step-circle" id="circle4">4</div>
+        <span class="step-title">Compliance</span>
+      </div>
+    </div>
+
+    <!-- Form Body -->
+    <div class="card-body" style="padding: 2rem;">
+      <form method="POST" id="sellerRegisterForm" novalidate>
+        {% csrf_token %}
+        {{ form.website }}
+
+        {% if form.errors %}
+        <div class="alert alert-danger" style="background: #fef2f2; border: 1.5px solid #f87171; color: #991b1b; border-radius: 8px; padding: 1rem 1.25rem; margin-bottom: 1.5rem; font-size: 0.88rem; box-shadow: 0 2px 6px rgba(220, 38, 38, 0.08);">
+          <div style="font-weight: 800; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; color: #b91c1c;">
+            <i class="bi bi-exclamation-octagon-fill" style="color: #dc2626; font-size: 1.15rem;"></i>
+            Please correct the highlighted issues to complete merchant registration:
+          </div>
+          <ul style="margin: 0; padding-left: 1.25rem; line-height: 1.6;">
+            {% for field, errors in form.errors.items %}
+              {% for error in errors %}
+                <li><strong>{% if field == '__all__' %}Form{% elif field == 'captcha_answer' %}CAPTCHA Verification{% else %}{{ field|title }}{% endif %}:</strong> {{ error }}</li>
+              {% endfor %}
+            {% endfor %}
+          </ul>
+        </div>
+        {% endif %}
+
+        <!-- ============================================== -->
+        <!-- STEP 1: BUSINESS PROFILE & CATEGORY HIERARCHY  -->
+        <!-- ============================================== -->
+        <div class="wizard-step active" id="stepSection1">
+          <div style="margin-bottom: 1.25rem;">
+            <h4 style="font-size: 1.1rem; font-weight: 800; color: #0f172a; margin-bottom: 0;">
+              Step 1: Business Profile &amp; Category
+            </h4>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 1.25rem;">
+            <label class="form-label" style="font-weight: 700;">{{ form.business_name.label }} <span class="text-danger">*</span></label>
+            {{ form.business_name }}
+            {% if form.business_name.errors %}
+              <div class="text-danger" style="font-size: 0.8rem; margin-top: 0.25rem;">{{ form.business_name.errors.0 }}</div>
+            {% endif %}
+          </div>
+
+          <div class="form-group" style="margin-bottom: 1.25rem;">
+            <label class="form-label" style="font-weight: 700;">{{ form.category.label }} <span class="text-danger">*</span></label>
+            {{ form.category }}
+            {% if form.category.errors %}
+              <div class="text-danger" style="font-size: 0.8rem; margin-top: 0.25rem;">{{ form.category.errors.0 }}</div>
+            {% endif %}
+
+            <!-- Dynamic Category Notices -->
+            <div id="fssaiNotice" class="compliance-notice compliance-fssai">
+              <i class="bi bi-info-circle-fill"></i> <strong>FSSAI Required:</strong> Businesses in food, beverages, and groceries require a valid FSSAI Food License in Step 4.
+            </div>
+            <div id="fdaNotice" class="compliance-notice compliance-fda">
+              <i class="bi bi-info-circle-fill"></i> <strong>FDA License Required:</strong> Medical, pharmaceutical, and healthcare businesses require a valid FDA Drug License in Step 4.
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 1.5rem;">
+            <label class="form-label" style="font-weight: 700;">
+              {{ form.subcategory.label }} 
+              <span style="font-size: 0.75rem; color: #64748b; font-weight: 500;">(Dynamic specialty)</span>
+            </label>
+            {{ form.subcategory }}
+            {% if form.subcategory.errors %}
+              <div class="text-danger" style="font-size: 0.8rem; margin-top: 0.25rem;">{{ form.subcategory.errors.0 }}</div>
+            {% endif %}
+            <small style="color: #64748b; font-size: 0.75rem; display: block; margin-top: 0.35rem;">
+              e.g., Selecting Lifestyle shows <em>Clothes, Shoes, Watches, Glasses, Accessories</em>.
+            </small>
+          </div>
+
+          <div class="step-nav-buttons" style="display: flex; justify-content: flex-end; margin-top: 2rem;">
+            <button type="button" class="btn btn-primary btn-lg" onclick="goToStep(2)" style="font-weight: 700; padding: 0.75rem 1.75rem;">
+              Next: Location &amp; Pin <i class="bi bi-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- ============================================== -->
+        <!-- STEP 2: OUTLET LOCATION & OPERATING HOURS      -->
+        <!-- ============================================== -->
+        <div class="wizard-step" id="stepSection2">
+          <div style="margin-bottom: 1.25rem;">
+            <h4 style="font-size: 1.1rem; font-weight: 800; color: #0f172a; margin-bottom: 0;">
+              Step 2: Physical Store Location &amp; Map Pin
+            </h4>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 1rem;">
+            <label class="form-label" style="font-weight: 700;">{{ form.address.label }} <span class="text-danger">*</span></label>
+            {{ form.address }}
+            {% if form.address.errors %}
+              <div class="text-danger" style="font-size: 0.8rem; margin-top: 0.25rem;">{{ form.address.errors.0 }}</div>
+            {% endif %}
+          </div>
+
+          <div class="d-grid grid-2 gap-2" style="margin-bottom: 1rem;">
+            <div class="form-group">
+              <label class="form-label" style="font-weight: 700;">{{ form.locality.label }} <span class="text-danger">*</span></label>
+              {{ form.locality }}
+              {% if form.locality.errors %}
+                <div class="text-danger" style="font-size: 0.8rem; margin-top: 0.25rem;">{{ form.locality.errors.0 }}</div>
+              {% endif %}
+            </div>
+            <div class="form-group">
+              <label class="form-label" style="font-weight: 700;">{{ form.city.label }} <span class="text-danger">*</span></label>
+              {{ form.city }}
+              {% if form.city.errors %}
+                <div class="text-danger" style="font-size: 0.8rem; margin-top: 0.25rem;">{{ form.city.errors.0 }}</div>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="d-grid grid-2 gap-2" style="margin-bottom: 1.25rem;">
+            <div class="form-group">
+              <label class="form-label" style="font-weight: 700;">{{ form.state.label }}</label>
+              {{ form.state }}
+              {% if form.state.errors %}
+                <div class="text-danger" style="font-size: 0.8rem; margin-top: 0.25rem;">{{ form.state.errors.0 }}</div>
+              {% endif %}
+            </div>
+            <div class="form-group">
+              <label class="form-label" style="font-weight: 700;">{{ form.pincode.label }} <span class="text-danger">*</span></label>
+              {{ form.pincode }}
+              {% if form.pincode.errors %}
+                <div class="text-danger" style="font-size: 0.8rem; margin-top: 0.25rem;">{{ form.pincode.errors.0 }}</div>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Interactive Leaflet Map -->
+          <div style="margin-bottom: 1.25rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+              <label class="form-label" style="font-weight: 700; margin-bottom: 0;">
+                <i class="bi bi-geo-alt-fill text-danger"></i> Pin Exact Entrance on Map
+              </label>
+              <button type="button" class="btn btn-sm btn-outline" onclick="detectGPSLocation()" style="font-size: 0.75rem; padding: 0.25rem 0.65rem; font-weight: 700;">
+                <i class="bi bi-crosshair"></i> Use Current Location
+              </button>
+            </div>
+            
+            <div id="merchantMap"></div>
+            
+            {{ form.latitude }}
+            {{ form.longitude }}
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem; flex-wrap: wrap; gap: 0.5rem;">
+              <div style="font-size: 0.78rem; color: #64748b; display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap;">
+                <span>Selected Pin:</span>
+                <span id="coordBadge" style="font-family: monospace; font-weight: 700; color: #0f172a; background: #f1f5f9; padding: 2px 8px; border-radius: 4px;">18.5204° N, 73.8567° E</span>
+              </div>
+              <button type="button" id="confirmPinBtn" class="btn btn-sm btn-outline-success" onclick="confirmPinLocation()" style="font-size: 0.8rem; font-weight: 700; display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.35rem 0.85rem; border-radius: 6px;">
+                <i class="bi bi-check-circle"></i> Save / Confirm Pin Location
+              </button>
+            </div>
+            <div id="pinConfirmedAlert" style="display: none; margin-top: 0.5rem; font-size: 0.8rem; padding: 0.45rem 0.75rem; border-radius: 6px; background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; font-weight: 600;">
+              <i class="bi bi-check2-circle"></i> Counter entrance pin location saved &amp; confirmed!
+            </div>
+          </div>
+
+          <div class="d-grid grid-2 gap-2" style="margin-bottom: 1.25rem;">
+            <div class="form-group">
+              <label class="form-label" style="font-weight: 700;">{{ form.operating_hours.label }}</label>
+              {{ form.operating_hours }}
+              {% if form.operating_hours.errors %}
+                <div class="text-danger" style="font-size: 0.8rem; margin-top: 0.25rem;">{{ form.operating_hours.errors.0 }}</div>
+              {% endif %}
+            </div>
+            <div class="form-group">
+              <label class="form-label" style="font-weight: 700;">{{ form.display_phone.label }}</label>
+              {{ form.display_phone }}
+              {% if form.display_phone.errors %}
+                <div class="text-danger" style="font-size: 0.8rem; margin-top: 0.25rem;">{{ form.display_phone.errors.0 }}</div>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="step-nav-buttons" style="display: flex; justify-content: space-between; margin-top: 2rem; gap: 0.75rem;">
+            <button type="button" class="btn btn-outline btn-lg" onclick="goToStep(1)" style="font-weight: 700;">
+              <i class="bi bi-arrow-left"></i> Back
+            </button>
+            <button type="button" class="btn btn-primary btn-lg" onclick="goToStep(3)" style="font-weight: 700; padding: 0.75rem 1.75rem;">
+              Next: Ownership <i class="bi bi-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- ============================================== -->
+        <!-- STEP 3: AUTHORIZED SIGNATORY & LOGIN DETAILS   -->
+        <!-- ============================================== -->
+        <div class="wizard-step" id="stepSection3">
+          <div style="margin-bottom: 1.5rem;">
+            <h4 style="font-size: 1.1rem; font-weight: 800; color: #0f172a; margin-bottom: 0;">
+              Step 3: Ownership &amp; Merchant Signatory
+            </h4>
+          </div>
+
+          <div class="d-grid grid-2 gap-2" style="margin-bottom: 1.25rem;">
+            <div class="form-group">
+              <label class="form-label" style="font-weight: 700;">{{ form.full_name.label }} <span class="text-danger">*</span></label>
+              {{ form.full_name }}
+              {% if form.full_name.errors %}
+                <div class="text-danger" style="font-size: 0.8rem; margin-top: 0.25rem;">{{ form.full_name.errors.0 }}</div>
+              {% endif %}
+            </div>
+            <div class="form-group">
+              <label class="form-label" style="font-weight: 700;">{{ form.designation.label }} <span class="text-danger">*</span></label>
+              {{ form.designation }}
+              {% if form.designation.errors %}
+                <div class="text-danger" style="font-size: 0.8rem; margin-top: 0.25rem;">{{ form.designation.errors.0 }}</div>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="d-grid grid-2 gap-2" style="margin-bottom: 1.25rem;">
+            <div class="form-group">
+              <label class="form-label" style="font-weight: 700;">{{ form.email.label }} <span class="text-danger">*</span></label>
+              {{ form.email }}
+              {% if form.email.errors %}
+                <div class="text-danger" style="font-size: 0.8rem; margin-top: 0.25rem;">{{ form.email.errors.0 }}</div>
+              {% endif %}
+            </div>
+            <div class="form-group">
+              <label class="form-label" style="font-weight: 700;">{{ form.phone.label }} <span class="text-danger">*</span></label>
+              {{ form.phone }}
+              {% if form.phone.errors %}
+                <div class="text-danger" style="font-size: 0.8rem; margin-top: 0.25rem;">{{ form.phone.errors.0 }}</div>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="d-grid grid-2 gap-2" style="margin-bottom: 1.5rem;">
+            <div class="form-group">
+              <label class="form-label" style="font-weight: 700;">{{ form.password.label }} <span class="text-danger">*</span></label>
+              <div style="position: relative;">
+                {{ form.password }}
+                <button type="button" id="togglePassBtn" onclick="togglePasswordVisibility('id_password', this)" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #64748b; cursor: pointer;">
+                  <i class="bi bi-eye"></i>
+                </button>
+              </div>
+              {% if form.password.errors %}
+                <div class="text-danger" style="font-size: 0.8rem; margin-top: 0.25rem;">{{ form.password.errors.0 }}</div>
+              {% endif %}
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" style="font-weight: 700;">{{ form.confirm_password.label }} <span class="text-danger">*</span></label>
+              <div style="position: relative;">
+                {{ form.confirm_password }}
+                <button type="button" id="toggleConfirmBtn" onclick="togglePasswordVisibility('id_confirm_password', this)" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #64748b; cursor: pointer;">
+                  <i class="bi bi-eye"></i>
+                </button>
+              </div>
+              {% if form.confirm_password.errors %}
+                <div class="text-danger" style="font-size: 0.8rem; margin-top: 0.25rem;">{{ form.confirm_password.errors.0 }}</div>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="d-grid grid-2 gap-2" style="margin-bottom: 1.5rem;">
+            <div class="form-group">
+              <label class="form-label" style="font-weight: 700;">{{ form.security_question.label }} <span class="text-danger">*</span></label>
+              {{ form.security_question }}
+              {% if form.security_question.errors %}
+                <div class="text-danger" style="font-size: 0.8rem; margin-top: 0.25rem;">{{ form.security_question.errors.0 }}</div>
+              {% endif %}
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" style="font-weight: 700;">{{ form.security_answer.label }} <span class="text-danger">*</span></label>
+              {{ form.security_answer }}
+              {% if form.security_answer.errors %}
+                <div class="text-danger" style="font-size: 0.8rem; margin-top: 0.25rem;">{{ form.security_answer.errors.0 }}</div>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="step-nav-buttons" style="display: flex; justify-content: space-between; margin-top: 2rem; gap: 0.75rem;">
+            <button type="button" class="btn btn-outline btn-lg" onclick="goToStep(2)" style="font-weight: 700;">
+              <i class="bi bi-arrow-left"></i> Back
+            </button>
+            <button type="button" class="btn btn-primary btn-lg" onclick="goToStep(4)" style="font-weight: 700; padding: 0.75rem 1.75rem;">
+              Next: Compliance <i class="bi bi-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- ============================================== -->
+        <!-- STEP 4: STATUTORY COMPLIANCE & SLIDER CAPTCHA  -->
+        <!-- ============================================== -->
+        <div class="wizard-step" id="stepSection4">
+          <div style="margin-bottom: 1.5rem;">
+            <h4 style="font-size: 1.1rem; font-weight: 800; color: #0f172a; margin-bottom: 0;">
+              Step 4: Statutory Compliance &amp; Verification
+            </h4>
+          </div>
+
+          <!-- Shop Act / Gumasta License & Valid Till (Optional) -->
+          <div class="d-grid grid-2 gap-2" style="margin-bottom: 1.25rem;">
+            <div class="form-group">
+              <label class="form-label" style="font-weight: 700;">
+                {{ form.shop_act_license_number.label }} <span class="text-danger">*</span>
+              </label>
+              {{ form.shop_act_license_number }}
+              {% if form.shop_act_license_number.errors %}
+                <div class="text-danger" style="font-size: 0.8rem; margin-top: 0.25rem;">{{ form.shop_act_license_number.errors.0 }}</div>
+              {% endif %}
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" style="font-weight: 700;">
+                Valid Till <span style="font-weight: 400; color: #64748b; font-size: 0.78rem;">(Optional)</span>
+              </label>
+              {{ form.shop_act_valid_till }}
+              {% if form.shop_act_valid_till.errors %}
+                <div class="text-danger" style="font-size: 0.8rem; margin-top: 0.25rem;">{{ form.shop_act_valid_till.errors.0 }}</div>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Dynamic FSSAI Field & Valid Till (Only shown if Category requires FSSAI) -->
+          <div id="fssaiFieldGroup" style="margin-bottom: 1.25rem; display: none;">
+            <div class="d-grid grid-2 gap-2">
+              <div class="form-group">
+                <label class="form-label" style="font-weight: 700;">
+                  {{ form.fssai_license_number.label }} <span id="fssaiRequiredStar" class="text-danger" style="display: none;">*</span>
+                </label>
+                {{ form.fssai_license_number }}
+                {% if form.fssai_license_number.errors %}
+                  <div class="text-danger" style="font-size: 0.8rem; margin-top: 0.25rem;">{{ form.fssai_license_number.errors.0 }}</div>
+                {% endif %}
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" style="font-weight: 700;">
+                  Valid Till <span id="fssaiValidTillStar" class="text-danger" style="display: none;">*</span>
+                </label>
+                {{ form.fssai_valid_till }}
+                {% if form.fssai_valid_till.errors %}
+                  <div class="text-danger" style="font-size: 0.8rem; margin-top: 0.25rem;">{{ form.fssai_valid_till.errors.0 }}</div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <!-- Dynamic FDA Field & Valid Till (Only shown if Category requires FDA) -->
+          <div id="fdaFieldGroup" style="margin-bottom: 1.25rem; display: none;">
+            <div class="d-grid grid-2 gap-2">
+              <div class="form-group">
+                <label class="form-label" style="font-weight: 700;">
+                  {{ form.fda_license_number.label }} <span id="fdaRequiredStar" class="text-danger" style="display: none;">*</span>
+                </label>
+                {{ form.fda_license_number }}
+                {% if form.fda_license_number.errors %}
+                  <div class="text-danger" style="font-size: 0.8rem; margin-top: 0.25rem;">{{ form.fda_license_number.errors.0 }}</div>
+                {% endif %}
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" style="font-weight: 700;">
+                  Valid Till <span id="fdaValidTillStar" class="text-danger" style="display: none;">*</span>
+                </label>
+                {{ form.fda_valid_till }}
+                {% if form.fda_valid_till.errors %}
+                  <div class="text-danger" style="font-size: 0.8rem; margin-top: 0.25rem;">{{ form.fda_valid_till.errors.0 }}</div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <!-- Business PAN & GSTIN -->
+          <div class="d-grid grid-2 gap-2" style="margin-bottom: 1.25rem;">
+            <div class="form-group">
+              <label class="form-label" style="font-weight: 700;">{{ form.business_pan.label }} <span class="text-danger">*</span></label>
+              {{ form.business_pan }}
+              {% if form.business_pan.errors %}
+                <div class="text-danger" style="font-size: 0.8rem; margin-top: 0.25rem;">{{ form.business_pan.errors.0 }}</div>
+              {% endif %}
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" style="font-weight: 700;">{{ form.gst_number.label }}</label>
+              {{ form.gst_number }}
+              {% if form.gst_number.errors %}
+                <div class="text-danger" style="font-size: 0.8rem; margin-top: 0.25rem;">{{ form.gst_number.errors.0 }}</div>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Slider CAPTCHA -->
+          {% include "components/captcha_field.html" %}
+
+          <div style="margin: 1.25rem 0 1.5rem;">
+            <label style="display: flex; align-items: flex-start; gap: 0.6rem; cursor: pointer; font-size: 0.8rem; color: #475569; line-height: 1.4;">
+              <input type="checkbox" name="agreement_accepted" id="id_agreement_accepted" required style="margin-top: 3px; accent-color: #ea580c;" {% if request.POST.agreement_accepted %}checked{% endif %}>
+              <span>I hereby certify that all submitted outlet information, Shop Act, and statutory licenses are valid, and I agree to the <a href="/terms/" target="_blank" rel="noopener noreferrer" style="color: #ea580c; font-weight: 700;">Merchant Digital Agreement</a>.</span>
+            </label>
+          </div>
+
+          <div class="step-nav-buttons" style="display: flex; justify-content: space-between; margin-top: 1.5rem; gap: 0.75rem;">
+            <button type="button" class="btn btn-outline btn-lg" onclick="goToStep(3)" style="font-weight: 700;">
+              <i class="bi bi-arrow-left"></i> Back
+            </button>
+            <button type="submit" id="submitBtn" class="btn btn-dark btn-lg" style="font-weight: 800; padding: 0.85rem 2rem; background: #0f172a; border-radius: 8px;">
+              <i class="bi bi-shop"></i> Register Store &amp; Claim 50 Credits 🚀
+            </button>
+          </div>
+        </div>
+
+      </form>
+    </div>
+
+    <!-- Card Footer -->
+    <div class="card-footer text-center" style="font-size: 0.85rem; background: #f8fafc; border-top: 1px solid #f1f5f9; padding: 1.25rem 1rem;">
+      Already a registered merchant? <a href="/seller/login/" style="font-weight: 700; color: #ea580c;">Sign In to Merchant Suite</a>
+    </div>
+
+  </div>
+</div>
+
+<!-- Leaflet.js Interactive Free Map Script -->
+<script src="{% static 'vendor/leaflet/leaflet.js' %}"></script>
+
+<script>
+  // 1. Data Schema & Category Tree (Pre-serialized for instant subcategory binding)
+  // BUG-2.6: Guard category tree JSON parsing against empty or malformed strings
+  let categoryTree = {};
+  try {
+    const rawTree = '{{ category_tree_json|escapejs }}';
+    categoryTree = rawTree ? JSON.parse(rawTree) : {};
+  } catch (e) {
+    console.warn("Failed to parse category tree:", e);
+    categoryTree = {};
+  }
+  let currentStep = 1;
+  let leafletMap = null;
+  let mapMarker = null;
+
+  // 2. Wizard Step Navigation Logic
+  function updateWizardUI(step) {
+    currentStep = step;
+    
+    // Toggle step sections
+    for (let i = 1; i <= 4; i++) {
+      const sec = document.getElementById('stepSection' + i);
+      const pill = document.getElementById('stepPill' + i);
+      const circle = document.getElementById('circle' + i);
+      
+      if (sec) sec.classList.toggle('active', i === step);
+      
+      if (pill && circle) {
+        pill.classList.remove('active', 'completed');
+        if (i === step) {
+          pill.classList.add('active');
+          circle.innerHTML = i;
+        } else if (i < step) {
+          pill.classList.add('completed');
+          circle.innerHTML = '<i class="bi bi-check-lg"></i>';
+        } else {
+          circle.innerHTML = i;
+        }
+      }
+    }
+
+    // Update Progress Bar
+    const progressMap = { 1: '25%', 2: '50%', 3: '75%', 4: '100%' };
+    const pBar = document.getElementById('wizardProgressBar');
+    if (pBar) pBar.style.width = progressMap[step] || '25%';
+
+    // Re-render Leaflet Map on entering Step 2
+    if (step === 2) {
+      setTimeout(initMerchantMap, 350);
+    }
+
+    window.scrollTo({ top: 120, behavior: 'smooth' });
+  }
+
+  function goToStep(targetStep) {
+    // Validate required fields of current step before advancing
+    if (targetStep > currentStep) {
+      if (!validateStepFields(currentStep)) {
+        return;
+      }
+    }
+    updateWizardUI(targetStep);
+  }
+
+  function jumpToStep(targetStep) {
+    if (targetStep < currentStep) {
+      updateWizardUI(targetStep);
+    } else if (targetStep > currentStep) {
+      goToStep(targetStep);
+    }
+  }
+
+  function validateStepFields(step) {
+    if (step === 1) {
+      const bName = document.getElementById('id_business_name');
+      const cat = document.getElementById('id_category');
+      if (!bName || !bName.value.trim()) {
+        if (bName) bName.focus();
+        alert("Please enter your Shop or Business Name.");
+        return false;
+      }
+      if (!cat || !cat.value) {
+        if (cat) cat.focus();
+        alert("Please select a primary Business Category.");
+        return false;
+      }
+    } else if (step === 2) {
+      const addr = document.getElementById('id_address');
+      const loc = document.getElementById('id_locality');
+      const city = document.getElementById('id_city');
+      const pin = document.getElementById('id_pincode');
+      if (!addr || !addr.value.trim() || !loc || !loc.value.trim() || !city || !city.value.trim()) {
+        alert("Please complete the address, locality, and city fields.");
+        return false;
+      }
+      if (!pin || !pin.value.trim()) {
+        if (pin) pin.focus();
+        alert("Please enter a valid 6-digit postal Pincode.");
+        return false;
+      }
+      if (!/^\d{6}$/.test(pin.value.trim())) {
+        if (pin) pin.focus();
+        alert("Pincode must be exactly 6 numeric digits (e.g., 411001).");
+        return false;
+      }
+      const latInp = document.getElementById('id_latitude');
+      const lngInp = document.getElementById('id_longitude');
+      const latVal = latInp ? parseFloat(latInp.value) : NaN;
+      const lngVal = lngInp ? parseFloat(lngInp.value) : NaN;
+      if (isNaN(latVal) || isNaN(lngVal) || (latVal === 0 && lngVal === 0)) {
+        alert("Please pin your store entrance location on the map.");
+        return false;
+      }
+    } else if (step === 3) {
+      const name = document.getElementById('id_full_name');
+      const email = document.getElementById('id_email');
+      const phone = document.getElementById('id_phone');
+      const pass = document.getElementById('id_password');
+      const confirmPass = document.getElementById('id_confirm_password');
+      if (!name || !name.value.trim() || !email || !email.value.trim() || !phone || !phone.value.trim() || !pass || !pass.value.trim()) {
+        alert("Please complete all required ownership fields.");
+        return false;
+      }
+      if (!confirmPass || !confirmPass.value.trim()) {
+        if (confirmPass) confirmPass.focus();
+        alert("Please confirm your account password.");
+        return false;
+      }
+      if (pass.value !== confirmPass.value) {
+        if (confirmPass) confirmPass.focus();
+        alert("Account passwords do not match. Please re-enter matching passwords.");
+        return false;
+      }
+      const secAns = document.getElementById('id_security_answer');
+      if (secAns && !secAns.value.trim()) {
+        secAns.focus();
+        alert("Please enter a secret recovery answer for account protection.");
+        return false;
+      }
+    } else if (step === 4) {
+      const shopAct = document.getElementById('id_shop_act_license_number');
+      const pan = document.getElementById('id_business_pan');
+      const cat = document.getElementById('id_category');
+      const catData = cat && cat.value ? categoryTree[cat.value] : null;
+
+      if (!shopAct || !shopAct.value.trim()) {
+        alert("Please enter your Shop Act / Gumasta License Number.");
+        return false;
+      }
+      if (!pan || !pan.value.trim()) {
+        alert("Please enter your Business PAN.");
+        return false;
+      }
+      if (catData && catData.requires_fssai) {
+        const fssai = document.getElementById('id_fssai_license_number');
+        const fssaiTill = document.getElementById('id_fssai_valid_till');
+        if (!fssai || !fssai.value.trim()) {
+          alert("FSSAI Food License Number is required for this category.");
+          return false;
+        }
+        if (!fssaiTill || !fssaiTill.value.trim()) {
+          alert("Valid Till date is required for your FSSAI Food License.");
+          return false;
+        }
+      }
+      if (catData && catData.requires_fda) {
+        const fda = document.getElementById('id_fda_license_number');
+        const fdaTill = document.getElementById('id_fda_valid_till');
+        if (!fda || !fda.value.trim()) {
+          alert("FDA Drug License Number is required for this category.");
+          return false;
+        }
+        if (!fdaTill || !fdaTill.value.trim()) {
+          alert("Valid Till date is required for your FDA Drug License.");
+          return false;
+        }
+      }
+
+      const agree = document.getElementById('id_agreement_accepted');
+      if (agree && !agree.checked) {
+        alert("Please accept the Merchant Digital Agreement to continue.");
+        agree.focus();
+        return false;
+      }
+    }
+    return true;
+  }
+
+  // 3. Dynamic Subcategories & Statutory Compliance Flags
+  function onCategoryChange(categoryId) {
+    const subSelect = document.getElementById('id_subcategory');
+    const fssaiGroup = document.getElementById('fssaiFieldGroup');
+    const fdaGroup = document.getElementById('fdaFieldGroup');
+    const fssaiNotice = document.getElementById('fssaiNotice');
+    const fdaNotice = document.getElementById('fdaNotice');
+    const fssaiStar = document.getElementById('fssaiRequiredStar');
+    const fdaStar = document.getElementById('fdaRequiredStar');
+    const fssaiTillStar = document.getElementById('fssaiValidTillStar');
+    const fdaTillStar = document.getElementById('fdaValidTillStar');
+
+    if (!subSelect) return;
+
+    subSelect.innerHTML = '<option value="">-- Select Subcategory (Optional) --</option>';
+
+    if (!categoryId || !categoryTree[categoryId]) {
+      if (fssaiGroup) fssaiGroup.style.display = 'none';
+      if (fdaGroup) fdaGroup.style.display = 'none';
+      if (fssaiNotice) fssaiNotice.style.display = 'none';
+      if (fdaNotice) fdaNotice.style.display = 'none';
+      if (fssaiStar) fssaiStar.style.display = 'none';
+      if (fdaStar) fdaStar.style.display = 'none';
+      if (fssaiTillStar) fssaiTillStar.style.display = 'none';
+      if (fdaTillStar) fdaTillStar.style.display = 'none';
+      return;
+    }
+
+    const catData = categoryTree[categoryId];
+
+    // Populate dependent subcategories
+    if (catData.subcategories && catData.subcategories.length > 0) {
+      catData.subcategories.forEach(sub => {
+        const opt = document.createElement('option');
+        opt.value = sub.id;
+        opt.textContent = sub.name;
+        subSelect.appendChild(opt);
+      });
+    }
+
+    // Dynamic Step 4 Field Visibility & Mandatory Star Toggles
+    const requiresFssai = Boolean(catData.requires_fssai);
+    const requiresFda = Boolean(catData.requires_fda);
+
+    if (fssaiGroup) {
+      fssaiGroup.style.display = requiresFssai ? 'block' : 'none';
+      if (!requiresFssai) {
+        const fssaiInp = document.getElementById('id_fssai_license_number');
+        const fssaiTill = document.getElementById('id_fssai_valid_till');
+        if (fssaiInp) fssaiInp.value = '';
+        if (fssaiTill) fssaiTill.value = '';
+      }
+    }
+    if (fssaiNotice) fssaiNotice.style.display = requiresFssai ? 'block' : 'none';
+    if (fssaiStar) fssaiStar.style.display = requiresFssai ? 'inline' : 'none';
+    if (fssaiTillStar) fssaiTillStar.style.display = requiresFssai ? 'inline' : 'none';
+
+    if (fdaGroup) {
+      fdaGroup.style.display = requiresFda ? 'block' : 'none';
+      if (!requiresFda) {
+        const fdaInp = document.getElementById('id_fda_license_number');
+        const fdaTill = document.getElementById('id_fda_valid_till');
+        if (fdaInp) fdaInp.value = '';
+        if (fdaTill) fdaTill.value = '';
+      }
+    }
+    if (fdaNotice) fdaNotice.style.display = requiresFda ? 'block' : 'none';
+    if (fdaStar) fdaStar.style.display = requiresFda ? 'inline' : 'none';
+    if (fdaTillStar) fdaTillStar.style.display = requiresFda ? 'inline' : 'none';
+  }
+
+  const CITY_COORDS_MAP = {
+    'pune': [18.5204, 73.8567],
+    'mumbai': [19.0760, 72.8777],
+    'bengaluru': [12.9716, 77.5946],
+    'bangalore': [12.9716, 77.5946],
+    'delhi': [28.6139, 77.2090],
+    'hyderabad': [17.3850, 78.4867],
+    'chennai': [13.0827, 80.2707],
+    'kolkata': [22.5726, 88.3639],
+    'ahmedabad': [23.0225, 72.5714],
+    'nagpur': [21.1458, 79.0882],
+    'thane': [19.2183, 72.9781],
+    'nashik': [19.9975, 73.7898],
+    'chhatrapati sambhajinagar': [19.8762, 75.3433],
+    'aurangabad': [19.8762, 75.3433],
+    'solapur': [17.6599, 75.9064],
+    'kolhapur': [16.7050, 74.2433],
+    'navi mumbai': [19.0330, 73.0297]
+  };
+
+  function recenterMapToCity(cityName) {
+    if (!cityName) return;
+    const key = cityName.trim().toLowerCase();
+    if (CITY_COORDS_MAP[key]) {
+      const [cLat, cLng] = CITY_COORDS_MAP[key];
+      if (leafletMap && mapMarker) {
+        leafletMap.setView([cLat, cLng], 14);
+        mapMarker.setLatLng([cLat, cLng]);
+        updateCoordinates(cLat, cLng);
+      }
+    }
+  }
+
+  // 4. Interactive Leaflet.js / OpenStreetMap Integration
+  function initMerchantMap() {
+    const mapContainer = document.getElementById('merchantMap');
+    if (!mapContainer) return;
+
+    const latInput = document.getElementById('id_latitude');
+    const lngInput = document.getElementById('id_longitude');
+    const coordBadge = document.getElementById('coordBadge');
+
+    const cityEl = document.getElementById('id_city');
+    const cKey = cityEl ? cityEl.value.trim().toLowerCase() : '';
+    let initialLat = parseFloat(latInput.value);
+    let initialLng = parseFloat(lngInput.value);
+    if ((isNaN(initialLat) || isNaN(initialLng) || (initialLat === 18.5204 && initialLng === 73.8567)) && cKey && CITY_COORDS_MAP[cKey]) {
+      initialLat = CITY_COORDS_MAP[cKey][0];
+      initialLng = CITY_COORDS_MAP[cKey][1];
+      latInput.value = initialLat.toFixed(6);
+      lngInput.value = initialLng.toFixed(6);
+      if (coordBadge) coordBadge.textContent = `${initialLat.toFixed(6)}° N, ${initialLng.toFixed(6)}° E`;
+    } else {
+      initialLat = initialLat || 18.5204;
+      initialLng = initialLng || 73.8567;
+    }
+
+    if (!leafletMap) {
+      // BUG-2.2: Guard against Leaflet CDN connection failures
+      if (typeof L === 'undefined') {
+        const mapContainer = document.getElementById('merchantMap');
+        if (mapContainer) {
+          mapContainer.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#64748b;font-size:0.88rem;padding:1.5rem;text-align:center;background:#f8fafc;"><i class="bi bi-geo-alt" style="margin-right:0.5rem;font-size:1.3rem;color:#f97316;"></i> Map preview is temporarily offline. Your address details above will still be saved accurately.</div>';
+        }
+        return;
+      }
+      leafletMap = L.map('merchantMap', { scrollWheelZoom: false }).setView([initialLat, initialLng], 14);
+
+      // OpenStreetMap Free Tile Layer
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '© OpenStreetMap contributors'
+      }).addTo(leafletMap);
+
+      // Custom high-contrast draggable marker
+      mapMarker = L.marker([initialLat, initialLng], { draggable: true }).addTo(leafletMap);
+      mapMarker.bindTooltip("Drag pin to counter entrance", { permanent: false, direction: 'top' });
+
+      mapMarker.on('dragend', function(e) {
+        const pos = e.target.getLatLng();
+        updateCoordinates(pos.lat, pos.lng);
+      });
+
+      leafletMap.on('click', function(e) {
+        mapMarker.setLatLng(e.latlng);
+        updateCoordinates(e.latlng.lat, e.latlng.lng);
+      });
+    } else {
+      leafletMap.invalidateSize();
+      setTimeout(function() {
+        if (leafletMap) leafletMap.invalidateSize();
+      }, 350);
+    }
+  }
+
+  let isPinConfirmed = false;
+
+  function confirmPinLocation() {
+    const latInput = document.getElementById('id_latitude');
+    const lngInput = document.getElementById('id_longitude');
+    if (!latInput || !lngInput || !latInput.value || !lngInput.value) {
+      alert("Please select a location on the map first.");
+      return;
+    }
+    isPinConfirmed = true;
+    const btn = document.getElementById('confirmPinBtn');
+    const alertBox = document.getElementById('pinConfirmedAlert');
+    if (btn) {
+      btn.className = "btn btn-sm btn-success";
+      btn.innerHTML = '<i class="bi bi-check2-circle"></i> Pin Confirmed &amp; Saved';
+    }
+    if (alertBox) {
+      alertBox.style.display = 'block';
+      alertBox.innerHTML = `<i class="bi bi-check2-circle"></i> Counter entrance pinned &amp; saved at <strong>${latInput.value}° N, ${lngInput.value}° E</strong>.`;
+    }
+    if (mapMarker) {
+      mapMarker.bindTooltip("Confirmed Entrance Location ✅", { permanent: true, direction: 'top' }).openTooltip();
+    }
+  }
+
+  function resetPinConfirmation() {
+    isPinConfirmed = false;
+    const btn = document.getElementById('confirmPinBtn');
+    const alertBox = document.getElementById('pinConfirmedAlert');
+    if (btn) {
+      btn.className = "btn btn-sm btn-outline-success";
+      btn.innerHTML = '<i class="bi bi-check-circle"></i> Save / Confirm Pin Location';
+    }
+    if (alertBox) {
+      alertBox.style.display = 'none';
+    }
+    if (mapMarker) {
+      mapMarker.unbindTooltip();
+      mapMarker.bindTooltip("Drag pin to counter entrance", { permanent: false, direction: 'top' });
+    }
+  }
+
+  function updateCoordinates(lat, lng) {
+    const latInput = document.getElementById('id_latitude');
+    const lngInput = document.getElementById('id_longitude');
+    const coordBadge = document.getElementById('coordBadge');
+
+    const formattedLat = parseFloat(lat).toFixed(6);
+    const formattedLng = parseFloat(lng).toFixed(6);
+
+    if (latInput) latInput.value = formattedLat;
+    if (lngInput) lngInput.value = formattedLng;
+    if (coordBadge) coordBadge.textContent = `${formattedLat}° N, ${formattedLng}° E`;
+
+    resetPinConfirmation();
+  }
+
+  function detectGPSLocation() {
+    if (!navigator.geolocation) {
+      alert("Geolocation is not supported by your browser.");
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      function(position) {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        updateCoordinates(lat, lng);
+
+        if (leafletMap && mapMarker) {
+          leafletMap.setView([lat, lng], 16);
+          mapMarker.setLatLng([lat, lng]);
+          mapMarker.bindTooltip("GPS Location Located! Click Save Pin to confirm.", { permanent: true, direction: 'top' }).openTooltip();
+        }
+      },
+      function(error) {
+        alert("GPS detection failed: " + error.message + ". Please drag the pin manually on the map.");
+      },
+      { timeout: 10000, enableHighAccuracy: true }
+    );
+  }
+
+  // 5. Password toggle helper
+  function togglePasswordVisibility(fieldId, btn) {
+    const field = document.getElementById(fieldId);
+    if (!field) return;
+    const isPass = field.getAttribute('type') === 'password';
+    field.setAttribute('type', isPass ? 'text' : 'password');
+    btn.innerHTML = isPass ? '<i class="bi bi-eye-slash"></i>' : '<i class="bi bi-eye"></i>';
+  }
+
+  // 6. Navigation, date restrictions and error step positioning
+  document.addEventListener('DOMContentLoaded', function() {
+    // Set minimum date to today for all Valid Till date pickers (No past dates allowed)
+    const todayStr = new Date().toISOString().split('T')[0];
+    ['id_shop_act_valid_till', 'id_fssai_valid_till', 'id_fda_valid_till'].forEach(function(fieldId) {
+      const picker = document.getElementById(fieldId);
+      if (picker) {
+        picker.min = todayStr;
+        picker.addEventListener('change', function() {
+          if (this.value && this.value < todayStr) {
+            alert("Valid Till date cannot be in the past. Please select a valid future expiry date.");
+            this.value = '';
+          }
+        });
+      }
+    });
+
+    const cityInputEl = document.getElementById('id_city');
+    if (cityInputEl) {
+      cityInputEl.addEventListener('change', function() {
+        recenterMapToCity(this.value);
+      });
+      cityInputEl.addEventListener('blur', function() {
+        recenterMapToCity(this.value);
+      });
+    }
+
+    const catSelect = document.getElementById('id_category');
+    if (catSelect && catSelect.value) {
+      onCategoryChange(catSelect.value);
+    }
+
+    {% if form.is_bound and form.errors %}
+      // Server-side validation errors present: Automatically navigate to the first step containing an error
+      {% if form.business_name.errors or form.category.errors or form.subcategory.errors %}
+        updateWizardUI(1);
+      {% elif form.address.errors or form.locality.errors or form.city.errors or form.state.errors or form.pincode.errors or form.latitude.errors or form.longitude.errors or form.operating_hours.errors or form.display_phone.errors %}
+        updateWizardUI(2);
+      {% elif form.full_name.errors or form.designation.errors or form.email.errors or form.phone.errors or form.password.errors or form.confirm_password.errors %}
+        updateWizardUI(3);
+      {% else %}
+        updateWizardUI(4);
+      {% endif %}
+    {% else %}
+      // Fresh registration load: Open Step 1 (Business Category) directly
+      updateWizardUI(1);
+    {% endif %}
+
+    // Validate Step 4 upon form submission (BUG-PIN-02)
+    const regForm = document.getElementById('sellerRegisterForm');
+    if (regForm) {
+      regForm.addEventListener('submit', function(e) {
+        if (!validateStepFields(4)) {
+          e.preventDefault();
+          return false;
+        }
+      });
+    }
+  });
+</script>
+{% endblock %}

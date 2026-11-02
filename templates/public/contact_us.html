@@ -1,0 +1,832 @@
+{% extends "base/public_base.html" %}
+{% load static %}
+
+{% block title %}Contact Us &amp; Grievance Redressal Desk — LokalLoop{% endblock %}
+
+{% block meta_description %}Official Contact Us and Statutory Grievance Desk for LokalLoop, operated by Trisha Infotech Solution, Chhatrapati Sambhaji Nagar, Maharashtra. Customer support, merchant partnership, and regulatory redressal.{% endblock %}
+
+{% block extra_css %}
+<!-- Leaflet.js Free & Open-Source Map CSS -->
+<link rel="stylesheet" href="{% static 'vendor/leaflet/leaflet.css' %}" />
+<style>
+  /* Senior-Developer Styling System for Contact & Grievance Desk */
+  .contact-page-wrapper {
+    padding-top: 2.5rem;
+    padding-bottom: 5rem;
+    background: 
+      radial-gradient(circle at 15% 0%, rgba(249, 115, 22, 0.06) 0%, transparent 50%),
+      radial-gradient(circle at 85% 20%, rgba(99, 102, 241, 0.04) 0%, transparent 40%),
+      var(--bg-body, #f8fafc);
+  }
+
+  /* Segmented Policy Pill Navigation */
+  .policy-nav-strip {
+    display: inline-flex;
+    align-items: center;
+    background: #f1f5f9;
+    padding: 4px;
+    border-radius: 9999px;
+    border: 1px solid #e2e8f0;
+    gap: 4px;
+    flex-wrap: wrap;
+    margin-bottom: 2.25rem;
+  }
+
+  .policy-nav-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.45rem 1rem;
+    border-radius: 9999px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-decoration: none;
+    color: #64748b;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .policy-nav-pill:hover {
+    color: #0f172a;
+    background: rgba(255, 255, 255, 0.65);
+  }
+
+  .policy-nav-pill.active {
+    background: #ffffff;
+    color: #0f172a;
+    font-weight: 700;
+    box-shadow: 0 1px 4px rgba(15, 23, 42, 0.08), 0 0 0 1px rgba(15, 23, 42, 0.03);
+  }
+
+  .policy-nav-pill.active i {
+    color: #ea580c;
+  }
+
+  /* Hero Section */
+  .contact-hero {
+    margin-bottom: 2.75rem;
+  }
+
+  .hero-tag-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    background: #fff7ed;
+    border: 1px solid #fed7aa;
+    color: #ea580c;
+    padding: 0.35rem 0.85rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+  }
+
+  .contact-hero-title {
+    font-family: var(--font-display, 'Outfit', sans-serif);
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: -0.03em;
+    line-height: 1.2;
+    margin: 0 0 0.65rem;
+  }
+
+  .contact-hero-desc {
+    color: #64748b;
+    font-size: 1.02rem;
+    max-width: 720px;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  /* High-End Enterprise Cards */
+  .enterprise-card {
+    background: #ffffff;
+    border: 1px solid rgba(226, 232, 240, 0.9);
+    border-radius: 20px;
+    padding: 2.25rem 2rem;
+    box-shadow: 
+      0 20px 40px -15px rgba(15, 23, 42, 0.06),
+      0 0 0 1px rgba(15, 23, 42, 0.02);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+  }
+
+  .card-section-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.85rem;
+    margin-bottom: 1.75rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid #f1f5f9;
+  }
+
+  .header-icon-box {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+    background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+    color: #ea580c;
+    border: 1px solid #fed7aa;
+    box-shadow: 0 2px 6px rgba(249, 115, 22, 0.12);
+  }
+
+  .header-icon-blue {
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+    color: #2563eb;
+    border-color: #bfdbfe;
+    box-shadow: 0 2px 6px rgba(37, 99, 235, 0.12);
+  }
+
+  .card-section-header h3 {
+    font-family: var(--font-display, 'Outfit', sans-serif);
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: -0.015em;
+    margin: 0 0 0.25rem;
+  }
+
+  .card-section-header p {
+    font-size: 0.85rem;
+    color: #64748b;
+    margin: 0;
+    line-height: 1.4;
+  }
+
+  /* Form Elements */
+  .form-group-custom {
+    margin-bottom: 1.25rem;
+  }
+
+  .form-label-custom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 0.45rem;
+    letter-spacing: -0.01em;
+  }
+
+  .form-label-custom .req-star {
+    color: #ef4444;
+    margin-left: 2px;
+  }
+
+  .input-custom {
+    width: 100%;
+    height: 46px;
+    padding: 0.65rem 1rem;
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: #0f172a;
+    background: #ffffff;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 12px;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    box-sizing: border-box;
+  }
+
+  .input-custom::placeholder {
+    color: #94a3b8;
+    font-weight: 400;
+  }
+
+  .input-custom:hover {
+    border-color: #cbd5e1;
+  }
+
+  .input-custom:focus {
+    outline: none;
+    border-color: #f97316;
+    box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.12);
+    background: #ffffff;
+  }
+
+  .select-custom {
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b' stroke-width='2.5'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1rem 1rem;
+    padding-right: 2.5rem;
+    cursor: pointer;
+  }
+
+  .textarea-custom {
+    width: 100%;
+    min-height: 125px;
+    padding: 0.75rem 1rem;
+    font-size: 0.92rem;
+    font-weight: 500;
+    color: #0f172a;
+    background: #ffffff;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 12px;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    box-sizing: border-box;
+    resize: vertical;
+    line-height: 1.55;
+  }
+
+  .textarea-custom::placeholder {
+    color: #94a3b8;
+    font-weight: 400;
+  }
+
+  .textarea-custom:hover {
+    border-color: #cbd5e1;
+  }
+
+  .textarea-custom:focus {
+    outline: none;
+    border-color: #f97316;
+    box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.12);
+    background: #ffffff;
+  }
+
+  .btn-submit-premium {
+    width: 100%;
+    height: 50px;
+    border-radius: 12px;
+    border: none;
+    background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+    color: #ffffff;
+    font-size: 1.02rem;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    cursor: pointer;
+    box-shadow: 0 8px 20px -3px rgba(249, 115, 22, 0.38);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    margin-top: 1.25rem;
+  }
+
+  .btn-submit-premium:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 12px 24px -4px rgba(249, 115, 22, 0.45);
+    background: linear-gradient(135deg, #fb923c 0%, #ea580c 100%);
+  }
+
+  .btn-submit-premium:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 12px -2px rgba(249, 115, 22, 0.4);
+  }
+
+  /* Corporate Info Rows */
+  .corporate-info-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.15rem;
+    margin-bottom: 1.75rem;
+  }
+
+  .corp-row-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.95rem;
+    padding: 0.85rem 1rem;
+    border-radius: 12px;
+    background: #f8fafc;
+    border: 1px solid #f1f5f9;
+    transition: all 0.2s ease;
+  }
+
+  .corp-row-item:hover {
+    background: #f1f5f9;
+    border-color: #e2e8f0;
+  }
+
+  .corp-item-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    color: #ea580c;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.05rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+
+  .corp-item-label {
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #64748b;
+    margin-bottom: 0.2rem;
+  }
+
+  .corp-item-value {
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: #0f172a;
+    line-height: 1.45;
+  }
+
+  .corp-item-value small {
+    font-weight: 500;
+    color: #64748b;
+    display: block;
+    margin-top: 0.15rem;
+    font-size: 0.78rem;
+  }
+
+  /* Map Container */
+  .map-outer-box {
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1.5px solid #e2e8f0;
+    background: #ffffff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+
+  .map-bar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.65rem 1rem;
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .map-directions-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    color: #0f172a;
+    padding: 0.25rem 0.65rem;
+    border-radius: 6px;
+    font-size: 0.74rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.15s ease;
+  }
+
+  .map-directions-link:hover {
+    background: #f1f5f9;
+    border-color: #94a3b8;
+    color: #ea580c;
+  }
+
+  #officeMap {
+    height: 250px;
+    width: 100%;
+    z-index: 1;
+  }
+
+  /* Bottom Statutory Grievance Redressal Card */
+  .grievance-hero-card {
+    background: linear-gradient(145deg, #0f172a 0%, #1e1b4b 60%, #172554 100%);
+    color: #ffffff;
+    border-radius: 20px;
+    padding: 2.25rem 2.25rem;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.35);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .grievance-hero-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 320px;
+    height: 320px;
+    background: radial-gradient(circle, rgba(249, 115, 22, 0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .statutory-badge-row {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.85rem;
+  }
+
+  .compliance-pill {
+    background: rgba(249, 115, 22, 0.16);
+    border: 1px solid rgba(249, 115, 22, 0.35);
+    color: #fed7aa;
+    padding: 0.22rem 0.65rem;
+    border-radius: 9999px;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .grievance-title {
+    font-family: var(--font-display, 'Outfit', sans-serif);
+    font-size: 1.55rem;
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: -0.02em;
+    margin: 0 0 0.85rem;
+  }
+
+  .grievance-text {
+    font-size: 0.9rem;
+    color: #cbd5e1;
+    line-height: 1.6;
+    margin: 0 0 1.5rem;
+    max-width: 960px;
+  }
+
+  .grievance-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+
+  .grievance-tile {
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    padding: 1.25rem;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+  }
+
+  .grievance-tile:hover {
+    border-color: rgba(255, 255, 255, 0.16);
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  .grievance-tile-header {
+    font-size: 0.72rem;
+    color: #94a3b8;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.35rem;
+  }
+
+  .grievance-tile-title {
+    font-size: 1rem;
+    font-weight: 800;
+    color: #ffffff;
+    margin-bottom: 0.25rem;
+  }
+
+  .grievance-tile-desc {
+    font-size: 0.82rem;
+    color: #cbd5e1;
+    line-height: 1.45;
+  }
+
+  @media (max-width: 992px) {
+    .grievance-grid {
+      grid-template-columns: 1fr !important;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .contact-main-grid {
+      grid-template-columns: 1fr !important;
+    }
+    .enterprise-card {
+      padding: 1.75rem 1.25rem;
+    }
+    .grievance-hero-card {
+      padding: 1.75rem 1.25rem;
+    }
+    .contact-hero-title {
+      font-size: 2rem;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="contact-page-wrapper">
+  <div class="container">
+
+    <!-- Segmented Policy & Support Navigation Strip -->
+    <nav class="policy-nav-strip" aria-label="Legal & Support Policies">
+      <a href="/contact-us/" class="policy-nav-pill active">
+        <i class="bi bi-headset"></i> Contact &amp; Grievance
+      </a>
+      <a href="/terms/" class="policy-nav-pill">
+        <i class="bi bi-file-earmark-text"></i> Terms &amp; Conditions
+      </a>
+      <a href="/privacy-policy/" class="policy-nav-pill">
+        <i class="bi bi-shield-check"></i> Privacy Policy
+      </a>
+      <a href="/refund-policy/" class="policy-nav-pill">
+        <i class="bi bi-arrow-counterclockwise"></i> Refund Policy
+      </a>
+      <a href="/cookie-policy/" class="policy-nav-pill">
+        <i class="bi bi-cookie"></i> Cookie Policy
+      </a>
+    </nav>
+
+    <!-- Page Hero Header -->
+    <div class="contact-hero">
+      <div class="hero-tag-badge">
+        <i class="bi bi-patch-check-fill"></i> Regulatory &amp; Customer Support
+      </div>
+      <h1 class="contact-hero-title">Contact Us &amp; Grievance Desk</h1>
+      <p class="contact-hero-desc">
+        Have questions regarding store discounts, merchant onboarding, or payment redemptions? Submit an inquiry to our prompt support desk or lodge a statutory grievance under IT Rules 2021.
+      </p>
+    </div>
+
+    <!-- Success Ticket Notification (PRG Pattern) -->
+    {% if request.GET.ticket %}
+      <div style="background: #ecfdf5; border: 1.5px solid #34d399; border-radius: 16px; padding: 1.35rem 1.5rem; margin-bottom: 2rem; display: flex; align-items: flex-start; gap: 0.95rem; box-shadow: 0 4px 15px rgba(5, 150, 105, 0.08);">
+        <i class="bi bi-check-circle-fill text-success" style="font-size: 1.5rem; margin-top: 1px;"></i>
+        <div>
+          <div style="font-weight: 800; font-size: 1.05rem; color: #065f46; margin-bottom: 0.25rem;">
+            Inquiry Successfully Registered!
+          </div>
+          <div style="font-size: 0.9rem; color: #047857; line-height: 1.5;">
+            Your tracking ticket number is <strong style="font-family: monospace; font-size: 1.05rem; background: #d1fae5; padding: 2px 8px; border-radius: 6px; letter-spacing: 0.04em;">{{ request.GET.ticket }}</strong>. Our team has received your submission and will respond promptly within statutory timelines.
+          </div>
+        </div>
+      </div>
+    {% endif %}
+
+    <!-- 2-Column Main Enterprise Layout -->
+    <div class="d-grid grid-2 gap-4 contact-main-grid" style="margin-bottom: 2.75rem;">
+      
+      <!-- LEFT COLUMN: Contact Form Card -->
+      <div class="enterprise-card">
+        <div class="card-section-header">
+          <div class="header-icon-box">
+            <i class="bi bi-envelope-paper-heart-fill"></i>
+          </div>
+          <div>
+            <h3>Submit an Inquiry / Support Ticket</h3>
+            <p>Fill out the form below. An official Ticket ID will be generated upon dispatch.</p>
+          </div>
+        </div>
+
+        {% if form.errors %}
+          <div class="alert alert-danger" style="border-radius: 12px; margin-bottom: 1.25rem; font-size: 0.88rem; padding: 0.85rem 1rem;">
+            <strong><i class="bi bi-exclamation-triangle-fill"></i> Please correct the errors below:</strong>
+            <ul style="margin: 0.4rem 0 0; padding-left: 1.2rem;">
+              {% for field, errors in form.errors.items %}
+                {% for error in errors %}
+                  <li>{{ error }}</li>
+                {% endfor %}
+              {% endfor %}
+            </ul>
+          </div>
+        {% endif %}
+
+        <form method="POST" id="contactInquiryForm">
+          {% csrf_token %}
+          {{ form.website }}
+
+          <!-- Full Name -->
+          <div class="form-group-custom">
+            <label class="form-label-custom" for="id_full_name">
+              <span>Full Name<span class="req-star">*</span></span>
+            </label>
+            <input type="text" name="full_name" id="id_full_name" class="input-custom" placeholder="e.g. Rajesh Sharma" value="{{ form.full_name.value|default:'' }}" required autocomplete="name">
+          </div>
+
+          <!-- Email & Phone 2-Col Grid -->
+          <div class="d-grid grid-2 gap-2" style="margin-bottom: 1.25rem;">
+            <div class="form-group-custom" style="margin-bottom: 0;">
+              <label class="form-label-custom" for="id_email">
+                <span>Email Address<span class="req-star">*</span></span>
+              </label>
+              <input type="email" name="email" id="id_email" class="input-custom" placeholder="name@example.com" value="{{ form.email.value|default:'' }}" required autocomplete="email">
+            </div>
+
+            <div class="form-group-custom" style="margin-bottom: 0;">
+              <label class="form-label-custom" for="id_phone">
+                <span>Mobile Phone (Optional)</span>
+              </label>
+              <input type="tel" name="phone" id="id_phone" class="input-custom" placeholder="10-digit Indian Mobile" value="{{ form.phone.value|default:'' }}" autocomplete="tel">
+            </div>
+          </div>
+
+          <!-- Inquiry Role / Category Selector -->
+          <div class="form-group-custom">
+            <label class="form-label-custom" for="id_user_role">
+              <span>Inquiry Category / Department<span class="req-star">*</span></span>
+            </label>
+            <select name="user_role" id="id_user_role" class="input-custom select-custom" required>
+              {% for val, label in form.fields.user_role.choices %}
+                <option value="{{ val }}" {% if form.user_role.value == val %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Subject -->
+          <div class="form-group-custom">
+            <label class="form-label-custom" for="id_subject">
+              <span>Subject / Topic<span class="req-star">*</span></span>
+            </label>
+            <input type="text" name="subject" id="id_subject" class="input-custom" placeholder="Brief summary of your inquiry or grievance" value="{{ form.subject.value|default:'' }}" required>
+          </div>
+
+          <!-- Message -->
+          <div class="form-group-custom">
+            <label class="form-label-custom" for="id_message">
+              <span>Detailed Message<span class="req-star">*</span></span>
+            </label>
+            <textarea name="message" id="id_message" class="textarea-custom" placeholder="Please provide specific transaction, store name, or claim details..." required>{{ form.message.value|default:'' }}</textarea>
+          </div>
+
+          <!-- Slider Anti-Bot Challenge -->
+          {% include "components/captcha_field.html" %}
+
+          <!-- Submit CTA Button -->
+          <button type="submit" class="btn-submit-premium">
+            <i class="bi bi-send-fill"></i>
+            <span>Submit Inquiry / Grievance</span>
+          </button>
+        </form>
+      </div>
+
+      <!-- RIGHT COLUMN: Corporate Entity Details & Location Map Card -->
+      <div class="enterprise-card">
+        <div class="card-section-header">
+          <div class="header-icon-box header-icon-blue">
+            <i class="bi bi-building-check"></i>
+          </div>
+          <div>
+            <h3>Corporate &amp; Contact Details</h3>
+            <p>Verified regulatory disclosures and physical operating address.</p>
+          </div>
+        </div>
+
+        <div class="corporate-info-list">
+          <!-- Legal Entity -->
+          <div class="corp-row-item">
+            <div class="corp-item-icon">
+              <i class="bi bi-building"></i>
+            </div>
+            <div>
+              <div class="corp-item-label">Verified Legal Entity</div>
+              <div class="corp-item-value">
+                Trisha Infotech Solution
+                <small>Operating Platform Brand: <strong>LokalLoop</strong> (GENNIA Network) (Udyam Registered Entity)</small>
+              </div>
+            </div>
+          </div>
+
+          <!-- Registered Office Address -->
+          <div class="corp-row-item">
+            <div class="corp-item-icon">
+              <i class="bi bi-geo-alt-fill"></i>
+            </div>
+            <div>
+              <div class="corp-item-label">Registered Principal Office</div>
+              <div class="corp-item-value">
+                Office 610, D Wing, Freedom Tower, Aakashwani, Chhatrapati Sambhaji Nagar, Maharashtra – 431001, India.
+              </div>
+            </div>
+          </div>
+
+          <!-- Support Email -->
+          <div class="corp-row-item">
+            <div class="corp-item-icon">
+              <i class="bi bi-envelope-at-fill"></i>
+            </div>
+            <div>
+              <div class="corp-item-label">Support &amp; Partner Email</div>
+              <div class="corp-item-value">
+                <a href="mailto:gennia@gmail.com" style="color: #2563eb; text-decoration: none;">gennia@gmail.com</a>
+                <small>Monitored 24/7 for merchant &amp; customer inquiries</small>
+              </div>
+            </div>
+          </div>
+
+          <!-- Helpline & Hours -->
+          <div class="corp-row-item">
+            <div class="corp-item-icon">
+              <i class="bi bi-telephone-inbound-fill"></i>
+            </div>
+            <div>
+              <div class="corp-item-label">Helpline &amp; Operating Hours</div>
+              <div class="corp-item-value">
+                <a href="tel:+919822011223" style="color: #0f172a; text-decoration: none;">+91 98220 11223</a>
+                <small>Monday to Saturday: <strong>10:00 AM</strong> – <strong>6:30 PM</strong> IST (Closed on Sundays &amp; National Gazetted Holidays)</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Interactive Map Frame -->
+        <div class="map-outer-box">
+          <div class="map-bar-header">
+            <span style="font-weight: 700; font-size: 0.82rem; color: #0f172a; display: flex; align-items: center; gap: 0.35rem;">
+              <i class="bi bi-map-fill text-saffron"></i> Office Location Map
+            </span>
+            <a href="https://www.google.com/maps/dir/?api=1&destination=19.8762,75.3433" target="_blank" rel="noopener noreferrer" class="map-directions-link">
+              <i class="bi bi-cursor-fill text-danger"></i> Open in Google Maps
+            </a>
+          </div>
+          <div id="officeMap"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Statutory Grievance Redressal Banner (IT Rules 2021 & Consumer Protection Rules 2020) -->
+    <div class="grievance-hero-card">
+      <div class="statutory-badge-row">
+        <span class="compliance-pill">
+          <i class="bi bi-shield-lock-fill"></i> Statutory Compliance
+        </span>
+        <span style="font-size: 0.82rem; color: #94a3b8; font-weight: 500;">
+          Rule 3(2) of the Information Technology Rules, 2021 &amp; Consumer Protection (E-Commerce) Rules, 2020
+        </span>
+      </div>
+
+      <h2 class="grievance-title">
+        Grievance Redressal Mechanism &amp; Officer Contact
+      </h2>
+
+      <p class="grievance-text">
+        In accordance with Rule 3(2) of the Information Technology (Intermediary Guidelines and Digital Media Ethics Code) Rules, 2021 and Rule 4(4) of the Consumer Protection (E-Commerce) Rules, 2020, users and consumers may direct complaints or legal grievances to our designated Grievance Officer:
+      </p>
+
+      <div class="grievance-grid">
+        <!-- Tile 1 -->
+        <div class="grievance-tile">
+          <div class="grievance-tile-header">Designated Officer</div>
+          <div class="grievance-tile-title">Grievance Redressal Officer</div>
+          <div class="grievance-tile-desc">Customer, Merchant &amp; Regulatory Disputes</div>
+        </div>
+
+        <!-- Tile 2 -->
+        <div class="grievance-tile">
+          <div class="grievance-tile-header">Direct Escalation Channel</div>
+          <div class="grievance-tile-title">
+            <a href="mailto:gennia@gmail.com" style="color: #38bdf8; text-decoration: none;">gennia@gmail.com</a>
+          </div>
+          <div class="grievance-tile-desc">Subject Prefix: <code>[GRIEVANCE]</code></div>
+        </div>
+
+        <!-- Tile 3 -->
+        <div class="grievance-tile">
+          <div class="grievance-tile-header">Statutory Timelines</div>
+          <div class="grievance-tile-title" style="font-size: 0.88rem; font-weight: 700; line-height: 1.5;">
+            &bull; Acknowledgement: Within <strong>48 hours</strong><br>
+            &bull; Resolution: Within <strong>30 calendar days</strong>
+          </div>
+          <div class="grievance-tile-desc" style="margin-top: 0.25rem;">As prescribed under consumer protection law.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Leaflet.js Interactive Free Map Script -->
+<script src="{% static 'vendor/leaflet/leaflet.js' %}"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const officeLat = 19.8762;
+    const officeLng = 75.3433;
+    const mapContainer = document.getElementById('officeMap');
+    
+    if (mapContainer && typeof L !== 'undefined') {
+      const map = L.map('officeMap', {
+        scrollWheelZoom: false
+      }).setView([officeLat, officeLng], 15);
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        maxZoom: 19
+      }).addTo(map);
+
+      const marker = L.marker([officeLat, officeLng]).addTo(map);
+      marker.bindPopup('<strong>Trisha Infotech Solution</strong><br>LokalLoop Operating Headquarters<br>Freedom Tower, Aakashwani, Chhatrapati Sambhaji Nagar').openPopup();
+
+      setTimeout(function() {
+        map.invalidateSize();
+      }, 300);
+    }
+  });
+</script>
+{% endblock %}

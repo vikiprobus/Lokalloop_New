@@ -1,0 +1,481 @@
+{% extends "base/buyer_base.html" %}
+
+{% block title %}Delete Shopper Account — LokalLoop{% endblock %}
+
+{% block content %}
+<style>
+  /* Senior-Developer Styling System for Account Deletion */
+  .deletion-page-container {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 1.5rem 1rem 4rem;
+  }
+
+  .deletion-card {
+    background: #ffffff;
+    border-radius: 20px;
+    border: 1px solid rgba(226, 232, 240, 0.9);
+    box-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.08), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
+    overflow: hidden;
+  }
+
+  .deletion-header {
+    background: linear-gradient(145deg, #ffffff 0%, #fef2f2 60%, #fee2e2 100%);
+    padding: 2rem 2.25rem 1.75rem;
+    border-bottom: 1px solid #fee2e2;
+    position: relative;
+  }
+
+  .deletion-header::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 140px;
+    height: 140px;
+    background: radial-gradient(circle, rgba(239, 68, 68, 0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .compliance-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.25rem 0.65rem;
+    border-radius: 9999px;
+    background: rgba(220, 38, 38, 0.08);
+    color: #dc2626;
+    border: 1px solid rgba(220, 38, 38, 0.2);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+  }
+
+  .icon-squircle-danger {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+    color: #dc2626;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.16);
+    flex-shrink: 0;
+  }
+
+  .forfeiture-card {
+    background: linear-gradient(135deg, #fffbeb 0%, #fff7ed 100%);
+    border: 1px solid #fed7aa;
+    border-left: 4px solid #ea580c;
+    border-radius: 14px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.75rem;
+  }
+
+  .segmented-auth-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.65rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .segmented-auth-label {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.85rem 1rem;
+    border-radius: 12px;
+    border: 1.5px solid #e2e8f0;
+    background: #ffffff;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    font-size: 0.86rem;
+    font-weight: 600;
+    color: #475569;
+  }
+
+  .segmented-auth-label:hover {
+    border-color: #cbd5e1;
+    background: #f8fafc;
+  }
+
+  .segmented-auth-label.active {
+    border-color: #2563eb;
+    background: #eff6ff;
+    color: #1d4ed8;
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.12);
+  }
+
+  .custom-form-select {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #0f172a;
+    background-color: #ffffff;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    outline: none;
+  }
+
+  .custom-form-select:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+  }
+
+  .custom-form-textarea {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 0.88rem;
+    color: #0f172a;
+    background-color: #ffffff;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+    outline: none;
+    resize: vertical;
+  }
+
+  .custom-form-textarea:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+  }
+
+  .input-with-icon-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .input-with-icon-wrap i.field-icon {
+    position: absolute;
+    left: 1rem;
+    color: #94a3b8;
+    font-size: 1rem;
+    pointer-events: none;
+  }
+
+  .input-with-icon-wrap .form-control {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 2.65rem;
+    font-size: 0.9rem;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 12px;
+    outline: none;
+    transition: all 0.2s ease;
+  }
+
+  .input-with-icon-wrap .form-control:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+  }
+
+  .pass-reveal-btn {
+    position: absolute;
+    right: 0.75rem;
+    background: none;
+    border: none;
+    color: #94a3b8;
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    transition: color 0.15s ease;
+  }
+
+  .pass-reveal-btn:hover {
+    color: #0f172a;
+  }
+
+  .consent-box {
+    background: #fff5f5;
+    border: 1.5px dashed #fca5a5;
+    border-radius: 12px;
+    padding: 1.15rem 1.25rem;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .consent-checkbox {
+    width: 20px;
+    height: 20px;
+    accent-color: #dc2626;
+    margin-top: 0.15rem;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .btn-danger-execute {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: #ffffff;
+    border: none;
+    padding: 0.8rem 1.75rem;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 0.92rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(220, 38, 38, 0.3);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .btn-danger-execute:hover {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    box-shadow: 0 6px 18px rgba(220, 38, 38, 0.4);
+    transform: translateY(-1px);
+    color: #ffffff;
+  }
+
+  .trust-strip {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.25rem;
+    padding: 0.9rem 1rem;
+    background: #f8fafc;
+    border-top: 1px solid #f1f5f9;
+    font-size: 0.78rem;
+    color: #64748b;
+    font-weight: 600;
+    flex-wrap: wrap;
+  }
+</style>
+
+<div class="deletion-page-container">
+  
+  <!-- Breadcrumb Navigation -->
+  <nav aria-label="breadcrumb" style="margin-bottom: 1.25rem;">
+    <ol style="display: flex; align-items: center; gap: 0.5rem; list-style: none; padding: 0; margin: 0; font-size: 0.85rem;">
+      <li><a href="/buyer/dashboard/" style="color: var(--text-muted, #64748b); text-decoration: none;"><i class="bi bi-house-door"></i> Home</a></li>
+      <li style="color: #cbd5e1;">/</li>
+      <li><a href="/buyer/change-password/" style="color: var(--text-muted, #64748b); text-decoration: none;">Account Security</a></li>
+      <li style="color: #cbd5e1;">/</li>
+      <li style="color: #dc2626; font-weight: 700;">Delete Account</li>
+    </ol>
+  </nav>
+
+  <!-- Main Elevation Card -->
+  <div class="deletion-card">
+    
+    <!-- Hero Header -->
+    <div class="deletion-header">
+      <div style="display: flex; align-items: flex-start; gap: 1rem;">
+        <div class="icon-squircle-danger">
+          <i class="bi bi-shield-x"></i>
+        </div>
+        <div>
+          <h1 style="font-size: 1.45rem; font-weight: 800; color: #0f172a; margin: 0 0 0.3rem; letter-spacing: -0.02em;">
+            Delete My Shopper Account
+          </h1>
+          <p style="font-size: 0.86rem; color: #64748b; margin: 0; line-height: 1.45;">
+            Permanent digital persona deactivation, data erasure, and loyalty reward forfeiture.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div style="padding: 2rem 2.25rem 2.25rem;">
+      
+      <!-- Forfeiture Warning Banner -->
+      <div class="forfeiture-card">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.65rem;">
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <i class="bi bi-gift-fill text-saffron" style="font-size: 1.25rem;"></i>
+            <h4 style="font-size: 1rem; font-weight: 800; color: #9a3412; margin: 0;">
+              Immediate Forfeiture of Rewards
+            </h4>
+          </div>
+          <span style="background: #ffedd5; color: #ea580c; border: 1px solid #fed7aa; padding: 0.2rem 0.65rem; border-radius: 9999px; font-weight: 800; font-size: 0.85rem; font-variant-numeric: tabular-nums;">
+            {{ points_balance }} Points Active
+          </span>
+        </div>
+        <p style="font-size: 0.86rem; color: #7c2d12; margin: 0 0 0.75rem; line-height: 1.5;">
+          Closing your shopper profile permanently forfeits your <strong>{{ points_balance }} loyalty points</strong>, scratch rewards, and store cashback passes. This action is final and cannot be recovered.
+        </p>
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap; font-size: 0.78rem; color: #9a3412; font-weight: 600;">
+          <span><i class="bi bi-x-circle-fill" style="color: #ea580c;"></i> Surrender Shopper ID</span>
+          <span><i class="bi bi-x-circle-fill" style="color: #ea580c;"></i> Erase Device Token</span>
+          <span><i class="bi bi-x-circle-fill" style="color: #ea580c;"></i> Revoke Session Keys</span>
+        </div>
+      </div>
+
+      <form method="POST" id="buyerDeleteForm">
+        {% csrf_token %}
+
+        <!-- Reason Selection -->
+        <div class="form-group" style="margin-bottom: 1.5rem;">
+          <label class="form-label" style="font-weight: 700; color: #0f172a; font-size: 0.88rem; margin-bottom: 0.45rem; display: block;">
+            Reason for Account Closure <span class="text-danger">*</span>
+          </label>
+          <select name="reason_category" id="id_buyer_del_reason" class="custom-form-select" required>
+            {% for choice_val, choice_label in form.fields.reason_category.choices %}
+              <option value="{{ choice_val }}" {% if form.reason_category.value == choice_val %}selected{% endif %}>
+                {{ choice_label }}
+              </option>
+            {% endfor %}
+          </select>
+          {% if form.reason_category.errors %}
+            <div class="text-danger" style="font-size: 0.8rem; margin-top: 0.35rem; font-weight: 600;">{{ form.reason_category.errors.0 }}</div>
+          {% endif %}
+        </div>
+
+        <!-- Optional Feedback Notes -->
+        <div class="form-group" style="margin-bottom: 1.75rem;">
+          <label class="form-label" style="font-weight: 700; color: #0f172a; font-size: 0.88rem; margin-bottom: 0.45rem; display: block;">
+            Help Us Improve (Optional Feedback)
+          </label>
+          <textarea name="reason_notes" id="id_buyer_del_notes" class="custom-form-textarea" rows="2" placeholder="Tell us what prompted your decision or what we could have done better...">{{ form.reason_notes.value|default:'' }}</textarea>
+        </div>
+
+        <!-- Re-Authentication Box -->
+        <div style="border: 1px solid #e2e8f0; border-radius: 14px; padding: 1.35rem; margin-bottom: 1.75rem; background: #fbfcfe;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.85rem;">
+            <label style="font-weight: 700; color: #0f172a; font-size: 0.88rem; margin: 0;">
+              Confirm Your Identity <span class="text-danger">*</span>
+            </label>
+            <span style="font-size: 0.75rem; color: #64748b; font-weight: 600;">Re-authentication required</span>
+          </div>
+
+          <!-- Segmented Tab Switcher -->
+          <div class="segmented-auth-group">
+            <label class="segmented-auth-label active" id="buyerAuthLabelPass" onclick="selectBuyerAuthMethod('PASSWORD')">
+              <input type="radio" name="auth_method" value="PASSWORD" id="buyerAuthMethodPass" checked style="display: none;">
+              <i class="bi bi-key-fill text-primary" style="font-size: 1.1rem;"></i>
+              <div>
+                <div style="line-height: 1.2;">Password</div>
+                <span style="font-size: 0.72rem; color: #64748b; font-weight: 500;">Account credential</span>
+              </div>
+            </label>
+
+            {% if buyer_profile.security_question %}
+              <label class="segmented-auth-label" id="buyerAuthLabelSecQ" onclick="selectBuyerAuthMethod('SECURITY_QUESTION')">
+                <input type="radio" name="auth_method" value="SECURITY_QUESTION" id="buyerAuthMethodSecQ" style="display: none;">
+                <i class="bi bi-shield-lock-fill text-saffron" style="font-size: 1.1rem;"></i>
+                <div>
+                  <div style="line-height: 1.2;">Secret Answer</div>
+                  <span style="font-size: 0.72rem; color: #64748b; font-weight: 500;">Security question</span>
+                </div>
+              </label>
+            {% else %}
+              <div class="segmented-auth-label" style="opacity: 0.55; cursor: not-allowed;">
+                <i class="bi bi-shield-x text-muted" style="font-size: 1.1rem;"></i>
+                <div>
+                  <div style="line-height: 1.2;">Secret Answer</div>
+                  <span style="font-size: 0.72rem; color: #94a3b8; font-weight: 500;">Not configured</span>
+                </div>
+              </div>
+            {% endif %}
+          </div>
+
+          <!-- Password Input -->
+          <div id="buyerPasswordFieldBlock">
+            <div class="input-with-icon-wrap">
+              <i class="bi bi-lock-fill field-icon"></i>
+              <input type="password" name="current_password" id="id_buyer_del_password" class="form-control" placeholder="Enter your current password">
+              <button type="button" class="pass-reveal-btn" onclick="togglePasswordVisibility('id_buyer_del_password', this)">
+                <i class="bi bi-eye"></i>
+              </button>
+            </div>
+            {% if form.current_password.errors %}
+              <div class="text-danger" style="font-size: 0.8rem; margin-top: 0.35rem; font-weight: 600;">{{ form.current_password.errors.0 }}</div>
+            {% endif %}
+          </div>
+
+          <!-- Security Question Answer -->
+          {% if buyer_profile.security_question %}
+            <div id="buyerSecurityFieldBlock" style="display: none;">
+              <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 0.75rem 1rem; margin-bottom: 0.65rem;">
+                <span style="font-size: 0.72rem; text-transform: uppercase; font-weight: 700; color: #64748b; letter-spacing: 0.04em; display: block; margin-bottom: 0.2rem;">Configured Secret Question:</span>
+                <span style="font-size: 0.88rem; font-weight: 700; color: #0f172a;"><i class="bi bi-question-circle text-primary"></i> {{ buyer_profile.security_question }}</span>
+              </div>
+              <div class="input-with-icon-wrap">
+                <i class="bi bi-shield-check field-icon"></i>
+                <input type="text" name="security_answer" id="id_buyer_del_answer" class="form-control" placeholder="Enter your secret recovery answer">
+              </div>
+              {% if form.security_answer.errors %}
+                <div class="text-danger" style="font-size: 0.8rem; margin-top: 0.35rem; font-weight: 600;">{{ form.security_answer.errors.0 }}</div>
+              {% endif %}
+            </div>
+          {% endif %}
+        </div>
+
+        <!-- Statutory Consent Checkbox -->
+        <div class="consent-box">
+          <input type="checkbox" name="confirm_forfeiture" id="id_confirm_buyer_forfeiture" class="consent-checkbox" required>
+          <label for="id_confirm_buyer_forfeiture" style="font-size: 0.86rem; color: #7f1d1d; font-weight: 600; line-height: 1.45; cursor: pointer; margin: 0;">
+            I confirm that I want to permanently delete my shopper profile and acknowledge the immediate forfeiture of all {{ points_balance }} reward points.
+          </label>
+        </div>
+        {% if form.confirm_forfeiture.errors %}
+          <div class="text-danger" style="font-size: 0.8rem; margin-top: -1.5rem; margin-bottom: 1.5rem; font-weight: 600;">{{ form.confirm_forfeiture.errors.0 }}</div>
+        {% endif %}
+
+        <!-- Actions -->
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
+          <a href="/buyer/change-password/" class="btn btn-outline" style="border-radius: 12px; font-weight: 600; padding: 0.75rem 1.25rem;">
+            <i class="bi bi-arrow-left"></i> Keep Rewards &amp; Cancel
+          </a>
+          <button type="submit" class="btn-danger-execute">
+            <i class="bi bi-trash3-fill"></i>
+            <span>Permanently Delete Account</span>
+          </button>
+        </div>
+
+      </form>
+    </div>
+
+    <!-- Trust Strip -->
+    <div class="trust-strip">
+      <span><i class="bi bi-shield-fill-check text-success"></i> 256-Bit Encrypted</span>
+      <span>&bull;</span>
+      <span><i class="bi bi-person-slash"></i> Irreversible Account Closure</span>
+      <span>&bull;</span>
+      <span><i class="bi bi-clock-history"></i> Immediate Session Termination</span>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  function selectBuyerAuthMethod(method) {
+    const isPass = (method === 'PASSWORD');
+    const passRadio = document.getElementById('buyerAuthMethodPass');
+    const secRadio = document.getElementById('buyerAuthMethodSecQ');
+    const labelPass = document.getElementById('buyerAuthLabelPass');
+    const labelSecQ = document.getElementById('buyerAuthLabelSecQ');
+    const passBlock = document.getElementById('buyerPasswordFieldBlock');
+    const secBlock = document.getElementById('buyerSecurityFieldBlock');
+
+    if (isPass) {
+      if (passRadio) passRadio.checked = true;
+      if (labelPass) labelPass.classList.add('active');
+      if (labelSecQ) labelSecQ.classList.remove('active');
+      if (passBlock) passBlock.style.display = 'block';
+      if (secBlock) secBlock.style.display = 'none';
+    } else {
+      if (secRadio) secRadio.checked = true;
+      if (labelSecQ) labelSecQ.classList.add('active');
+      if (labelPass) labelPass.classList.remove('active');
+      if (passBlock) passBlock.style.display = 'none';
+      if (secBlock) secBlock.style.display = 'block';
+    }
+  }
+
+  function togglePasswordVisibility(inputId, btn) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    const isPass = input.type === 'password';
+    input.type = isPass ? 'text' : 'password';
+    btn.innerHTML = isPass ? '<i class="bi bi-eye-slash"></i>' : '<i class="bi bi-eye"></i>';
+  }
+</script>
+{% endblock %}

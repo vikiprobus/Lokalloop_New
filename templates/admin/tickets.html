@@ -1,0 +1,127 @@
+{% extends "base/admin_base.html" %}
+
+{% block title %}Support Tickets — {{ BRAND_NAME }} Console{% endblock %}
+{% block page_title %}Dispute Moderation & Support Tickets{% endblock %}
+
+{% block content %}
+<div class="card card-padded">
+  <div class="d-flex align-center justify-between" style="margin-bottom: 1.25rem;">
+    <div>
+      <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--brand-navy-900);">Customer & Merchant Tickets</h3>
+      <p style="font-size: 0.85rem; color: var(--text-muted);">Manage shopper queries, redemption disputes, and merchant billing questions</p>
+    </div>
+    <span class="badge badge-neutral">{{ tickets|length }} Inquiries</span>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 1rem;">
+    {% for t in tickets %}
+      <div class="card card-padded" style="background: #fafbfc; border-left: 4px solid {% if t.status == 'OPEN' %}var(--color-danger){% elif t.status == 'IN_PROGRESS' %}#d97706{% else %}#10b981{% endif %};">
+        <div class="d-flex align-center justify-between flex-wrap gap-2" style="margin-bottom: 0.5rem;">
+          <div class="d-flex align-center gap-2">
+            <span style="font-weight: 800; font-size: 0.95rem; color: var(--brand-navy-900);">#{{ t.id }} &bull; {{ t.subject }}</span>
+            <span class="badge badge-indigo">{{ t.get_category_display }}</span>
+          </div>
+          <span class="badge {% if t.status == 'OPEN' %}badge-danger{% elif t.status == 'IN_PROGRESS' %}badge-warning{% else %}badge-success{% endif %}">
+            {{ t.get_status_display }}
+          </span>
+        </div>
+
+        <p style="font-size: 0.9rem; color: var(--text-main); margin-bottom: 0.75rem; line-height: 1.5;">
+          {{ t.message }}
+        </p>
+
+        <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">
+          Submitted by: <strong>{{ t.user.username }}</strong> ({{ t.user.email }}) &bull; {{ t.created_at|date:"d M Y, h:i A" }}
+        </div>
+
+        <!-- Ticket Update Form -->
+        <form method="POST" action="/admin-portal/tickets/{{ t.id }}/update/" class="d-flex gap-2 align-center flex-wrap" style="background: #ffffff; padding: 0.75rem; border-radius: var(--radius-md); border: 1px solid var(--border-light);">
+          {% csrf_token %}
+          <div style="min-width: 150px;">
+            <select name="status" class="form-select" style="padding: 0.4rem 0.75rem; font-size: 0.85rem;">
+              <option value="OPEN" {% if t.status == 'OPEN' %}selected{% endif %}>Open</option>
+              <option value="IN_PROGRESS" {% if t.status == 'IN_PROGRESS' %}selected{% endif %}>In Progress</option>
+              <option value="RESOLVED" {% if t.status == 'RESOLVED' %}selected{% endif %}>Resolved</option>
+              <option value="CLOSED" {% if t.status == 'CLOSED' %}selected{% endif %}>Closed</option>
+            </select>
+          </div>
+
+          <div style="flex: 1; min-width: 200px;">
+            <input type="text" name="admin_notes" value="{{ t.admin_notes }}" class="form-control" style="padding: 0.4rem 0.75rem; font-size: 0.85rem;" placeholder="Internal resolution notes...">
+          </div>
+
+          <button type="submit" class="btn btn-dark btn-sm">
+            Save Status
+          </button>
+        </form>
+      </div>
+    {% empty %}
+      <div style="text-align: center; padding: 3rem 1rem; color: var(--text-muted);">
+        No support tickets open. Everything is running smoothly!
+      </div>
+    {% endfor %}
+  </div>
+
+  <!-- Statutory Grievances & Guest Inquiries Section (IT Rules 2021) -->
+  <div style="margin-top: 3rem; padding-top: 2rem; border-top: 2px dashed var(--border-light);">
+    <div class="d-flex align-center justify-between" style="margin-bottom: 1.25rem;">
+      <div>
+        <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--brand-navy-900);">
+          <i class="bi bi-shield-check text-saffron"></i> Public Contact Inquiries & Statutory Grievances
+        </h3>
+        <p style="font-size: 0.85rem; color: var(--text-muted);">Inquiries and formal grievances submitted via /contact-us/ under IT Rules 2021</p>
+      </div>
+      <span class="badge badge-indigo">{{ contact_inquiries|length }} Inquiries</span>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 1rem;">
+      {% for inq in contact_inquiries %}
+        <div class="card card-padded" style="background: #fafbfc; border-left: 4px solid {% if inq.status == 'OPEN' %}var(--color-danger){% elif inq.status == 'IN_PROGRESS' %}#d97706{% else %}#10b981{% endif %};">
+          <div class="d-flex align-center justify-between flex-wrap gap-2" style="margin-bottom: 0.5rem;">
+            <div class="d-flex align-center gap-2">
+              <span style="font-weight: 800; font-size: 0.95rem; color: var(--brand-navy-900);">[{{ inq.ticket_number }}] &bull; {{ inq.subject }}</span>
+              <span class="badge badge-indigo">{{ inq.get_user_role_display }}</span>
+            </div>
+            <span class="badge {% if inq.status == 'OPEN' %}badge-danger{% elif inq.status == 'IN_PROGRESS' %}badge-warning{% else %}badge-success{% endif %}">
+              {{ inq.get_status_display }}
+            </span>
+          </div>
+
+          <p style="font-size: 0.9rem; color: var(--text-main); margin-bottom: 0.75rem; line-height: 1.5;">
+            {{ inq.message }}
+          </p>
+
+          <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">
+            Contact: <strong>{{ inq.full_name }}</strong> &bull; <a href="mailto:{{ inq.email }}" style="color: var(--brand-navy-900); text-decoration: underline;">{{ inq.email }}</a> &bull; Phone: {{ inq.phone|default:"N/A" }} &bull; Submitted on {{ inq.created_at|date:"d M Y, h:i A" }}
+          </div>
+
+          <!-- Inquiry Update Form -->
+          <form method="POST" action="/admin-portal/inquiries/{{ inq.id }}/update/" class="d-flex gap-2 align-center flex-wrap" style="background: #ffffff; padding: 0.75rem; border-radius: var(--radius-md); border: 1px solid var(--border-light);">
+            {% csrf_token %}
+            <div style="min-width: 150px;">
+              <select name="status" class="form-select" style="padding: 0.4rem 0.75rem; font-size: 0.85rem;">
+                <option value="OPEN" {% if inq.status == 'OPEN' %}selected{% endif %}>Open</option>
+                <option value="IN_PROGRESS" {% if inq.status == 'IN_PROGRESS' %}selected{% endif %}>In Progress</option>
+                <option value="RESOLVED" {% if inq.status == 'RESOLVED' %}selected{% endif %}>Resolved</option>
+                <option value="CLOSED" {% if inq.status == 'CLOSED' %}selected{% endif %}>Closed</option>
+              </select>
+            </div>
+
+            <div style="flex: 1; min-width: 200px;">
+              <input type="text" name="admin_notes" value="{{ inq.admin_notes }}" class="form-control" style="padding: 0.4rem 0.75rem; font-size: 0.85rem;" placeholder="Resolution / action notes...">
+            </div>
+
+            <button type="submit" class="btn btn-dark btn-sm">
+              Save Status
+            </button>
+          </form>
+        </div>
+      {% empty %}
+        <div style="text-align: center; padding: 2.5rem 1rem; color: var(--text-muted);">
+          No guest inquiries or statutory grievances submitted.
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

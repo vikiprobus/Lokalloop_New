@@ -1,0 +1,287 @@
+{% extends "base/public_base.html" %}
+{% load static %}
+
+{% block title %}{{ shop.name }} — {{ shop.locality }}, {{ shop.city }} | LokalLoop{% endblock %}
+
+{% block extra_css %}
+<!-- Leaflet Map CSS (Local Vendor) -->
+<link rel="stylesheet" href="{% static 'vendor/leaflet/leaflet.css' %}" />
+<style>
+  @media (max-width: 768px) {
+    .shop-detail-grid {
+      grid-template-columns: 1fr !important;
+    }
+    .shop-detail-left-col {
+      grid-column: span 1 !important;
+    }
+    .shop-banner-box {
+      height: auto !important;
+      min-height: 280px !important;
+      position: relative !important;
+    }
+    .shop-banner-box .banner-bg-img {
+      position: absolute !important;
+      inset: 0 !important;
+      height: 100% !important;
+      object-fit: cover !important;
+    }
+    .shop-banner-overlay-content {
+      position: relative !important;
+      bottom: auto !important;
+      left: auto !important;
+      right: auto !important;
+      padding: 1.25rem 1rem !important;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 1.5rem; padding-bottom: 4rem;">
+  
+  <!-- Breadcrumb -->
+  <div style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.4rem;">
+    <a href="/" style="color: var(--text-muted); text-decoration: none;">Home</a>
+    <i class="bi bi-chevron-right" style="font-size: 0.7rem;"></i>
+    <a href="/explore/" style="color: var(--text-muted); text-decoration: none;">Shops</a>
+    <i class="bi bi-chevron-right" style="font-size: 0.7rem;"></i>
+    <a href="/explore/?category={{ shop.category.slug }}" style="color: var(--text-muted); text-decoration: none;">{{ shop.category.name }}</a>
+    <i class="bi bi-chevron-right" style="font-size: 0.7rem;"></i>
+    <span style="color: var(--brand-navy-900); font-weight: 600;">{{ shop.name }}</span>
+  </div>
+
+  <!-- Store Header Banner -->
+  <div class="card" style="margin-bottom: 2rem; overflow: hidden; border: 1px solid var(--border-light); box-shadow: var(--shadow-sm); border-radius: var(--radius-lg);">
+    <div class="shop-banner-box" style="height: 260px; position: relative;">
+      <img src="{{ shop.banner_image_url }}" alt="{{ shop.name }}" class="banner-bg-img" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='/static/images/placeholder_shop.svg'">
+      <div style="position: absolute; inset: 0; background: linear-gradient(180deg, rgba(12, 16, 23, 0.2) 30%, rgba(12, 16, 23, 0.9) 100%);"></div>
+      
+      <div class="shop-banner-overlay-content" style="position: absolute; bottom: 20px; left: 20px; right: 20px; display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 1rem; color: #fff;">
+        <div class="d-flex align-center gap-3">
+          <img src="{{ shop.logo_image_url }}" alt="{{ shop.name }} Logo" style="width: 68px; height: 68px; border-radius: var(--radius-md); border: 2px solid #ffffff; background: #ffffff; object-fit: cover; box-shadow: var(--shadow-md);">
+          <div>
+            <div class="d-flex align-center gap-2 flex-wrap">
+              <h1 style="font-size: 1.85rem; font-weight: 800; color: #ffffff; margin: 0; letter-spacing: -0.02em;">{{ shop.name }}</h1>
+              <span class="badge badge-success" style="font-size: 0.75rem;"><i class="bi bi-patch-check-fill"></i> Verified Store</span>
+              {% if user_distance_display %}
+                <span class="badge" style="background: rgba(249, 115, 22, 0.95); color: #fff; font-size: 0.78rem; font-weight: 700;">
+                  <i class="bi bi-geo-alt-fill"></i> {{ user_distance_display }} away from you
+                </span>
+              {% endif %}
+            </div>
+            <p style="font-size: 0.9rem; color: #cbd5e1; margin: 0.25rem 0 0;">
+              {{ shop.tagline|default:shop.locality }} &bull; <i class="bi bi-geo-alt-fill text-saffron"></i> {{ shop.locality }}, {{ shop.city }}
+            </p>
+          </div>
+        </div>
+
+        <div class="d-flex align-center gap-2">
+          <span style="background: rgba(12, 16, 23, 0.6); border: 1px solid rgba(255,255,255,0.2); backdrop-filter: blur(8px); padding: 0.45rem 0.9rem; border-radius: var(--radius-md); font-weight: 700; font-size: 0.95rem; color: #fde047; font-variant-numeric: tabular-nums;">
+            <i class="bi bi-star-fill"></i> {{ shop.rating }} / 5.0
+          </span>
+          <a href="#active-offers" class="btn btn-primary btn-sm">
+            <i class="bi bi-tag-fill"></i> View Deals ({{ active_offers|length }})
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="d-grid grid-3 gap-4 shop-detail-grid">
+    
+    <!-- Left Column: Details & Offers (2 cols span) -->
+    <div class="shop-detail-left-col" style="grid-column: span 2;">
+      
+      <!-- Store Overview -->
+      <div class="card card-padded" style="margin-bottom: 2rem; background: #ffffff; border: 1px solid var(--border-light);">
+        <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--brand-navy-900); margin-bottom: 0.65rem;">
+          About the Store
+        </h3>
+        <p style="font-size: 0.92rem; color: var(--text-main); line-height: 1.6; white-space: pre-line; margin: 0;">
+          {{ shop.description }}
+        </p>
+      </div>
+
+      <!-- Active Offers Section -->
+      <div id="active-offers" style="margin-bottom: 2.5rem;">
+        <div class="d-flex align-center justify-between" style="margin-bottom: 1.25rem;">
+          <div>
+            <h2 style="font-size: 1.35rem; font-weight: 800; color: var(--brand-navy-900); letter-spacing: -0.01em; margin: 0;">
+              Exclusive In-Store Offers
+            </h2>
+            <p style="font-size: 0.82rem; color: var(--text-muted); margin: 0.2rem 0 0;">
+              Redeem these discounts live at the checkout counter using your smartphone
+            </p>
+          </div>
+          <span class="badge badge-saffron">{{ active_offers|length }} Available</span>
+        </div>
+
+        <div class="d-grid grid-2 gap-3">
+          {% for offer in active_offers %}
+            {% include "components/offer_card.html" with offer=offer %}
+          {% empty %}
+            <div style="grid-column: 1 / -1;">
+              {% include "components/empty_state.html" with title="No active promotions right now" description="This store is currently not running public counter discount campaigns. Check back soon!" %}
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Right Column: Location, Timings, Contact Info & Map -->
+    <div>
+      
+      <!-- Store Info Card -->
+      <div class="card card-padded" style="margin-bottom: 1.5rem; background: #ffffff; border: 1px solid var(--border-light);">
+        <h4 style="font-size: 1.05rem; font-weight: 700; color: var(--brand-navy-900); margin-bottom: 0.85rem; border-bottom: 1px solid var(--border-light); padding-bottom: 0.5rem;">
+          Store Information
+        </h4>
+
+        <div style="display: flex; flex-direction: column; gap: 0.9rem; font-size: 0.88rem;">
+          <div>
+            <span style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 0.2rem; letter-spacing: 0.04em;">Address</span>
+            <div style="color: var(--text-main); line-height: 1.45;">
+              <i class="bi bi-geo-alt text-saffron"></i> {{ shop.full_address }}
+            </div>
+          </div>
+
+          {% if user_distance_display %}
+            <div style="background: var(--bg-subtle); padding: 0.65rem 0.85rem; border-radius: var(--radius-md); border: 1px solid var(--border-light);">
+              <span style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; color: var(--brand-saffron-600); display: block; margin-bottom: 0.15rem; letter-spacing: 0.04em;">Proximity to you</span>
+              <div style="color: var(--ink-950); font-weight: 800; font-size: 1rem;">
+                📍 {{ user_distance_display }} away
+              </div>
+            </div>
+          {% endif %}
+
+          <div>
+            <span style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 0.2rem; letter-spacing: 0.04em;">Operating Hours</span>
+            <div style="color: var(--text-main); font-variant-numeric: tabular-nums;">
+              <i class="bi bi-clock"></i> {{ shop.timing_display }}
+            </div>
+          </div>
+
+          <div>
+            <span style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 0.2rem; letter-spacing: 0.04em;">Contact Telephone</span>
+            <div style="color: var(--text-main); font-weight: 600; font-variant-numeric: tabular-nums;">
+              <i class="bi bi-telephone text-success"></i> {{ shop.phone }}
+            </div>
+          </div>
+
+          <div>
+            <span style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 0.2rem; letter-spacing: 0.04em;">Retail Category</span>
+            <span class="badge badge-neutral" style="font-size: 0.8rem;">
+              <i class="bi {{ shop.category.icon }}"></i> {{ shop.category.name }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Map & Directions Card -->
+      <div class="card card-padded" style="background: #ffffff; border: 1px solid var(--border-light);">
+        <div class="d-flex align-center justify-between" style="margin-bottom: 0.75rem;">
+          <h4 style="font-size: 1.05rem; font-weight: 700; color: var(--brand-navy-900); margin: 0;">
+            Location & Directions
+          </h4>
+          {% if user_distance_display %}
+            <span class="badge badge-saffron" style="font-size: 0.75rem;">{{ user_distance_display }}</span>
+          {% endif %}
+        </div>
+
+        <div id="shopDetailMap" style="height: 190px; border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--border-light); margin-bottom: 0.85rem; position: relative; z-index: 1;">
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+          <a href="https://www.google.com/maps/dir/?api=1&destination={{ shop.latitude }},{{ shop.longitude }}" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-block btn-sm">
+            <i class="bi bi-cursor-fill"></i> Launch Google Maps Navigation
+          </a>
+          <a href="https://maps.google.com/?q={{ shop.latitude }},{{ shop.longitude }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-block btn-sm">
+            <i class="bi bi-geo-alt"></i> View on Google Maps
+          </a>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Leaflet Map Engine (Local Vendor) -->
+<script src="{% static 'vendor/leaflet/leaflet.js' %}"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const mapEl = document.getElementById('shopDetailMap');
+    if (!mapEl) return;
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    const lat = parseFloat("{{ shop.latitude|default:'0' }}");
+    const lng = parseFloat("{{ shop.longitude|default:'0' }}");
+    const safeShopName = escapeHtml("{{ shop.name|escapejs }}");
+    const safeLocality = escapeHtml("{{ shop.locality|default:''|escapejs }}");
+    const safeCity = escapeHtml("{{ shop.city|default:''|escapejs }}");
+    const safeAddress = safeLocality && safeCity ? `${safeLocality}, ${safeCity}` : (safeLocality || safeCity || 'Location Verified');
+
+    if (typeof L !== 'undefined' && lat && lng && !isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0) {
+      try {
+        const map = L.map('shopDetailMap', {
+          scrollWheelZoom: false,
+          zoomControl: true,
+          attributionControl: false
+        }).setView([lat, lng], 15);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 19,
+          attribution: '&copy; OpenStreetMap'
+        }).addTo(map);
+
+        const pinHtml = '<div style="background: #f97316; color: white; width: 32px; height: 32px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.35); border: 2px solid white;"><i class="bi bi-shop" style="transform: rotate(45deg); font-size: 14px;"></i></div>';
+        
+        const shopIcon = L.divIcon({
+          className: 'll-shop-marker',
+          html: pinHtml,
+          iconSize: [32, 32],
+          iconAnchor: [16, 32],
+          popupAnchor: [0, -32]
+        });
+
+        const marker = L.marker([lat, lng], { icon: shopIcon }).addTo(map);
+        marker.bindPopup(`<div style="font-family: inherit; font-size: 0.85rem;"><strong style="color: #0f172a;">${safeShopName}</strong><br><span style="color: #64748b; font-size: 0.78rem;">${safeAddress}</span></div>`).openPopup();
+
+        setTimeout(function() {
+          map.invalidateSize();
+        }, 300);
+        return;
+      } catch (err) {
+        console.warn('Leaflet initialization fallback:', err);
+      }
+    }
+
+    // High quality offline fallback card with XSS-safe encoding
+    mapEl.innerHTML = `
+      <div style="width: 100%; height: 100%; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; color: #f8fafc; text-align: center; padding: 1rem;">
+        <div style="width: 44px; height: 44px; border-radius: 50%; background: rgba(249, 115, 22, 0.15); border: 2px solid #f97316; display: flex; align-items: center; justify-content: center; margin-bottom: 0.5rem;">
+          <i class="bi bi-geo-alt-fill" style="color: #f97316; font-size: 1.3rem;"></i>
+        </div>
+        <div style="font-weight: 700; font-size: 0.92rem; color: #ffffff; margin-bottom: 0.2rem;">${safeShopName}</div>
+        <div style="font-size: 0.78rem; color: #94a3b8; margin-bottom: 0.4rem;">${safeAddress}</div>
+        <div style="font-size: 0.72rem; color: #cbd5e1; background: rgba(255,255,255,0.08); padding: 0.2rem 0.6rem; border-radius: 9999px;">
+          📍 GPS: ${lat && !isNaN(lat) ? lat.toFixed(4) : 'N/A'}, ${lng && !isNaN(lng) ? lng.toFixed(4) : 'N/A'}
+        </div>
+      </div>
+    `;
+  });
+</script>
+{% endblock %}

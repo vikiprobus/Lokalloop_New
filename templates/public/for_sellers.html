@@ -1,0 +1,146 @@
+{% extends "base/public_base.html" %}
+
+{% block title %}For Retailers & Merchants — In-Store Footfall Growth | LokalLoop{% endblock %}
+
+{% block extra_css %}
+<style>
+  @media (max-width: 768px) {
+    .for-sellers-hero h1 {
+      font-size: 1.85rem !important;
+    }
+    .for-sellers-hero p {
+      font-size: 0.95rem !important;
+    }
+    .for-sellers-hero .btn-lg {
+      width: 100% !important;
+      font-size: 0.95rem !important;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Merchant Pitch Hero -->
+<section class="for-sellers-hero" style="background: var(--brand-navy-900); color: #ffffff; padding: 4.5rem 0 4rem; position: relative; overflow: hidden;">
+  <div class="container container-narrow text-center" style="position: relative; z-index: 2;">
+    <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(232, 93, 4, 0.15); border: 1px solid rgba(232, 93, 4, 0.4); padding: 0.35rem 0.9rem; border-radius: var(--radius-full); margin-bottom: 1.5rem;">
+      <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--brand-saffron-500); display: inline-block;"></span>
+      <span style="font-size: 0.78rem; font-weight: 700; color: #fdba74; letter-spacing: 0.05em; text-transform: uppercase;">Offline Retail Growth Engine</span>
+    </div>
+
+    <h1 style="font-size: 2.75rem; font-weight: 900; line-height: 1.15; letter-spacing: -0.03em; margin: 0 0 1.25rem; color: #ffffff;">
+      Measurable In-Store Footfalls.<br>
+      <span style="color: var(--brand-saffron-400);">Zero Wasted Promotion Budgets.</span>
+    </h1>
+
+    <p style="font-size: 1.05rem; color: #94a3b8; line-height: 1.6; margin: 0 auto 2.25rem; max-width: 680px;">
+      Put your boutique, café, bakery, or salon directly on the map for high-intent shoppers in Indiranagar, Koramangala, Bandra, and Pune. Spend promotional credits only when a customer completes a verified purchase at your billing counter.
+    </p>
+
+    <div class="d-flex justify-center gap-3 flex-wrap">
+      <a href="/seller/register/" class="btn btn-primary btn-lg">
+        <i class="bi bi-shop"></i> Register Your Store Free
+      </a>
+      <a href="/seller/login/" class="btn btn-outline btn-lg" style="color: #ffffff; border-color: rgba(255, 255, 255, 0.25);">
+        <i class="bi bi-box-arrow-in-right"></i> Merchant Sign In
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- 3 Pillars Grid -->
+<section style="padding: 4.5rem 0; background: #ffffff;">
+  <div class="container">
+    <div class="text-center" style="max-width: 600px; margin: 0 auto 3rem;">
+      <span class="badge badge-neutral" style="font-size: 0.75rem; letter-spacing: 0.04em; margin-bottom: 0.5rem;">WHY LOCAL MERCHANTS CHOOSE US</span>
+      <h2 style="font-size: 1.85rem; font-weight: 800; color: var(--brand-navy-900); letter-spacing: -0.02em; margin: 0.35rem 0;">Built for Indian High-Street Dynamics</h2>
+      <p style="color: var(--text-muted); font-size: 0.92rem; margin: 0;">Eliminate print pamphlets and unmeasurable billboard spends</p>
+    </div>
+
+    <div class="d-grid grid-3 gap-3">
+      <div class="card card-padded" style="border: 1px solid var(--border-light); background: #ffffff;">
+        <div style="width: 48px; height: 48px; border-radius: var(--radius-md); background: #fff7ed; color: var(--brand-saffron-600); display: flex; align-items: center; justify-content: center; font-size: 1.35rem; margin-bottom: 1.25rem; border: 1px solid #fed7aa;">
+          <i class="bi bi-geo-alt-fill"></i>
+        </div>
+        <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--brand-navy-900); margin-bottom: 0.5rem;">Hyperlocal Catchment Targeting</h3>
+        <p style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.6; margin: 0;">
+          Your campaigns reach residents within a 3–5 km radius of your storefront when they are actively exploring deals in your immediate locality.
+        </p>
+      </div>
+
+      <div class="card card-padded" style="border: 1px solid var(--border-light); background: #ffffff;">
+        <div style="width: 48px; height: 48px; border-radius: var(--radius-md); background: #ecfdf5; color: var(--color-success); display: flex; align-items: center; justify-content: center; font-size: 1.35rem; margin-bottom: 1.25rem; border: 1px solid #a7f3d0;">
+          <i class="bi bi-qr-code-scan"></i>
+        </div>
+        <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--brand-navy-900); margin-bottom: 0.5rem;">Performance-Based Model</h3>
+        <p style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.6; margin: 0;">
+          No locking subscription contracts. You only spend credits (approx. 5 credits per visit) when a customer presents a QR code at your checkout counter.
+        </p>
+      </div>
+
+      <div class="card card-padded" style="border: 1px solid var(--border-light); background: #ffffff;">
+        <div style="width: 48px; height: 48px; border-radius: var(--radius-md); background: #f8fafc; color: var(--brand-navy-800); display: flex; align-items: center; justify-content: center; font-size: 1.35rem; margin-bottom: 1.25rem; border: 1px solid var(--border-light);">
+          <i class="bi bi-arrow-repeat"></i>
+        </div>
+        <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--brand-navy-900); margin-bottom: 0.5rem;">Built-in Repeat Visits</h3>
+        <p style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.6; margin: 0;">
+          Every completed bill redemption deposits loyalty reward points into the shopper's wallet, turning one-time visitors into repeat regulars.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Credit Packages (Pricing) -->
+<section id="pricing" style="padding: 4.5rem 0; background: var(--bg-page); border-top: 1px solid var(--border-light);">
+  <div class="container">
+    <div class="text-center" style="max-width: 600px; margin: 0 auto 3rem;">
+      <span class="badge badge-saffron" style="font-size: 0.75rem; letter-spacing: 0.04em; margin-bottom: 0.5rem;">TRANSPARENT INR PRICING</span>
+      <h2 style="font-size: 2rem; font-weight: 800; color: var(--brand-navy-900); letter-spacing: -0.02em; margin: 0.35rem 0;">Promotional Credit Packages</h2>
+      <p style="color: var(--text-muted); font-size: 0.92rem; margin: 0;">
+        Simple pay-as-you-grow credits. Each completed customer checkout redemption uses 5 credits.
+      </p>
+    </div>
+
+    <div class="d-grid grid-3 gap-3">
+      {% for pkg in packages %}
+        <div class="card card-padded" style="background: #ffffff; position: relative; border: 1px solid var(--border-light); {% if pkg.is_popular %}border-color: var(--brand-saffron-500); box-shadow: var(--shadow-md);{% endif %}">
+          {% if pkg.is_popular %}
+            <span class="badge badge-saffron" style="position: absolute; top: -11px; right: 20px; font-size: 0.72rem; letter-spacing: 0.04em;">
+              POPULAR CHOICE
+            </span>
+          {% endif %}
+
+          <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--brand-navy-900); margin-bottom: 0.25rem;">{{ pkg.name }}</h3>
+          <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1.25rem;">{{ pkg.description }}</p>
+
+          <div style="margin-bottom: 1.5rem; display: flex; align-items: baseline; gap: 0.4rem;">
+            <span style="font-size: 2.25rem; font-weight: 900; color: var(--brand-navy-900); font-variant-numeric: tabular-nums;">₹{{ pkg.price_inr|floatformat:0 }}</span>
+            <span style="font-size: 0.8rem; color: var(--text-muted);">+ 18% GST</span>
+          </div>
+
+          <div style="background: var(--bg-subtle); padding: 0.85rem 1rem; border-radius: var(--radius-md); margin-bottom: 1.5rem; border: 1px solid var(--border-light);">
+            <div style="font-size: 1.05rem; font-weight: 800; color: var(--brand-navy-900); margin-bottom: 0.2rem; font-variant-numeric: tabular-nums;">
+              {{ pkg.total_credits }} Promotional Credits
+            </div>
+            {% if pkg.bonus_credits > 0 %}
+              <span class="badge badge-success" style="font-size: 0.72rem;">Includes {{ pkg.bonus_credits }} Bonus Credits</span>
+            {% else %}
+              <span style="font-size: 0.75rem; color: var(--text-muted);">Ideal for testing local campaigns</span>
+            {% endif %}
+          </div>
+
+          <a href="/seller/register/" class="btn {% if pkg.is_popular %}btn-primary{% else %}btn-dark{% endif %} btn-block">
+            Start with {{ pkg.name }}
+          </a>
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- Free trial note -->
+    <div class="text-center" style="margin-top: 2.5rem; font-size: 0.88rem; color: var(--text-muted);">
+      Every newly approved store receives <strong>50 free promotional credits</strong> upon verification.
+    </div>
+  </div>
+</section>
+{% endblock %}

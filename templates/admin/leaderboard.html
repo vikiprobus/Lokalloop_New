@@ -1,0 +1,195 @@
+{% extends "base/admin_base.html" %}
+
+{% block title %}Weekly Leaderboard Management &bull; Admin Console{% endblock %}
+{% block page_title %}Weekly Shopper Leaderboard{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 2rem;">
+  
+  <div class="d-flex align-center justify-between flex-wrap gap-2" style="margin-bottom: 1.5rem;">
+    <div>
+      <h1 style="font-size: 1.5rem; font-weight: 800; color: var(--brand-navy-900); margin: 0 0 0.25rem;">
+        🏆 Weekly Shopper Leaderboard Management
+      </h1>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">
+        Monitor real-time shopper rankings, audit 3-cycle anti-monopoly cooldowns, and manage weekly cycle rollovers.
+      </p>
+    </div>
+
+    <!-- Manual Rollover Action Button -->
+    <div>
+      <form method="POST" action="{% url 'admin_leaderboard_rollover' %}" onsubmit="return confirm('Are you sure you want to trigger the weekly cycle rollover now? This will award the Grand Prize, notify winners, and start the next cycle.');">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary" style="font-weight: 800; display: flex; align-items: center; gap: 0.5rem; background: #0284c7; border-color: #0284c7;">
+          <i class="bi bi-arrow-repeat"></i> Trigger Cycle Rollover (Cycle #{{ current_cycle }} &rarr; #{{ current_cycle|add:1 }})
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Metric Overview Cards -->
+  <div class="d-grid grid-3 gap-3" style="margin-bottom: 1.75rem;">
+    <div class="admin-kpi-card" style="border-left: 4px solid #f59e0b;">
+      <span class="stat-label" style="color: #f59e0b; font-weight: 700;">Active Sprint</span>
+      <div class="stat-value" style="color: #b45309;">Cycle #{{ current_cycle }}</div>
+      <span style="font-size: 0.78rem; color: var(--text-muted);">
+        Window: {{ cycle_start|date:"d M" }} &ndash; {{ cycle_end|date:"d M Y" }}
+      </span>
+    </div>
+
+    <div class="admin-kpi-card">
+      <span class="stat-label">Sprint Participants</span>
+      <div class="stat-value" style="color: #0284c7;">{{ total_participants }}</div>
+      <span style="font-size: 0.78rem; color: var(--text-muted);">Shoppers with verified in-store redemptions</span>
+    </div>
+
+    <div class="admin-kpi-card">
+      <span class="stat-label">Historical Records</span>
+      <div class="stat-value" style="color: #10b981;">{{ past_cycles|length }}</div>
+      <span style="font-size: 0.78rem; color: var(--text-muted);">Past podium winners archived</span>
+    </div>
+  </div>
+
+  <!-- Active Cycle Leaderboard Table -->
+  <div class="card card-padded" style="background: #ffffff; border: 1px solid var(--border-light); border-radius: 14px; margin-bottom: 2rem;">
+    <div class="d-flex align-center justify-between" style="margin-bottom: 1rem; border-bottom: 1px solid var(--border-light); padding-bottom: 0.75rem;">
+      <div>
+        <h3 style="font-size: 1.1rem; font-weight: 800; color: var(--brand-navy-900); margin: 0;">
+          Current Cycle #{{ current_cycle }} Standings
+        </h3>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0.15rem 0 0;">
+          Only authentic shopping redemptions (excluding starter bonuses &amp; adjustments)
+        </p>
+      </div>
+      <span class="badge" style="background: #fef3c7; color: #92400e; font-weight: 800;">
+        Active Window
+      </span>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th style="width: 70px;">Rank</th>
+            <th>Shopper Identity</th>
+            <th>Tier &amp; Badge</th>
+            <th>Sprint Points</th>
+            <th>Status / Eligibility</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for entry in leaderboard %}
+            <tr>
+              <td>
+                <span style="font-weight: 900; font-size: 1.05rem; color: {% if entry.rank == 1 %}#f59e0b{% elif entry.rank == 2 %}#94a3b8{% elif entry.rank == 3 %}#ea580c{% else %}var(--brand-navy-900){% endif %};">
+                  #{{ entry.rank }}
+                </span>
+              </td>
+              <td>
+                <div style="font-weight: 800; color: var(--brand-navy-900);">
+                  {{ entry.gennie_nickname }}
+                </div>
+                <div style="font-size: 0.75rem; color: var(--text-muted); font-family: monospace;">
+                  {{ entry.public_unique_id }} (User ID: {{ entry.buyer_id }})
+                </div>
+              </td>
+              <td>
+                <span class="badge badge-neutral">
+                  {{ entry.badge_icon }} {{ entry.badge_tier }}
+                </span>
+              </td>
+              <td style="font-weight: 800; color: #16a34a; font-size: 1.05rem;">
+                {{ entry.points_earned }} Pts
+              </td>
+              <td>
+                {% if entry.in_cooldown %}
+                  <span class="badge" style="background: #fef3c7; color: #92400e; border: 1px solid #fde68a;">
+                    🏆 In 3-Cycle Cooldown (Won Cycle #{{ entry.last_won_cycle }})
+                  </span>
+                {% elif entry.is_grand_prize_winner %}
+                  <span class="badge badge-success" style="background: #dcfce7; color: #166534; border: 1px solid #86efac;">
+                    🎁 Leading for Grand Prize
+                  </span>
+                {% else %}
+                  <span style="font-size: 0.8rem; color: var(--text-muted);">Active Contender</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="5" class="text-center text-muted" style="padding: 2.5rem 1rem;">
+                No participant shopping transactions in this sprint cycle yet.
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Past Cycle Champions (Hall of Fame) -->
+  <div class="card card-padded" style="background: #ffffff; border: 1px solid var(--border-light); border-radius: 14px;">
+    <div style="margin-bottom: 1rem; border-bottom: 1px solid var(--border-light); padding-bottom: 0.75rem;">
+      <h3 style="font-size: 1.1rem; font-weight: 800; color: var(--brand-navy-900); margin: 0;">
+        Archived Cycle Histories &amp; Podium Finishes
+      </h3>
+      <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0.15rem 0 0;">
+        Past cycle champions and runners-up preserved for audit and cooldown enforcement
+      </p>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Cycle</th>
+            <th>Rank</th>
+            <th>Winner / Identity</th>
+            <th>Points Scored</th>
+            <th>Cycle Window</th>
+            <th>Recorded At</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for h in past_cycles %}
+            <tr>
+              <td>
+                <span class="badge badge-primary">Cycle #{{ h.cycle_number }}</span>
+              </td>
+              <td>
+                <span style="font-weight: 800; color: {% if h.rank == 1 %}#b45309{% elif h.rank == 2 %}#475569{% else %}#ea580c{% endif %};">
+                  {% if h.rank == 1 %}🥇 Gold Champion{% elif h.rank == 2 %}🥈 Silver Runner-Up{% else %}🥉 Bronze Contender{% endif %}
+                </span>
+              </td>
+              <td>
+                <div style="font-weight: 800; color: var(--brand-navy-900);">
+                  {{ h.winner.username }}
+                </div>
+                <div style="font-size: 0.75rem; color: var(--text-muted); font-family: monospace;">
+                  {{ h.notes }}
+                </div>
+              </td>
+              <td style="font-weight: 800; color: #b45309;">
+                {{ h.points_scored }} Pts
+              </td>
+              <td style="font-size: 0.8rem; color: var(--text-muted);">
+                {{ h.cycle_start|date:"d M Y" }} &ndash; {{ h.cycle_end|date:"d M Y" }}
+              </td>
+              <td style="font-size: 0.8rem; color: var(--text-muted);">
+                {{ h.created_at|date:"d M Y H:i" }}
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="6" class="text-center text-muted" style="padding: 2.5rem 1rem;">
+                No archived cycle histories recorded yet.
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

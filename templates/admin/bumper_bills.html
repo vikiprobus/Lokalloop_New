@@ -1,0 +1,237 @@
+{% extends "base/admin_base.html" %}
+
+{% block title %}Bumper Purchase Verifications (₹10,000+) &bull; Admin Console{% endblock %}
+{% block page_title %}Bumper Bill Verifications (₹10,000+){% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 2rem;">
+  
+  <div class="d-flex align-center justify-between flex-wrap gap-2" style="margin-bottom: 1.5rem;">
+    <div>
+      <h1 style="font-size: 1.5rem; font-weight: 800; color: var(--brand-navy-900); margin: 0 0 0.25rem;">
+        High-Value Bumper Bill Verifications
+      </h1>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">
+        Review customer purchases of ₹10,000+, verify receipt images, and grant 100 bonus loyalty points plus VIP meal perks.
+      </p>
+    </div>
+  </div>
+
+  <!-- Metric Overview Cards -->
+  <div class="d-grid grid-4 gap-3" style="margin-bottom: 1.75rem;">
+    <div class="admin-kpi-card" style="border-left: 4px solid #0284c7;">
+      <span class="stat-label" style="color: #0284c7; font-weight: 700;">Ready for Final Clearance</span>
+      <div class="stat-value" style="color: #0284c7;">{{ store_verified_submissions }}</div>
+      <span style="font-size: 0.78rem; color: var(--text-muted);">Store-verified bills awaiting admin sign-off</span>
+    </div>
+
+    <div class="admin-kpi-card">
+      <span class="stat-label">Awaiting Store Review</span>
+      <div class="stat-value" style="color: #f59e0b;">{{ pending_store_submissions }}</div>
+      <span style="font-size: 0.78rem; color: var(--text-muted);">Pending merchant verification</span>
+    </div>
+
+    <div class="admin-kpi-card">
+      <span class="stat-label">Approved &amp; Rewarded</span>
+      <div class="stat-value" style="color: #10b981;">{{ approved_submissions }}</div>
+      <span style="font-size: 0.78rem; color: var(--text-muted);">Validated receipts</span>
+    </div>
+
+    <div class="admin-kpi-card">
+      <span class="stat-label">Bumper Points Granted</span>
+      <div class="stat-value" style="color: #6366f1;">{{ total_bumper_points }} <span style="font-size: 1rem; color: var(--text-muted);">Pts</span></div>
+      <span style="font-size: 0.78rem; color: var(--text-muted);">100 pts per approved purchase</span>
+    </div>
+  </div>
+
+  <!-- Filter Navigation Tabs -->
+  <div class="d-flex align-center flex-wrap gap-2" style="margin-bottom: 1.25rem;">
+    <a href="{% url 'admin_bumper_bills' %}" class="btn btn-sm {% if not status_filter %}btn-primary{% else %}btn-outline{% endif %}" style="font-weight: 700;">
+      All Submissions ({{ total_submissions }})
+    </a>
+    <a href="{% url 'admin_bumper_bills' %}?status=STORE_VERIFIED" class="btn btn-sm {% if status_filter == 'STORE_VERIFIED' %}btn-primary{% else %}btn-outline{% endif %}" style="font-weight: 700; background: {% if status_filter == 'STORE_VERIFIED' %}#0284c7{% else %}transparent{% endif %}; border-color: #0284c7; color: {% if status_filter == 'STORE_VERIFIED' %}#ffffff{% else %}#0284c7{% endif %};">
+      <i class="bi bi-shield-check"></i> Store Verified (Ready for Final Approval) ({{ store_verified_submissions }})
+    </a>
+    <a href="{% url 'admin_bumper_bills' %}?status=PENDING_STORE" class="btn btn-sm {% if status_filter == 'PENDING_STORE' or status_filter == 'PENDING' %}btn-primary{% else %}btn-outline{% endif %}" style="font-weight: 700;">
+      Awaiting Store ({{ pending_store_submissions }})
+    </a>
+    <a href="{% url 'admin_bumper_bills' %}?status=APPROVED" class="btn btn-sm {% if status_filter == 'APPROVED' %}btn-primary{% else %}btn-outline{% endif %}" style="font-weight: 700;">
+      Approved ({{ approved_submissions }})
+    </a>
+    <a href="{% url 'admin_bumper_bills' %}?status=REJECTED" class="btn btn-sm {% if status_filter == 'REJECTED' %}btn-primary{% else %}btn-outline{% endif %}" style="font-weight: 700;">
+      Rejected ({{ rejected_submissions }})
+    </a>
+  </div>
+
+  <!-- Search Bar (BUG-115) -->
+  <div class="card card-padded" style="margin-bottom: 1.25rem; padding: 0.85rem 1.25rem;">
+    <form method="GET" action="{% url 'admin_bumper_bills' %}" class="d-flex align-center gap-2 flex-wrap">
+      {% if status_filter %}
+        <input type="hidden" name="status" value="{{ status_filter }}">
+      {% endif %}
+      <div style="flex: 1; min-width: 260px;">
+        <input type="text" name="q" value="{{ query }}" class="form-control" placeholder="Search bill number, shopper name, public unique ID, store outlet, or voucher code...">
+      </div>
+      <button type="submit" class="btn btn-sm btn-primary" style="font-weight: 700; padding: 0.5rem 1.2rem;">
+        <i class="bi bi-search"></i> Search
+      </button>
+      {% if query %}
+        <a href="{% url 'admin_bumper_bills' %}{% if status_filter %}?status={{ status_filter }}{% endif %}" class="btn btn-sm btn-outline" style="font-weight: 600;">
+          <i class="bi bi-x-circle"></i> Clear
+        </a>
+      {% endif %}
+    </form>
+  </div>
+
+  <!-- Submissions Table Card -->
+  <div class="card card-padded" style="background: #ffffff; border: 1px solid var(--border-light); border-radius: 16px;">
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Submitted At</th>
+            <th>Buyer / Customer</th>
+            <th>Store Outlet</th>
+            <th>Bill Details</th>
+            <th>Receipt Upload</th>
+            <th>Workflow Status</th>
+            <th>Actions / Resolution</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for sub in submissions %}
+            <tr>
+              <td style="font-size: 0.82rem; color: var(--text-muted); white-space: nowrap;">
+                {{ sub.submitted_at|date:"d M Y, h:i A" }}
+              </td>
+              <td>
+                <div style="font-weight: 800; color: var(--brand-navy-900);">
+                  {{ sub.buyer.buyer_profile.nickname|default:sub.buyer.username }}
+                </div>
+                <div style="font-size: 0.75rem; color: var(--text-muted);">
+                  {{ sub.buyer.email }} &bull; {{ sub.buyer.buyer_profile.public_unique_id|default:"-" }}
+                </div>
+              </td>
+              <td>
+                <div style="font-weight: 700; color: var(--brand-navy-900);">{{ sub.shop.name }}</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted);">{{ sub.shop.locality }}, {{ sub.shop.city }}</div>
+              </td>
+              <td>
+                <div style="font-family: monospace; font-weight: 700; color: var(--brand-navy-900);">
+                  #{{ sub.bill_number }}
+                </div>
+                {% if sub.bill_date %}
+                  <div style="font-size: 0.72rem; color: var(--text-muted);">
+                    Date: {{ sub.bill_date|date:"d M Y" }}
+                  </div>
+                {% endif %}
+                <div style="font-weight: 900; color: #b45309; font-size: 1.05rem;">
+                  ₹{{ sub.bill_amount }}
+                </div>
+              </td>
+              <td>
+                {% if sub.bill_image %}
+                  <a href="{{ sub.bill_image.url }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline" style="font-size: 0.75rem; padding: 0.25rem 0.6rem; border-color: #6366f1; color: #4f46e5;">
+                    <i class="bi bi-image"></i> View Receipt
+                  </a>
+                {% else %}
+                  <span style="font-size: 0.75rem; color: var(--text-muted);">No upload</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if sub.status == 'APPROVED' %}
+                  <span class="badge badge-success">APPROVED &amp; REWARDED</span>
+                  {% if sub.admin_reviewed_by %}
+                    <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.2rem;">
+                      By Admin: {{ sub.admin_reviewed_by.username }}
+                    </div>
+                  {% endif %}
+                {% elif sub.status == 'STORE_VERIFIED' %}
+                  <span class="badge" style="background: #0284c7; color: #ffffff; font-weight: 700;">STORE VERIFIED</span>
+                  <div style="font-size: 0.72rem; color: #0284c7; font-weight: 600; margin-top: 0.2rem;">
+                    Store Confirmed: {% if sub.store_verified_by %}{{ sub.store_verified_by.get_full_name|default:sub.store_verified_by.username }}{% else %}Merchant{% endif %}
+                  </div>
+                  <div style="font-size: 0.7rem; color: var(--text-muted);">
+                    {{ sub.store_verified_at|date:"d M, h:i A" }}
+                  </div>
+                {% elif sub.status == 'REJECTED' %}
+                  <span class="badge badge-danger">REJECTED</span>
+                  <div style="font-size: 0.7rem; color: #ef4444; margin-top: 0.2rem;">
+                    Stage: {% if sub.rejection_stage == 'STORE' %}Store Merchant{% else %}Platform Admin{% endif %}
+                  </div>
+                {% else %}
+                  <span class="badge badge-warning">AWAITING STORE VERIFICATION</span>
+                  <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.2rem;">
+                    Pending merchant sign-off
+                  </div>
+                {% endif %}
+              </td>
+              <td>
+                {% if sub.status == 'STORE_VERIFIED' %}
+                  <div style="display: flex; gap: 0.4rem; align-items: center;">
+                    <form method="POST" action="{% url 'admin_bumper_bill_approve' sub.id %}">
+                      {% csrf_token %}
+                      <button type="submit" class="btn btn-sm btn-primary" style="background: #16a34a; border: none; font-size: 0.75rem; font-weight: 700; padding: 0.35rem 0.75rem;" title="Grant Central Platform Sign-Off (+100 Pts & VIP Voucher)">
+                        <i class="bi bi-shield-fill-check"></i> Clear &amp; Approve
+                      </button>
+                    </form>
+
+                    <button type="button" onclick="handleAdminReject('{{ sub.id }}');" class="btn btn-sm btn-outline" style="border-color: #ef4444; color: #dc2626; font-size: 0.75rem; font-weight: 700; padding: 0.35rem 0.65rem;">
+                      <i class="bi bi-x-circle"></i> Reject
+                    </button>
+
+                    <form id="rejectForm_{{ sub.id }}" method="POST" action="{% url 'admin_bumper_bill_reject' sub.id %}" style="display: none;">
+                      {% csrf_token %}
+                      <input type="hidden" name="rejection_reason" id="rejectReason_{{ sub.id }}">
+                    </form>
+                  </div>
+                {% elif sub.status == 'PENDING_STORE' or sub.status == 'PENDING' %}
+                  <span class="badge badge-neutral" style="font-size: 0.75rem; color: #64748b;">
+                    <i class="bi bi-shop"></i> Awaiting Step 1 Store Check
+                  </span>
+                {% elif sub.status == 'APPROVED' %}
+                  <div style="font-size: 0.8rem; color: #16a34a; font-weight: 700;">
+                    <i class="bi bi-patch-check-fill"></i> 100 Pts Awarded
+                  </div>
+                  <div style="font-size: 0.75rem; color: var(--text-muted);">
+                    VIP Voucher: <code style="font-weight: 800; color: #1e40af;">{{ sub.voucher_code }}</code>
+                  </div>
+                {% elif sub.status == 'REJECTED' %}
+                  <div style="font-size: 0.75rem; color: #ef4444; max-width: 220px;">
+                    Reason: {{ sub.rejection_reason|default:"Declined" }}
+                  </div>
+                {% endif %}
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="7" class="text-center text-muted" style="padding: 2.5rem 1rem;">
+                No bumper purchase submissions matching the selected filter.
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function handleAdminReject(subId) {
+  const r = prompt('Enter statutory admin rejection reason:');
+  if (r === null) return;
+  const trimmed = r.trim();
+  if (!trimmed) {
+    alert('A valid, non-empty rejection reason is required to reject a submission.');
+    return;
+  }
+  const input = document.getElementById('rejectReason_' + subId);
+  const form = document.getElementById('rejectForm_' + subId);
+  if (input && form) {
+    input.value = trimmed;
+    form.submit();
+  }
+}
+</script>
+{% endblock %}

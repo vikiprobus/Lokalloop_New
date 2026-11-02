@@ -1,0 +1,201 @@
+{% extends "base/public_base.html" %}
+
+{% block title %}Merchant Account Recovery — Security Reset — LokalLoop Business{% endblock %}
+{% block meta_description %}Recover your LokalLoop merchant portal account securely using your Email, Mobile Phone, or Merchant ID and your confidential security question.{% endblock %}
+
+{% block content %}
+<div class="container container-narrow" style="padding-top: 3.5rem; padding-bottom: 4rem;">
+  <div class="card" style="max-width: 480px; margin: 0 auto; box-shadow: var(--shadow-md); border: 1px solid var(--border-light); border-radius: var(--radius-lg); background: #ffffff;">
+    
+    <div class="card-header" style="flex-direction: column; text-align: center; gap: 0.5rem; background: #ffffff; padding: 2rem 2rem 1rem; border-bottom: none;">
+      <div style="width: 52px; height: 52px; border-radius: 50%; background: rgba(79, 70, 229, 0.12); color: var(--brand-indigo-600, #4f46e5); display: flex; align-items: center; justify-content: center; font-size: 1.6rem; margin: 0 auto;">
+        <i class="bi bi-shield-lock-fill"></i>
+      </div>
+      <h2 style="font-size: 1.55rem; font-weight: 800; color: #0f172a; margin: 0.25rem 0 0; letter-spacing: -0.02em; font-family: var(--font-display);">
+        Merchant Account Recovery
+      </h2>
+      <p style="font-size: 0.88rem; color: var(--text-muted, #64748b); margin: 0;">
+        Reset your merchant credentials using your verified account identifier and security answer.
+      </p>
+    </div>
+
+    <div class="card-body" style="padding: 1.25rem 2rem 2rem;">
+      {% if step == 1 %}
+        <!-- STEP 1: Enter Merchant Identifier -->
+        <form method="POST">
+          {% csrf_token %}
+          <input type="hidden" name="action_lookup" value="1">
+          {{ lookup_form.website }}
+
+          <div class="form-group" style="margin-bottom: 1.25rem;">
+            <label class="form-label" style="font-weight: 700; color: #0f172a;">{{ lookup_form.identifier.label }}</label>
+            {{ lookup_form.identifier }}
+            {% if lookup_form.identifier.errors %}
+              <div class="text-danger" style="font-size: 0.8rem; margin-top: 0.35rem;">
+                {{ lookup_form.identifier.errors.0 }}
+              </div>
+            {% endif %}
+          </div>
+
+          <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.85rem; font-size: 0.78rem; color: var(--text-muted, #64748b); line-height: 1.4; margin-bottom: 1.5rem;">
+            <i class="bi bi-info-circle-fill" style="color: var(--brand-indigo-600, #4f46e5);"></i> <strong>How recovery works:</strong> Enter your official business email, registered 10-digit mobile number, or Merchant ID (e.g. <code>PUN-123456</code>). Next, answer the security question configured during registration to set a new password.
+          </div>
+
+          {% include "components/captcha_field.html" with form=lookup_form %}
+
+          <button type="submit" class="btn btn-dark btn-block btn-lg" style="font-weight: 700; margin-top: 1rem; background: #0f172a;">
+            Verify Merchant Account <i class="bi bi-arrow-right"></i>
+          </button>
+        </form>
+
+      {% elif step == 2 %}
+        <!-- STEP 2: Answer Security Question & Reset Password -->
+        <div style="background: #eef2ff; border: 1px solid #c7d2fe; border-radius: 10px; padding: 0.85rem 1rem; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between;">
+          <div>
+            <div style="font-size: 0.7rem; color: #4338ca; text-transform: uppercase; font-weight: 700;">Merchant Storefront</div>
+            <div style="font-size: 1.1rem; font-weight: 900; color: #1e1b4b;">
+              {{ seller_profile.business_name }}
+            </div>
+            <div style="font-size: 0.75rem; color: #6366f1; font-family: monospace;">
+              {{ identifier }}
+            </div>
+          </div>
+          <a href="/seller/recover/" class="btn btn-sm btn-outline" style="font-size: 0.75rem; padding: 0.2rem 0.5rem; border-color: #a5b4fc; color: #4338ca;">
+            Change
+          </a>
+        </div>
+
+        <form method="POST">
+          {% csrf_token %}
+          <input type="hidden" name="action_reset" value="1">
+          <input type="hidden" name="identifier" value="{{ identifier }}">
+          {{ reset_form.website }}
+
+          <div class="form-group" style="margin-bottom: 1.25rem;">
+            <label class="form-label" style="font-weight: 700; color: #0f172a;">
+              Security Recovery Question
+            </label>
+            <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 0.75rem 1rem; font-size: 0.9rem; font-weight: 600; color: #334155;">
+              <i class="bi bi-patch-question-fill" style="color: var(--brand-indigo-600, #4f46e5);"></i> {{ seller_profile.security_question }}
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 1.25rem;">
+            <label class="form-label" style="font-weight: 700;">{{ reset_form.security_answer.label }} <span class="text-danger">*</span></label>
+            {{ reset_form.security_answer }}
+            {% if reset_form.security_answer.errors %}
+              <div class="text-danger" style="font-size: 0.8rem; margin-top: 0.35rem;">
+                {{ reset_form.security_answer.errors.0 }}
+              </div>
+            {% endif %}
+            <div style="font-size: 0.74rem; color: var(--text-muted, #64748b); margin-top: 0.25rem;">
+              Answers are case-insensitive (e.g. "pune" matches "Pune").
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 1.25rem;">
+            <div class="d-flex justify-between align-center" style="margin-bottom: 0.3rem;">
+              <label class="form-label" style="margin-bottom: 0; font-weight: 700;">{{ reset_form.new_password.label }} <span class="text-danger">*</span></label>
+              <span id="strengthBadge" style="font-size: 0.72rem; font-weight: 700; padding: 0.15rem 0.5rem; border-radius: 4px; background: #f1f5f9; color: #64748b;">
+                Too short
+              </span>
+            </div>
+            <div style="position: relative;">
+              {{ reset_form.new_password }}
+              <button type="button" id="togglePasswordBtn" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #64748b; cursor: pointer;">
+                <i class="bi bi-eye"></i>
+              </button>
+            </div>
+            {% if reset_form.new_password.errors %}
+              <div class="text-danger" style="font-size: 0.8rem; margin-top: 0.25rem;">
+                {{ reset_form.new_password.errors.0 }}
+              </div>
+            {% endif %}
+            <div style="height: 4px; width: 100%; background: #e2e8f0; border-radius: 2px; margin-top: 0.45rem; overflow: hidden;">
+              <div id="strengthBar" style="height: 100%; width: 0%; transition: width 0.3s ease, background 0.3s ease;"></div>
+            </div>
+            <div style="font-size: 0.72rem; color: var(--text-muted, #64748b); margin-top: 0.35rem;">
+              Minimum 8 characters with numbers, lowercase, and uppercase or special symbols.
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 1.5rem;">
+            <label class="form-label" style="font-weight: 700;">{{ reset_form.confirm_password.label }} <span class="text-danger">*</span></label>
+            <div style="position: relative;">
+              {{ reset_form.confirm_password }}
+              <button type="button" id="toggleConfirmBtn" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #64748b; cursor: pointer;">
+                <i class="bi bi-eye"></i>
+              </button>
+            </div>
+            {% if reset_form.confirm_password.errors %}
+              <div class="text-danger" style="font-size: 0.8rem; margin-top: 0.25rem;">
+                {{ reset_form.confirm_password.errors.0 }}
+              </div>
+            {% endif %}
+          </div>
+
+          <button type="submit" class="btn btn-dark btn-block btn-lg" style="font-weight: 700; background: #0f172a;">
+            <i class="bi bi-arrow-repeat"></i> Reset Password &amp; Update Credentials
+          </button>
+        </form>
+
+        <script>
+          const passInput = document.getElementById('id_new_password');
+          const confirmInput = document.getElementById('id_confirm_password');
+          const toggleBtn = document.getElementById('togglePasswordBtn');
+          const toggleConfirmBtn = document.getElementById('toggleConfirmBtn');
+          const strengthBadge = document.getElementById('strengthBadge');
+          const strengthBar = document.getElementById('strengthBar');
+
+          if (toggleBtn && passInput) {
+            toggleBtn.addEventListener('click', function() {
+              const isPass = passInput.getAttribute('type') === 'password';
+              passInput.setAttribute('type', isPass ? 'text' : 'password');
+              this.innerHTML = isPass ? '<i class="bi bi-eye-slash"></i>' : '<i class="bi bi-eye"></i>';
+            });
+          }
+
+          if (toggleConfirmBtn && confirmInput) {
+            toggleConfirmBtn.addEventListener('click', function() {
+              const isPass = confirmInput.getAttribute('type') === 'password';
+              confirmInput.setAttribute('type', isPass ? 'text' : 'password');
+              this.innerHTML = isPass ? '<i class="bi bi-eye-slash"></i>' : '<i class="bi bi-eye"></i>';
+            });
+          }
+
+          function evaluateStrength(p) {
+            if (!p) return { score: 0, text: 'Empty', color: '#64748b', width: '0%' };
+            let score = 0;
+            if (p.length >= 8) score++;
+            if (/[A-Z]/.test(p)) score++;
+            if (/[a-z]/.test(p)) score++;
+            if (/[0-9]/.test(p)) score++;
+            if (/[@#$%!&*^~_+=\-]/.test(p)) score++;
+
+            if (p.length < 8) return { score: 1, text: 'Too short (<8)', color: '#ef4444', width: '20%' };
+            if (score <= 2) return { score: 2, text: 'Weak', color: '#f97316', width: '40%' };
+            if (score <= 4) return { score: 3, text: 'Medium', color: '#eab308', width: '70%' };
+            return { score: 4, text: 'Strong', color: '#10b981', width: '100%' };
+          }
+
+          if (passInput && strengthBadge && strengthBar) {
+            passInput.addEventListener('input', function() {
+              const res = evaluateStrength(this.value);
+              strengthBadge.textContent = res.text;
+              strengthBadge.style.color = res.color;
+              strengthBadge.style.background = res.color + '18';
+              strengthBar.style.width = res.width;
+              strengthBar.style.backgroundColor = res.color;
+            });
+          }
+        </script>
+      {% endif %}
+    </div>
+
+    <div class="card-footer text-center" style="font-size: 0.85rem; background: var(--bg-subtle, #f8fafc); border-top: 1px solid var(--border-light, #e2e8f0); padding: 1rem;">
+      Remember your password? <a href="/seller/login/" style="font-weight: 600; color: var(--brand-indigo-600, #4f46e5);">Merchant Portal Sign In</a>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

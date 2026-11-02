@@ -1,0 +1,205 @@
+{% extends "base/admin_base.html" %}
+
+{% block title %}Category & Subcategory Hierarchy — {{ BRAND_NAME }} Console{% endblock %}
+{% block page_title %}Dynamic Retail Category Hierarchy{% endblock %}
+
+{% block content %}
+<!-- Top Metrics Row -->
+<div class="d-grid grid-4 gap-3" style="margin-bottom: 1.75rem;">
+  <div class="card card-padded" style="border-left: 4px solid #38bdf8;">
+    <div style="font-size: 0.8rem; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Total Categories</div>
+    <div style="font-size: 1.8rem; font-weight: 900; color: #fff; margin-top: 0.35rem;">{{ total_categories }}</div>
+    <div style="font-size: 0.75rem; color: #64748b; margin-top: 0.2rem;">Top-level business sectors</div>
+  </div>
+
+  <div class="card card-padded" style="border-left: 4px solid #10b981;">
+    <div style="font-size: 0.8rem; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Total Subcategories</div>
+    <div style="font-size: 1.8rem; font-weight: 900; color: #10b981; margin-top: 0.35rem;">{{ total_subcategories }}</div>
+    <div style="font-size: 0.75rem; color: #64748b; margin-top: 0.2rem;">Granular trade segments</div>
+  </div>
+
+  <div class="card card-padded" style="border-left: 4px solid #f97316;">
+    <div style="font-size: 0.8rem; font-weight: 700; color: #94a3b8; text-transform: uppercase;">FSSAI Compliance</div>
+    <div style="font-size: 1.8rem; font-weight: 900; color: #f97316; margin-top: 0.35rem;">
+      {{ categories.all|length }} <span style="font-size: 0.9rem; font-weight: 600; color: #94a3b8;">sectors active</span>
+    </div>
+    <div style="font-size: 0.75rem; color: #64748b; margin-top: 0.2rem;">Food safety license enforced</div>
+  </div>
+
+  <div class="card card-padded" style="border-left: 4px solid #a855f7;">
+    <div style="font-size: 0.8rem; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Admin Moderation</div>
+    <div style="font-size: 1.8rem; font-weight: 900; color: #a855f7; margin-top: 0.35rem;">Live</div>
+    <div style="font-size: 0.75rem; color: #64748b; margin-top: 0.2rem;">Zero code restart needed</div>
+  </div>
+</div>
+
+<!-- Add Category & Subcategory Card -->
+<div class="d-grid grid-2 gap-3" style="margin-bottom: 2rem;">
+  <!-- Add New Category -->
+  <div class="card card-padded" style="background: #1e293b; border: 1px solid #334155;">
+    <h3 style="font-size: 1.05rem; font-weight: 800; color: #fff; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+      <i class="bi bi-folder-plus text-primary"></i> Create Primary Category
+    </h3>
+    <form method="POST" action="/admin-portal/categories/">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="create_category">
+      
+      <div style="margin-bottom: 0.85rem;">
+        <label class="form-label" style="font-size: 0.8rem; color: #cbd5e1; font-weight: 700;">Category Name *</label>
+        <input type="text" name="name" class="form-control" placeholder="e.g., Grocery & Mart" required style="background: #0f172a; border-color: #334155; color: #fff;">
+      </div>
+
+      <div style="margin-bottom: 0.85rem;">
+        <label class="form-label" style="font-size: 0.8rem; color: #cbd5e1; font-weight: 700;">Bootstrap Icon</label>
+        <input type="text" name="icon" class="form-control" value="bi-tag" placeholder="bi-basket, bi-bag-heart, bi-laptop" style="background: #0f172a; border-color: #334155; color: #fff;">
+      </div>
+
+      <div style="display: flex; gap: 1.5rem; margin-bottom: 1.25rem;">
+        <label style="display: inline-flex; align-items: center; gap: 0.5rem; color: #cbd5e1; font-size: 0.85rem; cursor: pointer;">
+          <input type="checkbox" name="requires_fssai" style="accent-color: #f97316;">
+          <span>Requires <strong>FSSAI</strong> License</span>
+        </label>
+        <label style="display: inline-flex; align-items: center; gap: 0.5rem; color: #cbd5e1; font-size: 0.85rem; cursor: pointer;">
+          <input type="checkbox" name="requires_fda" style="accent-color: #a855f7;">
+          <span>Requires <strong>FDA</strong> License</span>
+        </label>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block" style="font-weight: 700;">
+        <i class="bi bi-plus-circle"></i> Save Category
+      </button>
+    </form>
+  </div>
+
+  <!-- Add New Subcategory -->
+  <div class="card card-padded" style="background: #1e293b; border: 1px solid #334155;">
+    <h3 style="font-size: 1.05rem; font-weight: 800; color: #fff; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+      <i class="bi bi-node-plus text-success"></i> Add Specific Subcategory
+    </h3>
+    <form method="POST" action="/admin-portal/categories/">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="create_subcategory">
+
+      <div style="margin-bottom: 0.85rem;">
+        <label class="form-label" style="font-size: 0.8rem; color: #cbd5e1; font-weight: 700;">Parent Category *</label>
+        <select name="category_id" class="form-select" required style="background: #0f172a; border-color: #334155; color: #fff;">
+          <option value="">-- Choose Category --</option>
+          {% for cat in categories %}
+            <option value="{{ cat.id }}">{{ cat.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div style="margin-bottom: 1.25rem;">
+        <label class="form-label" style="font-size: 0.8rem; color: #cbd5e1; font-weight: 700;">Subcategory Name *</label>
+        <input type="text" name="name" class="form-control" placeholder="e.g. Eyewear, Pharmacy, Yoga Classes" required style="background: #0f172a; border-color: #334155; color: #fff;">
+      </div>
+
+      <button type="submit" class="btn btn-success btn-block" style="font-weight: 700;">
+        <i class="bi bi-plus-circle"></i> Save Subcategory
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- Category Hierarchy Table -->
+<div class="card" style="background: #1e293b; border: 1px solid #334155;">
+  <div class="card-header" style="background: #1e293b; border-bottom: 1px solid #334155; padding: 1.25rem 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+    <div>
+      <h3 style="font-size: 1.1rem; font-weight: 800; color: #fff; margin: 0;">Active Category & Subcategory Catalog</h3>
+      <p style="font-size: 0.8rem; color: #94a3b8; margin: 0.2rem 0 0;">Toggle visibility or modify compliance prerequisites in real-time</p>
+    </div>
+    <span class="badge" style="background: #0f172a; color: #38bdf8; border: 1px solid #334155; padding: 0.4rem 0.8rem;">
+      {{ total_categories }} Sectors Registered
+    </span>
+  </div>
+
+  <div style="overflow-x: auto;">
+    <table class="table" style="margin-bottom: 0; color: #cbd5e1; width: 100%; border-collapse: collapse;">
+      <thead>
+        <tr style="border-bottom: 1px solid #334155; background: #0f172a; font-size: 0.78rem; text-transform: uppercase; color: #94a3b8; text-align: left;">
+          <th style="padding: 1rem 1.25rem;">Category & Slug</th>
+          <th style="padding: 1rem 1.25rem;">Compliance Rules</th>
+          <th style="padding: 1rem 1.25rem;">Outlets</th>
+          <th style="padding: 1rem 1.25rem;">Subcategories Breakdown</th>
+          <th style="padding: 1rem 1.25rem; text-align: right;">Status & Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for cat in categories %}
+        <tr style="border-bottom: 1px solid #334155; vertical-align: top;">
+          <td style="padding: 1.25rem;">
+            <div style="display: flex; align-items: center; gap: 0.6rem;">
+              <span style="display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #38bdf8;">
+                <i class="bi {{ cat.icon }}"></i>
+              </span>
+              <div>
+                <strong style="color: #fff; font-size: 0.95rem;">{{ cat.name }}</strong>
+                <div style="font-size: 0.75rem; color: #64748b; font-family: monospace;">slug: {{ cat.slug }}</div>
+              </div>
+            </div>
+          </td>
+
+          <td style="padding: 1.25rem;">
+            <div style="display: flex; flex-direction: column; gap: 0.35rem; align-items: flex-start;">
+              {% if cat.requires_fssai %}
+                <span class="badge" style="background: rgba(249, 115, 22, 0.15); color: #f97316; border: 1px solid rgba(249, 115, 22, 0.3); font-size: 0.72rem; font-weight: 700;">
+                  <i class="bi bi-shield-check"></i> FSSAI Compulsory
+                </span>
+              {% endif %}
+              {% if cat.requires_fda %}
+                <span class="badge" style="background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3); font-size: 0.72rem; font-weight: 700;">
+                  <i class="bi bi-capsule"></i> FDA Drug License Compulsory
+                </span>
+              {% endif %}
+              {% if not cat.requires_fssai and not cat.requires_fda %}
+                <span style="font-size: 0.75rem; color: #64748b;">Standard Shop Act Only</span>
+              {% endif %}
+            </div>
+          </td>
+
+          <td style="padding: 1.25rem;">
+            <span class="badge" style="background: #0f172a; color: #e2e8f0; border: 1px solid #334155; font-size: 0.8rem; font-weight: 700;">
+              {{ cat.shops_count|default:"0" }} Stores
+            </span>
+          </td>
+
+          <td style="padding: 1.25rem;">
+            <div style="display: flex; flex-wrap: wrap; gap: 0.35rem; max-width: 420px;">
+              {% for sub in cat.shop_subcategories.all %}
+                <span style="display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.75rem; padding: 2px 8px; border-radius: 6px; background: {% if sub.is_active %}#0f172a{% else %}#334155{% endif %}; border: 1px solid {% if sub.is_active %}#334155{% else %}#475569{% endif %}; color: {% if sub.is_active %}#cbd5e1{% else %}#94a3b8; text-decoration: line-through;{% endif %}">
+                  {{ sub.name }}
+                  <form method="POST" action="/admin-portal/subcategories/{{ sub.id }}/toggle/" style="display: inline; margin: 0; padding: 0;">
+                    {% csrf_token %}
+                    <button type="submit" style="background: none; border: none; padding: 0; cursor: pointer; color: #64748b; margin-left: 2px;" title="Toggle active status">
+                      <i class="bi {% if sub.is_active %}bi-eye text-success{% else %}bi-eye-slash text-danger{% endif %}"></i>
+                    </button>
+                  </form>
+                </span>
+              {% empty %}
+                <span style="font-size: 0.75rem; color: #64748b; font-style: italic;">No subcategories yet</span>
+              {% endfor %}
+            </div>
+          </td>
+
+          <td style="padding: 1.25rem; text-align: right;">
+            <form method="POST" action="/admin-portal/categories/{{ cat.id }}/toggle/" style="display: inline-block; margin: 0;">
+              {% csrf_token %}
+              {% if cat.is_active %}
+                <button type="submit" class="btn btn-sm" style="background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); font-weight: 700; font-size: 0.78rem; cursor: pointer;">
+                  <i class="bi bi-check-circle"></i> Active
+                </button>
+              {% else %}
+                <button type="submit" class="btn btn-sm" style="background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); font-weight: 700; font-size: 0.78rem; cursor: pointer;">
+                  <i class="bi bi-slash-circle"></i> Disabled
+                </button>
+              {% endif %}
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,130 @@
+{% extends "base/admin_base.html" %}
+
+{% block title %}Shops Moderation — {{ BRAND_NAME }} Console{% endblock %}
+{% block page_title %}Physical Outlets & Storefronts{% endblock %}
+
+{% block content %}
+<div class="card card-padded" style="margin-bottom: 1.5rem;">
+  <form method="GET" action="/admin-portal/shops/" class="admin-filter-bar">
+    <!-- Text Search Input -->
+    <div style="flex: 1; min-width: 220px;">
+      <input type="text" name="q" value="{{ query }}" class="form-control" placeholder="Search store name, locality, or city...">
+    </div>
+
+    <!-- Dropdown: Store (merchant) name -->
+    <div>
+      <select name="store" class="admin-filter-select" onchange="this.form.submit()">
+        <option value="all">All Merchant Stores</option>
+        {% for m in merchant_stores %}
+          <option value="{{ m.id }}" {% if selected_store == m.id|stringformat:"s" %}selected{% endif %}>
+            {{ m.business_name }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <!-- Dropdown: City -->
+    <div>
+      <select name="city" class="admin-filter-select" onchange="this.form.submit()">
+        <option value="all">All Cities</option>
+        {% for c in distinct_cities %}
+          <option value="{{ c }}" {% if selected_city|lower == c|lower %}selected{% endif %}>
+            {{ c }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <!-- Search Button (Signature Red) -->
+    <button type="submit" class="btn-admin-search">
+      <i class="bi bi-search"></i> Search
+    </button>
+
+    <!-- Reset Button -->
+    {% if has_filters %}
+      <a href="/admin-portal/shops/" class="btn btn-outline" style="padding: 0.5rem 1rem;">
+        <i class="bi bi-arrow-counterclockwise"></i> Reset
+      </a>
+    {% endif %}
+  </form>
+</div>
+
+<!-- Results Header & Counter with Export -->
+<div class="d-flex align-center justify-between flex-wrap gap-2" style="margin-bottom: 0.75rem; padding: 0 0.25rem;">
+  <div style="font-size: 0.875rem; font-weight: 700; color: var(--brand-navy-900);">
+    Showing <span style="color: #ef4444;">{{ filtered_count }}</span> of {{ total_shops_count }} shops & outlets
+    {% if has_filters %}
+      <span class="badge badge-indigo" style="font-size: 0.75rem; margin-left: 0.5rem;">
+        <i class="bi bi-funnel-fill"></i> Filter Active
+      </span>
+    {% endif %}
+  </div>
+  <div>
+    <a href="/admin-portal/shops/?q={{ query|urlencode }}&store={{ selected_store|urlencode }}&city={{ selected_city|urlencode }}&export=excel" 
+       class="btn-admin-excel" title="Download Excel Spreadsheet with current filters">
+      <i class="bi bi-file-earmark-excel-fill"></i> Export Excel (.xlsx)
+    </a>
+  </div>
+</div>
+
+<div class="card card-padded">
+  <div class="table-responsive">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Store Name</th>
+          <th>Merchant Owner</th>
+          <th>Category</th>
+          <th>Locality & City</th>
+          <th>Active Offers</th>
+          <th>Rating</th>
+          <th>Status</th>
+          <th class="text-right">Public View</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for s in shops %}
+          <tr>
+            <td>
+              <div style="font-weight: 700; color: var(--brand-navy-900);">{{ s.name }}</div>
+              <div style="font-size: 0.75rem; color: var(--text-muted);">{{ s.phone }}</div>
+            </td>
+            <td>
+              <div>{{ s.seller.seller_profile.business_name|default:s.seller.username }}</div>
+              <div style="font-size: 0.75rem; color: var(--text-muted);">{{ s.seller.email }}</div>
+            </td>
+            <td><span class="badge badge-indigo">{{ s.category.name }}</span></td>
+            <td>{{ s.locality }}, {{ s.city }}</td>
+            <td style="font-weight: 700;">{{ s.active_offers_count }} Offers</td>
+            <td><span style="color: #d97706; font-weight: 700;"><i class="bi bi-star-fill"></i> {{ s.rating }}</span></td>
+            <td>
+              {% if s.is_approved and s.is_active %}
+                <span class="badge badge-success">Live</span>
+              {% else %}
+                <span class="badge badge-warning">Inactive</span>
+              {% endif %}
+            </td>
+            <td class="text-right">
+              <a href="/shops/{{ s.slug }}/" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm">
+                <i class="bi bi-box-arrow-up-right"></i> View
+              </a>
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="8" class="text-center text-muted" style="padding: 3rem 0;">
+              <i class="bi bi-shop" style="font-size: 2rem; display: block; margin-bottom: 0.5rem; color: #94a3b8;"></i>
+              No shops found matching your filter criteria.
+              {% if has_filters %}
+                <div style="margin-top: 0.5rem;">
+                  <a href="/admin-portal/shops/" class="btn btn-sm btn-outline">Clear All Filters</a>
+                </div>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

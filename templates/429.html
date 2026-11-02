@@ -1,0 +1,40 @@
+{% extends "base/public_base.html" %}
+
+{% block title %}Too Many Requests (429) — LokalLoop{% endblock %}
+
+{% block meta_description %}Too many requests detected. Please slow down and try again in a few seconds.{% endblock %}
+
+{% block content %}
+<div class="container text-center" style="padding: 5rem 1.5rem; max-width: 680px; margin: 0 auto;">
+  
+  <div style="width: 80px; height: 80px; border-radius: var(--radius-xl); background: #fef2f2; border: 2px dashed #ef4444; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; font-size: 2.25rem; color: #dc2626;">
+    <i class="bi bi-shield-exclamation"></i>
+  </div>
+
+  <span class="badge badge-danger" style="font-size: 0.85rem; margin-bottom: 0.75rem;">
+    Error 429 &bull; Too Many Requests
+  </span>
+
+  <h1 style="font-size: 2.25rem; font-weight: 800; color: var(--brand-navy-900); margin-bottom: 1rem; letter-spacing: -0.02em;">
+    Too many attempts. Please slow down.
+  </h1>
+
+  <p style="font-size: 1.05rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 2rem;">
+    To protect our verified neighborhood merchants and users from automated bots and brute-force activity, requests to this route are temporarily rate-limited. Please wait <strong>{{ retry_after|default:"10" }} seconds</strong> before trying again.
+  </p>
+
+  <div class="d-flex align-center justify-center gap-3 flex-wrap">
+    <a href="javascript:location.reload();" class="btn btn-primary btn-lg">
+      <i class="bi bi-arrow-clockwise"></i> Try Again Now
+    </a>
+    <a href="/" class="btn btn-outline btn-lg">
+      <i class="bi bi-house-door"></i> Back to Homepage
+    </a>
+  </div>
+
+  <div style="margin-top: 3.5rem; padding-top: 2rem; border-top: 1px solid var(--border-light); font-size: 0.85rem; color: var(--text-muted);">
+    Need assistance or encountering an issue? <a href="/explore/" style="font-weight: 600;">Browse all stores</a> or try again shortly.
+  </div>
+
+</div>
+{% endblock %}

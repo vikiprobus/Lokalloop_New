@@ -1,0 +1,129 @@
+{% extends "base/public_base.html" %}
+
+{% block title %}Explore Local Shops & In-Store Deals — LokalLoop{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 2rem; padding-bottom: 4rem;">
+
+  <!-- Page Header -->
+  <div class="d-flex align-center justify-between flex-wrap gap-3" style="margin-bottom: 1.75rem;">
+    <div>
+      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
+        <span class="badge badge-saffron" style="font-size: 0.72rem; letter-spacing: 0.04em;">NEIGHBORHOOD DIRECTORY</span>
+        <span style="font-size: 0.8rem; color: var(--text-muted);">&bull;</span>
+        <span style="font-size: 0.8rem; font-weight: 600; color: var(--brand-navy-800);">{{ current_city }}</span>
+      </div>
+      <h1 style="font-size: 1.85rem; font-weight: 800; color: var(--brand-navy-900); letter-spacing: -0.02em; margin: 0;">
+        Discover In-Store Deals & Shops
+      </h1>
+      <p style="font-size: 0.88rem; color: var(--text-muted); margin: 0.25rem 0 0;">
+        Verified retail merchants offering instant discounts at their billing counter
+      </p>
+    </div>
+
+    <!-- View Switcher Tabs -->
+    <div class="explore-view-switcher" style="background: var(--bg-subtle); padding: 0.25rem; border-radius: var(--radius-md); display: flex; gap: 0.25rem; border: 1px solid var(--border-light);">
+      <a href="?type=shops{% if current_category %}&category={{ current_category }}{% endif %}{% if current_city %}&city={{ current_city }}{% endif %}{% if current_query %}&q={{ current_query }}{% endif %}" 
+         class="btn btn-sm {% if view_type == 'shops' %}btn-dark{% else %}btn-outline{% endif %}" style="border: none; font-size: 0.82rem;">
+        <i class="bi bi-shop"></i> Shops ({{ shops|length }})
+      </a>
+      <a href="?type=offers{% if current_category %}&category={{ current_category }}{% endif %}{% if current_city %}&city={{ current_city }}{% endif %}{% if current_query %}&q={{ current_query }}{% endif %}" 
+         class="btn btn-sm {% if view_type == 'offers' %}btn-dark{% else %}btn-outline{% endif %}" style="border: none; font-size: 0.82rem;">
+        <i class="bi bi-tag-fill"></i> Offers ({{ offers|length }})
+      </a>
+    </div>
+  </div>
+
+  <!-- Search & Filter Console -->
+  <div class="card card-padded" style="margin-bottom: 2rem; background: #ffffff; border: 1px solid var(--border-light); box-shadow: var(--shadow-sm);">
+    <form method="GET" action="/explore/" class="explore-filter-form d-flex gap-2 flex-wrap align-center">
+      <input type="hidden" name="type" value="{{ view_type }}">
+      <input type="hidden" name="lat" id="user-lat" value="{{ user_lat|default:'' }}">
+      <input type="hidden" name="lng" id="user-lng" value="{{ user_lng|default:'' }}">
+
+      <!-- City Selector -->
+      <div style="min-width: 170px;">
+        <select name="city" class="form-select" onchange="this.form.submit()" style="font-weight: 600;">
+          <option value="Bengaluru" {% if current_city == 'Bengaluru' %}selected{% endif %}>📍 Bengaluru, KA</option>
+          <option value="Mumbai" {% if current_city == 'Mumbai' %}selected{% endif %}>📍 Mumbai, MH</option>
+          <option value="Pune" {% if current_city == 'Pune' %}selected{% endif %}>📍 Pune, MH</option>
+          <option value="all" {% if current_city == 'all' %}selected{% endif %}>All Metro Cities</option>
+        </select>
+      </div>
+
+      <!-- Search Input -->
+      <div style="flex: 1; min-width: 240px; position: relative;">
+        <input type="text" name="q" value="{{ current_query }}" class="form-control" placeholder="Search store name, locality (e.g. Indiranagar), or discount...">
+      </div>
+
+      <button type="submit" class="btn btn-primary">
+        <i class="bi bi-search"></i> Search
+      </button>
+
+      <!-- Geolocation trigger -->
+      <button type="button" id="detect-location-btn" class="btn btn-secondary find-nearest-trigger" title="Find shops nearest to your physical location">
+        <i class="bi bi-geo-alt-fill text-saffron"></i> 📍 Find Nearest Shops to Me
+      </button>
+
+      <!-- PWA Install trigger -->
+      <button type="button" onclick="promptPwaInstall()" class="btn btn-outline btn-install-pwa" style="border-color: var(--brand-saffron-500); color: var(--brand-saffron-600); font-weight: 600;" title="Install LokalLoop on your home screen">
+        <i class="bi bi-phone"></i> Install App
+      </button>
+
+      {% if user_lat and user_lng %}
+        <span class="badge badge-success" style="padding: 0.5rem 0.75rem; font-size: 0.78rem;">
+          <i class="bi bi-geo-fill"></i> Location Active (Sorted by Distance)
+        </span>
+      {% endif %}
+
+      {% if current_category or current_query or current_city != 'Bengaluru' or user_lat %}
+        <a href="/explore/?type={{ view_type }}" class="btn btn-outline" title="Reset all filters">
+          Reset
+        </a>
+      {% endif %}
+    </form>
+
+    <!-- Category Pill Strip -->
+    <div class="pill-strip-scrollable" style="margin-top: 1rem; padding-top: 0.85rem; border-top: 1px solid var(--border-light); display: flex; align-items: center; gap: 0.5rem; overflow-x: auto; white-space: nowrap; scrollbar-width: thin;">
+      <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em;">Category:</span>
+      <a href="?type={{ view_type }}&city={{ current_city }}{% if current_query %}&q={{ current_query }}{% endif %}" 
+         class="badge {% if not current_category %}badge-dark{% else %}badge-neutral{% endif %}" style="padding: 0.4rem 0.8rem; font-size: 0.8rem; text-decoration: none;">
+        All Categories
+      </a>
+      {% for cat in categories %}
+        <a href="?type={{ view_type }}&category={{ cat.slug }}&city={{ current_city }}{% if current_query %}&q={{ current_query }}{% endif %}" 
+           class="badge {% if current_category == cat.slug %}badge-saffron{% else %}badge-neutral{% endif %}" style="padding: 0.4rem 0.8rem; font-size: 0.8rem; text-decoration: none;">
+          <i class="bi {{ cat.icon }}"></i> {{ cat.name }}
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Results Content Area -->
+  {% if view_type == 'shops' %}
+    <!-- Shops Grid -->
+    <div class="d-grid grid-3 gap-3">
+      {% for shop in shops %}
+        {% include "components/shop_card.html" with shop=shop %}
+      {% empty %}
+        <div style="grid-column: 1 / -1;">
+          {% include "components/empty_state.html" with title="No shops found" description="Try selecting another city or clearing your search filters." action_url="/explore/" action_text="Reset Search" %}
+        </div>
+      {% endfor %}
+    </div>
+
+  {% else %}
+    <!-- Offers Grid -->
+    <div class="d-grid grid-3 gap-3">
+      {% for offer in offers %}
+        {% include "components/offer_card.html" with offer=offer %}
+      {% empty %}
+        <div style="grid-column: 1 / -1;">
+          {% include "components/empty_state.html" with title="No active offers found" description="Try choosing another category or city to view available store promotions." action_url="/explore/?type=offers" action_text="Reset Search" %}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}

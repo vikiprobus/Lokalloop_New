@@ -1,0 +1,99 @@
+{% extends "base/buyer_base.html" %}
+
+{% block title %}Activity & Savings History — {{ BRAND_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 1.5rem; padding-bottom: 3.5rem;">
+  
+  <div class="d-flex align-center justify-between flex-wrap gap-2" style="margin-bottom: 2rem;">
+    <div>
+      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+        <span class="badge badge-saffron" style="font-size: 0.72rem; letter-spacing: 0.04em;">PURCHASE LEDGER</span>
+      </div>
+      <h1 style="font-size: 1.75rem; font-weight: 800; color: var(--brand-navy-900); letter-spacing: -0.02em; margin: 0;">
+        My Savings & Visit History
+      </h1>
+      <p style="font-size: 0.88rem; color: var(--text-muted); margin: 0.2rem 0 0;">
+        All past verified in-store redemptions across neighborhood retail merchants
+      </p>
+    </div>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="d-grid grid-3 gap-3" style="margin-bottom: 2.25rem;">
+    <div class="card card-padded" style="background: #ffffff; border: 1px solid var(--border-light); box-shadow: var(--shadow-sm);">
+      <span class="stat-label">Total Real Cash Saved</span>
+      <div class="stat-val text-success" style="font-variant-numeric: tabular-nums;">₹{{ total_saved|floatformat:0 }}</div>
+      <span style="font-size: 0.8rem; color: var(--text-muted);">Direct discounts at checkout</span>
+    </div>
+
+    <div class="card card-padded" style="background: #ffffff; border: 1px solid var(--border-light); box-shadow: var(--shadow-sm);">
+      <span class="stat-label">Verified Checkouts</span>
+      <div class="stat-val" style="color: var(--brand-navy-900); font-variant-numeric: tabular-nums;">{{ redemptions|length }}</div>
+      <span style="font-size: 0.8rem; color: var(--text-muted);">Counter visits completed</span>
+    </div>
+
+    <div class="card card-padded" style="background: #ffffff; border: 1px solid var(--border-light); box-shadow: var(--shadow-sm);">
+      <span class="stat-label">Loyalty Points Earned</span>
+      <div class="stat-val" style="color: var(--brand-saffron-600); font-variant-numeric: tabular-nums;">+{{ total_pts }} Pts</div>
+      <span style="font-size: 0.8rem; color: var(--text-muted);">Credited to your wallet balance</span>
+    </div>
+  </div>
+
+  <!-- Redemptions Table -->
+  <div class="card card-padded" style="background: #ffffff; border: 1px solid var(--border-light); box-shadow: var(--shadow-sm);">
+    <div class="d-flex align-center justify-between" style="margin-bottom: 1.25rem; border-bottom: 1px solid var(--border-light); padding-bottom: 0.85rem;">
+      <div>
+        <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--brand-navy-900); margin: 0;">
+          Past In-Store Visits
+        </h3>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0.15rem 0 0;">Transaction details and counter savings verification</p>
+      </div>
+      <span class="badge badge-neutral" style="font-variant-numeric: tabular-nums;">{{ redemptions|length }} Visits</span>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Store & Locality</th>
+            <th>Offer Claimed</th>
+            <th>Bill Amount</th>
+            <th>Discount Saved</th>
+            <th>Reward Earned</th>
+            <th>Date & Time</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in redemptions %}
+            <tr>
+              <td>
+                <div style="font-weight: 700; color: var(--brand-navy-900);">{{ r.shop.name }}</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.1rem;">
+                  <i class="bi bi-geo-alt"></i> {{ r.shop.locality }}, {{ r.shop.city }}
+                </div>
+              </td>
+              <td style="font-weight: 600; color: var(--brand-navy-800);">{{ r.offer.title }}</td>
+              <td style="font-variant-numeric: tabular-nums; font-weight: 600;">₹{{ r.bill_amount|floatformat:2 }}</td>
+              <td class="text-success" style="font-weight: 700; font-variant-numeric: tabular-nums;">₹{{ r.discount_given|floatformat:2 }}</td>
+              <td style="color: var(--brand-saffron-600); font-weight: 700; font-variant-numeric: tabular-nums;">+{{ r.reward_points_earned }} Pts</td>
+              <td class="text-muted" style="font-variant-numeric: tabular-nums; font-size: 0.82rem; white-space: nowrap;">{{ r.redeemed_at|date:"d M Y, h:i A" }}</td>
+              <td>
+                <span class="badge badge-success"><i class="bi bi-patch-check-fill"></i> Verified</span>
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="7" class="text-center text-muted" style="padding: 2.5rem 1rem;">
+                No store visits recorded yet. Check the Explore tab to find deals near you!
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

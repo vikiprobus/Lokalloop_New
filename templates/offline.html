@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>You are Offline — LokalLoop</title>
+  <meta name="description" content="You are currently offline. Check your internet connection or browse cached shopper passes on LokalLoop.">
+  <link rel="icon" type="image/svg+xml" href="/static/images/favicon.svg">
+  <meta name="theme-color" content="#f97316">
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --card-bg: #151d2f;
+      --border: rgba(255, 255, 255, 0.12);
+      --text: #ffffff;
+      --muted: #94a3b8;
+      --saffron: #f97316;
+      --saffron-hover: #ea580c;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 1.5rem;
+    }
+    .offline-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 2.5rem 2rem;
+      max-width: 480px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+    }
+    .icon-wrapper {
+      width: 76px;
+      height: 76px;
+      border-radius: 50%;
+      background: rgba(249, 115, 22, 0.15);
+      color: var(--saffron);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.5rem;
+    }
+    .badge {
+      display: inline-block;
+      background: rgba(249, 115, 22, 0.2);
+      color: #fb923c;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      padding: 0.35rem 0.75rem;
+      border-radius: 9999px;
+      margin-bottom: 0.75rem;
+    }
+    h1 {
+      font-size: 1.65rem;
+      font-weight: 800;
+      margin-bottom: 0.75rem;
+      letter-spacing: -0.01em;
+    }
+    p {
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.6;
+      margin-bottom: 1.75rem;
+    }
+    .tips-box {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem;
+      text-align: left;
+      margin-bottom: 2rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+    .tips-box strong {
+      color: #ffffff;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+    .tips-box ul {
+      padding-left: 1.25rem;
+      line-height: 1.6;
+    }
+    .btn-group {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      font-size: 0.95rem;
+      font-weight: 700;
+      padding: 0.8rem 1.4rem;
+      border-radius: 10px;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: none;
+    }
+    .btn-primary {
+      background: var(--saffron);
+      color: #ffffff;
+      flex: 1;
+      min-width: 140px;
+    }
+    .btn-primary:hover {
+      background: var(--saffron-hover);
+    }
+    .btn-outline {
+      background: transparent;
+      color: #ffffff;
+      border: 1px solid var(--border);
+      flex: 1;
+      min-width: 140px;
+    }
+    .btn-outline:hover {
+      background: rgba(255, 255, 255, 0.08);
+    }
+  </style>
+</head>
+<body>
+  <div class="offline-card">
+    <div class="icon-wrapper">
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="1" y1="1" x2="23" y2="23"></line>
+        <path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"></path>
+        <path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"></path>
+        <path d="M10.71 5.05A16 16 0 0 1 22.58 9"></path>
+        <path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"></path>
+        <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
+        <line x1="12" y1="20" x2="12.01" y2="20"></line>
+      </svg>
+    </div>
+
+    <span class="badge">NO INTERNET DETECTED</span>
+    <h1>You're Currently Offline</h1>
+    <p>
+      LokalLoop requires a cellular data or Wi-Fi connection to calculate live store distances and generate verified counter discount QR tokens.
+    </p>
+
+    <div class="tips-box">
+      <strong>Quick Offline Tips:</strong>
+      <ul>
+        <li>Check whether Mobile Data or Wi-Fi is turned on.</li>
+        <li>Previously loaded digital Shopper Passes remain active.</li>
+        <li>Once your connection is restored, tap <em>Try Reconnecting</em> below.</li>
+      </ul>
+    </div>
+
+    <div class="btn-group">
+      <button type="button" onclick="window.location.reload();" class="btn btn-primary">
+        Try Reconnecting
+      </button>
+      <a href="/" class="btn btn-outline">
+        Home Page
+      </a>
+    </div>
+  </div>
+</body>
+</html>

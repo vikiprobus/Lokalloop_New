@@ -1,0 +1,82 @@
+{% extends "base/buyer_base.html" %}
+
+{% block title %}Voucher Redeemed — {{ BRAND_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container container-narrow" style="padding-top: 1.5rem; padding-bottom: 3.5rem;">
+  
+  <div class="card" style="max-width: 480px; margin: 0 auto; box-shadow: var(--shadow-md); border: 1px solid var(--border-light); overflow: hidden; border-radius: var(--radius-lg); background: #ffffff;">
+    
+    <!-- Top Success Header -->
+    <div style="background: var(--brand-navy-900); color: #ffffff; padding: 2rem 1.5rem; text-align: center; position: relative;">
+      <div style="width: 56px; height: 56px; border-radius: 50%; background: #ecfdf5; color: var(--color-success); display: flex; align-items: center; justify-content: center; font-size: 2rem; margin: 0 auto 0.85rem; border: 2px solid #a7f3d0;">
+        <i class="bi bi-check-lg"></i>
+      </div>
+      <h1 style="font-size: 1.6rem; font-weight: 800; margin: 0 0 0.25rem; letter-spacing: -0.02em; color: #ffffff;">Counter Voucher Verified</h1>
+      <p style="font-size: 0.88rem; color: #94a3b8; margin: 0;">Present this digital confirmation slip to the cashier</p>
+    </div>
+
+    <!-- Receipt Perforation Line -->
+    <div style="position: relative; height: 16px; background: #ffffff; border-bottom: 2px dashed var(--border-light);">
+      <div style="position: absolute; left: -10px; top: -8px; width: 20px; height: 20px; border-radius: 50%; background: var(--bg-page); border: 1px solid var(--border-light);"></div>
+      <div style="position: absolute; right: -10px; top: -8px; width: 20px; height: 20px; border-radius: 50%; background: var(--bg-page); border: 1px solid var(--border-light);"></div>
+    </div>
+
+    <!-- Digital Receipt Body -->
+    <div class="card-body" style="padding: 1.75rem 2rem 2rem;">
+      
+      <!-- Store & Offer Header -->
+      <div style="text-align: center; padding-bottom: 1.25rem; border-bottom: 1px solid var(--border-light); margin-bottom: 1.25rem;">
+        <span class="badge badge-neutral" style="margin-bottom: 0.4rem; font-size: 0.75rem;">{{ redemption.shop.locality }}, {{ redemption.shop.city }}</span>
+        <h2 style="font-size: 1.25rem; font-weight: 800; color: var(--brand-navy-900); margin: 0;">{{ redemption.shop.name }}</h2>
+        <div style="font-size: 0.92rem; font-weight: 700; color: var(--brand-saffron-600); margin-top: 0.25rem;">
+          {{ redemption.offer.title }}
+        </div>
+      </div>
+
+      <!-- Financial Breakdown -->
+      <div style="display: flex; flex-direction: column; gap: 0.75rem; font-size: 0.92rem; margin-bottom: 1.5rem;">
+        <div class="d-flex justify-between">
+          <span class="text-muted">Original Bill Amount:</span>
+          <strong style="font-variant-numeric: tabular-nums;">₹{{ redemption.bill_amount|floatformat:2 }}</strong>
+        </div>
+        <div class="d-flex justify-between" style="color: var(--color-success);">
+          <span style="font-weight: 600;">Store Discount Applied:</span>
+          <strong style="font-size: 1.05rem; font-variant-numeric: tabular-nums;">- ₹{{ redemption.discount_given|floatformat:2 }}</strong>
+        </div>
+      </div>
+
+      <!-- Loyalty Reward Box -->
+      <div style="background: #fffbeb; border: 1px solid #fef3c7; padding: 0.85rem 1rem; border-radius: var(--radius-md); text-align: center; margin-bottom: 1.5rem;">
+        <div style="font-size: 0.72rem; font-weight: 700; color: #92400e; text-transform: uppercase; letter-spacing: 0.04em;">Points Credited to Wallet</div>
+        <div style="font-size: 1.5rem; font-weight: 900; color: #78350f; font-variant-numeric: tabular-nums; margin-top: 0.15rem;">
+          +{{ redemption.reward_points_earned }} Points
+        </div>
+        <div style="font-size: 0.75rem; color: #92400e; margin-top: 0.15rem;">
+          Deposited instantly to your loyalty balance
+        </div>
+      </div>
+
+      <!-- Transaction Meta -->
+      <div style="background: var(--bg-subtle); padding: 0.85rem 1rem; border-radius: var(--radius-md); font-size: 0.75rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 1.5rem; border: 1px solid var(--border-light);">
+        <div><strong>Transaction ID:</strong> <span style="font-family: var(--font-mono); font-variant-numeric: tabular-nums;">#{{ redemption.id }}</span></div>
+        <div><strong>Redeemed At:</strong> <span style="font-variant-numeric: tabular-nums;">{{ redemption.redeemed_at|date:"d M Y, h:i A" }}</span></div>
+        <div><strong>Status:</strong> <span style="color: var(--color-success); font-weight: 700;"><i class="bi bi-patch-check-fill"></i> Verified at Counter</span></div>
+      </div>
+
+      <!-- Actions -->
+      <div class="d-flex gap-2">
+        <a href="/buyer/rewards/" class="btn btn-primary btn-block">
+          <i class="bi bi-wallet2"></i> View Loyalty Wallet
+        </a>
+        <a href="/buyer/dashboard/" class="btn btn-outline btn-block">
+          Back to Home
+        </a>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,100 @@
+{% extends "base/admin_base.html" %}
+
+{% block title %}Merchant Digital Agreement Logs — {{ BRAND_NAME }} Console{% endblock %}
+{% block page_title %}Merchant Digital Agreement Compliance Audit Trail{% endblock %}
+
+{% block content %}
+<div class="card card-padded" style="margin-bottom: 1.5rem; background: #1e293b; border: 1px solid #334155;">
+  <form method="GET" action="/admin-portal/agreement-logs/" class="admin-filter-bar" style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+    <div style="flex: 1; min-width: 240px;">
+      <input type="text" name="q" value="{{ query }}" class="form-control" placeholder="Search Merchant ID, Business Name, Username, or IP..." style="background: #0f172a; border-color: #334155; color: #fff;">
+    </div>
+    <button type="submit" class="btn btn-primary" style="font-weight: 700;">
+      <i class="bi bi-search"></i> Search Logs
+    </button>
+    {% if query %}
+      <a href="/admin-portal/agreement-logs/" class="btn btn-outline" style="color: #94a3b8; border-color: #475569;">
+        Clear
+      </a>
+    {% endif %}
+  </form>
+</div>
+
+<div class="card card-padded" style="background: #1e293b; border: 1px solid #334155;">
+  <div class="d-flex align-center justify-between" style="margin-bottom: 1.25rem;">
+    <div>
+      <h3 style="font-size: 1.15rem; font-weight: 800; color: #fff; margin-bottom: 0.25rem;">
+        <i class="bi bi-file-earmark-check" style="color: #10b981;"></i> Digital Agreement Legal Audit Trail
+      </h3>
+      <p style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 0;">
+        Immutable audit log of all merchants agreeing to the <a href="/terms/" target="_blank" rel="noopener noreferrer" style="color: #38bdf8; text-decoration: underline;">Merchant Digital Agreement</a>.
+      </p>
+    </div>
+    <span class="badge" style="background: #0f172a; color: #38bdf8; border: 1px solid #334155; padding: 0.4rem 0.75rem; font-family: monospace;">
+      {{ total_count }} Recorded Signatures
+    </span>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table" style="font-size: 0.85rem; color: #cbd5e1; width: 100%; border-collapse: collapse;">
+      <thead>
+        <tr style="border-bottom: 1px solid #334155; background: #0f172a; font-size: 0.78rem; text-transform: uppercase; color: #94a3b8;">
+          <th style="padding: 0.9rem 1rem;">Accepted Timestamp</th>
+          <th style="padding: 0.9rem 1rem;">Merchant ID</th>
+          <th style="padding: 0.9rem 1rem;">Business Name</th>
+          <th style="padding: 0.9rem 1rem;">Merchant Account</th>
+          <th style="padding: 0.9rem 1rem;">Client IP &amp; Device</th>
+          <th style="padding: 0.9rem 1rem;">Agreement Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for log in logs %}
+          <tr style="border-bottom: 1px solid #334155; vertical-align: middle;">
+            <td style="padding: 1rem; color: #94a3b8;">
+              <div style="font-weight: 600; color: #fff;">{{ log.accepted_at|date:"d M Y" }}</div>
+              <div style="font-size: 0.75rem; font-family: monospace;">{{ log.accepted_at|date:"h:i:s A" }}</div>
+            </td>
+            <td style="padding: 1rem;">
+              <span class="badge" style="background: #0f172a; color: #38bdf8; font-family: monospace; font-size: 0.82rem; border: 1px solid #334155;">
+                {{ log.merchant_id|default:"N/A" }}
+              </span>
+            </td>
+            <td style="padding: 1rem;">
+              <strong style="color: #fff; font-size: 0.92rem;">{{ log.business_name }}</strong>
+            </td>
+            <td style="padding: 1rem;">
+              <div style="color: #cbd5e1; font-weight: 500;">{{ log.user.username }}</div>
+              <div style="font-size: 0.75rem; color: #64748b;">{{ log.user.email }}</div>
+            </td>
+            <td style="padding: 1rem;">
+              <div style="font-family: monospace; color: #38bdf8; font-size: 0.8rem;">
+                <i class="bi bi-geo-alt"></i> {{ log.ip_address|default:"127.0.0.1" }}
+              </div>
+              <div style="font-size: 0.72rem; color: #64748b; max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="{{ log.user_agent }}">
+                {{ log.user_agent|default:"Standard Web Browser" }}
+              </div>
+            </td>
+            <td style="padding: 1rem;">
+              <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); padding: 0.35rem 0.65rem;">
+                <i class="bi bi-check-circle-fill"></i> Legally Accepted
+              </span>
+              <div style="font-size: 0.72rem; color: #64748b; margin-top: 0.2rem;">
+                <a href="{{ log.agreement_url }}" target="_blank" rel="noopener noreferrer" style="color: #38bdf8; text-decoration: underline;">
+                  {{ log.agreement_title }} ({{ log.agreement_version }})
+                </a>
+              </div>
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="6" class="text-center text-muted" style="padding: 3rem 0; color: #64748b;">
+              <i class="bi bi-file-earmark-text" style="font-size: 2rem; display: block; margin-bottom: 0.5rem; opacity: 0.5;"></i>
+              No agreement acceptance records found.
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

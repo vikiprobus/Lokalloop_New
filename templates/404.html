@@ -1,0 +1,40 @@
+{% extends "base/public_base.html" %}
+
+{% block title %}Page Not Found (404) — {{ BRAND_NAME }}{% endblock %}
+
+{% block meta_description %}The page you are looking for does not exist or has been moved. Explore verified local shops and active deals.{% endblock %}
+
+{% block content %}
+<div class="container text-center" style="padding: 5rem 1.5rem; max-width: 680px; margin: 0 auto;">
+  
+  <div style="width: 80px; height: 80px; border-radius: var(--radius-xl, 16px); background: var(--brand-saffron-50, #fff7ed); border: 2px dashed var(--brand-saffron-500, #ea580c); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; font-size: 2.25rem; color: var(--brand-saffron-600, #c2410c);">
+    <i class="bi bi-geo-alt"></i>
+  </div>
+
+  <span class="badge" style="background: #ffedd5; color: #9a3412; font-size: 0.82rem; font-weight: 800; padding: 4px 12px; border-radius: 999px; margin-bottom: 0.75rem; letter-spacing: 0.04em;">
+    HTTP 404 &bull; PAGE NOT FOUND
+  </span>
+
+  <h1 style="font-size: 2.25rem; font-weight: 800; color: var(--brand-navy-900, #0f172a); margin: 0.5rem 0 1rem; letter-spacing: -0.02em;">
+    Lost in your neighborhood?
+  </h1>
+
+  <p style="font-size: 1.05rem; color: var(--text-muted, #64748b); line-height: 1.6; margin-bottom: 2.25rem;">
+    We couldn't find the page or storefront you were looking for. The link might be outdated or the page may have moved.
+  </p>
+
+  <div class="d-flex align-center justify-center gap-3 flex-wrap">
+    <a href="/" class="btn btn-primary btn-lg" style="font-weight: 700; padding: 0.75rem 1.75rem;">
+      <i class="bi bi-house-door"></i> Return to Home
+    </a>
+    <a href="/explore/" class="btn btn-outline btn-lg" style="font-weight: 700; padding: 0.75rem 1.75rem;">
+      <i class="bi bi-compass"></i> Explore Deals
+    </a>
+  </div>
+
+  <div style="margin-top: 3.5rem; padding-top: 2rem; border-top: 1px solid var(--border-light, #e2e8f0); font-size: 0.85rem; color: var(--text-muted, #64748b);">
+    Looking for merchant tools? <a href="/seller/login/" style="font-weight: 600; color: #ea580c;">Sign in to Merchant Portal</a> or <a href="/for-sellers/">learn how to list your store</a>.
+  </div>
+
+</div>
+{% endblock %}

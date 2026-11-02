@@ -1,0 +1,79 @@
+{% extends "base/buyer_base.html" %}
+
+{% block title %}{{ offer.title }} — Buyer Portal | {{ BRAND_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container container-narrow" style="padding-top: 1.5rem; padding-bottom: 3.5rem;">
+  
+  <div style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.4rem;">
+    <a href="/buyer/dashboard/" style="color: var(--text-muted); text-decoration: none;">Dashboard</a>
+    <i class="bi bi-chevron-right" style="font-size: 0.7rem;"></i>
+    <a href="/buyer/explore/?type=offers" style="color: var(--text-muted); text-decoration: none;">Offers</a>
+    <i class="bi bi-chevron-right" style="font-size: 0.7rem;"></i>
+    <a href="/buyer/shops/{{ offer.shop.slug }}/" style="color: var(--text-muted); text-decoration: none;">{{ offer.shop.name }}</a>
+    <i class="bi bi-chevron-right" style="font-size: 0.7rem;"></i>
+    <span style="color: var(--brand-navy-900); font-weight: 600;">{{ offer.title }}</span>
+  </div>
+
+  <div class="card" style="margin-bottom: 2rem; overflow: hidden; box-shadow: var(--shadow-sm); border: 1px solid var(--border-light); border-radius: var(--radius-lg); background: #ffffff;">
+    <div style="position: relative; height: 260px;">
+      <img src="{{ offer.image_url }}" alt="{{ offer.title }}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='/static/images/placeholder_offer.svg'">
+      <div style="position: absolute; inset: 0; background: linear-gradient(180deg, rgba(12, 16, 23, 0.2) 20%, rgba(12, 16, 23, 0.88) 100%);"></div>
+
+      <div style="position: absolute; top: 16px; left: 16px; background: var(--brand-saffron-500); color: #ffffff; font-weight: 800; font-size: 1.1rem; padding: 0.4rem 1.1rem; border-radius: var(--radius-full); box-shadow: var(--shadow-md);">
+        {{ offer.discount_display }}
+      </div>
+
+      <div style="position: absolute; bottom: 16px; left: 16px; right: 16px; color: #ffffff;">
+        <div style="font-size: 0.85rem; color: #cbd5e1; margin-bottom: 0.2rem;"><i class="bi bi-shop"></i> {{ offer.shop.name }} &bull; {{ offer.shop.locality }}</div>
+        <h1 style="font-size: 1.75rem; font-weight: 800; color: #ffffff; margin: 0; letter-spacing: -0.02em;">{{ offer.title }}</h1>
+      </div>
+    </div>
+
+    <div class="card-body" style="padding: 1.75rem;">
+      <div class="d-grid grid-3 gap-3" style="margin-bottom: 1.75rem; background: var(--bg-subtle); padding: 1rem; border-radius: var(--radius-md); border: 1px solid var(--border-light);">
+        <div>
+          <span style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em;">Min. Bill</span>
+          <div style="font-size: 1.2rem; font-weight: 800; color: var(--brand-navy-900); font-variant-numeric: tabular-nums; margin-top: 0.2rem;">
+            {% if offer.min_purchase > 0 %}₹{{ offer.min_purchase|floatformat:0 }}{% else %}No Min{% endif %}
+          </div>
+        </div>
+
+        <div>
+          <span style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em;">Points Reward</span>
+          <div style="font-size: 1.2rem; font-weight: 800; color: var(--brand-saffron-600); font-variant-numeric: tabular-nums; margin-top: 0.2rem;">
+            +{{ offer.reward_points_per_redemption }} Pts
+          </div>
+        </div>
+
+        <div>
+          <span style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em;">Valid Until</span>
+          <div style="font-size: 1.2rem; font-weight: 800; color: var(--brand-navy-900); font-variant-numeric: tabular-nums; margin-top: 0.2rem;">
+            {{ offer.end_date|date:"d M Y" }}
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-bottom: 1.5rem;">
+        <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--brand-navy-900); margin-bottom: 0.4rem;">Description</h3>
+        <p style="font-size: 0.92rem; line-height: 1.6; color: var(--text-main); white-space: pre-line; margin: 0;">{{ offer.description }}</p>
+      </div>
+
+      <div style="margin-bottom: 2rem;">
+        <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--brand-navy-900); margin-bottom: 0.4rem;">Terms & Conditions</h3>
+        <p style="font-size: 0.85rem; line-height: 1.6; color: var(--text-muted); background: #fafbfc; padding: 1rem; border-radius: var(--radius-md); border: 1px solid var(--border-light); white-space: pre-line; margin: 0;">
+          {{ offer.terms }}
+        </p>
+      </div>
+
+      <!-- In-Store Redemption CTA Button -->
+      <button type="button" onclick="openOfferTermsModal(function(){ window.location.href='/buyer/scan/?offer={{ offer.id }}'; }, '{{ offer.title|escapejs }}', '{{ offer.shop.name|escapejs }}', '{{ offer.terms|escapejs }}')" class="btn btn-primary btn-block btn-lg" style="box-shadow: var(--shadow-sm); width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+        <i class="bi bi-qr-code-scan"></i> Redeem at Store Counter Now
+      </button>
+    </div>
+  </div>
+
+</div>
+
+{% include "offers/terms_modal.html" %}
+{% endblock %}

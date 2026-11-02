@@ -1,0 +1,253 @@
+{% extends "base/admin_base.html" %}
+
+{% block title %}Geo-Fence & Proximity Controls — {{ BRAND_NAME }} Console{% endblock %}
+{% block page_title %}In-Store Geo-Fence & Proximity Governance{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-column gap-4">
+
+  <!-- Overview Cards -->
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.25rem;">
+    
+    <div class="card card-padded" style="border-left: 4px solid {% if settings.geofence_enabled %}#10b981{% else %}#ef4444{% endif %};">
+      <div class="d-flex align-center justify-between">
+        <div>
+          <span style="font-size: 0.8rem; font-weight: 700; color: #64748b; text-transform: uppercase;">Geo-Fence Status</span>
+          <h3 style="font-size: 1.5rem; font-weight: 800; margin-top: 0.25rem; color: {% if settings.geofence_enabled %}#047857{% else %}#b91c1c{% endif %};">
+            {% if settings.geofence_enabled %}
+              <i class="bi bi-shield-check"></i> ACTIVE
+            {% else %}
+              <i class="bi bi-shield-slash"></i> DISABLED
+            {% endif %}
+          </h3>
+        </div>
+        <form method="POST" action="/admin-portal/settings/">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="toggle_geofence">
+          <button type="submit" class="btn btn-sm {% if settings.geofence_enabled %}btn-outline{% else %}btn-primary{% endif %}" style="font-weight: 700; border-radius: var(--radius-full);">
+            {% if settings.geofence_enabled %}
+              <i class="bi bi-pause-circle"></i> Disable
+            {% else %}
+              <i class="bi bi-play-circle-fill"></i> Enable
+            {% endif %}
+          </button>
+        </form>
+      </div>
+      <div style="font-size: 0.78rem; color: #64748b; margin-top: 0.5rem;">
+        {% if settings.geofence_enabled %}
+          Shoppers must be physically inside the store radius to claim discounts.
+        {% else %}
+          Bypassed: Anyone scanning valid QR code can redeem regardless of GPS distance.
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="card card-padded" style="border-left: 4px solid #3b82f6;">
+      <span style="font-size: 0.8rem; font-weight: 700; color: #64748b; text-transform: uppercase;">Enforced Radius</span>
+      <h3 style="font-size: 1.5rem; font-weight: 800; margin-top: 0.25rem; color: #1e3a8a;">
+        {{ settings.max_redemption_distance_meters }}m
+        <span style="font-size: 0.85rem; font-weight: 500; color: #64748b;">(+{{ settings.gps_accuracy_tolerance_meters }}m drift buffer)</span>
+      </h3>
+      <div style="font-size: 0.78rem; color: #64748b; margin-top: 0.5rem;">
+        Effective Max Distance: <strong>{{ effective_radius }} meters</strong>
+      </div>
+    </div>
+
+    <div class="card card-padded" style="border-left: 4px solid #10b981;">
+      <span style="font-size: 0.8rem; font-weight: 700; color: #64748b; text-transform: uppercase;">Verified In-Store Claims</span>
+      <h3 style="font-size: 1.5rem; font-weight: 800; margin-top: 0.25rem; color: #047857;">
+        {{ total_geofence_redemptions }}
+        <span style="font-size: 0.85rem; font-weight: 500; color: #64748b;">/ {{ total_redemptions }} total</span>
+      </h3>
+      <div style="font-size: 0.78rem; color: #64748b; margin-top: 0.5rem;">
+        Atomic redemptions with verified physical GPS presence.
+      </div>
+    </div>
+
+    <div class="card card-padded" style="border-left: 4px solid #f97316;">
+      <span style="font-size: 0.8rem; font-weight: 700; color: #64748b; text-transform: uppercase;">Blocked Remote Scans</span>
+      <h3 style="font-size: 1.5rem; font-weight: 800; margin-top: 0.25rem; color: #c2410c;">
+        {{ geofence_violations_count }}
+      </h3>
+      <div style="font-size: 0.78rem; color: #64748b; margin-top: 0.5rem;">
+        Unauthorized off-premise discount redemption attempts blocked.
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Sign-up Welcome Bonus Configuration Card -->
+  <div class="card card-padded">
+    <div class="d-flex align-center justify-between" style="margin-bottom: 1.25rem;">
+      <div>
+        <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--brand-navy-900);">
+          <i class="bi bi-gift-fill text-primary"></i> Sign-up Welcome Bonus
+        </h3>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">
+          Grant automatic promotional bonuses upon new user sign-up (25 points for buyers, 50 credits for sellers).
+        </p>
+      </div>
+      <span class="badge {% if settings.signup_bonus_enabled %}badge-success{% else %}badge-neutral{% endif %}" style="font-weight: 700;">
+        {% if settings.signup_bonus_enabled %}ACTIVE{% else %}DISABLED{% endif %}
+      </span>
+    </div>
+
+    <form method="POST" action="/admin-portal/settings/">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="update_signup_bonus">
+
+      <div style="display: flex; align-items: center; gap: 2.5rem; margin-bottom: 1.25rem;">
+        <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 700; color: var(--brand-navy-900); cursor: pointer; font-size: 0.95rem;">
+          <input type="radio" name="signup_bonus_enabled" value="yes" {% if settings.signup_bonus_enabled %}checked{% endif %} style="width: 18px; height: 18px; accent-color: var(--brand-navy-900);">
+          <span>Yes (Enabled)</span>
+        </label>
+        <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 700; color: var(--brand-navy-900); cursor: pointer; font-size: 0.95rem;">
+          <input type="radio" name="signup_bonus_enabled" value="no" {% if not settings.signup_bonus_enabled %}checked{% endif %} style="width: 18px; height: 18px; accent-color: var(--brand-navy-900);">
+          <span>No (Disabled)</span>
+        </label>
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="font-weight: 700; padding: 0.65rem 1.75rem;">
+        <i class="bi bi-save-fill"></i> Save
+      </button>
+    </form>
+  </div>
+
+  <!-- Proximity Configuration Form Card -->
+  <div class="card card-padded">
+    <div class="d-flex align-center justify-between" style="margin-bottom: 1.25rem;">
+      <div>
+        <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--brand-navy-900);">
+          <i class="bi bi-sliders text-danger"></i> Proximity Perimeter Controls
+        </h3>
+        <p style="font-size: 0.85rem; color: var(--text-muted);">
+          Adjust store perimeter enforcement and indoor GPS drift compensation without restarting servers.
+        </p>
+      </div>
+      <span class="badge badge-indigo">Mathematical Haversine Engine</span>
+    </div>
+
+    <form method="POST" action="/admin-portal/settings/">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="update_proximity">
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem;">
+        
+        <!-- Max Proximity Radius -->
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label" style="font-weight: 700;">
+            Max Redemption Distance (Meters) <span class="text-danger">*</span>
+          </label>
+          <input type="number" name="max_redemption_distance_meters" id="radius-input" class="form-control" min="5" max="5000" step="5" value="{{ settings.max_redemption_distance_meters }}" required>
+          <div class="form-text">
+            Physical distance radius from merchant storefront.
+          </div>
+
+          <!-- Quick Preset Buttons -->
+          <div class="d-flex gap-2" style="margin-top: 0.75rem; flex-wrap: wrap;">
+            <button type="button" class="btn btn-outline btn-sm" onclick="setRadius(50)">50m (Storefront)</button>
+            <button type="button" class="btn btn-outline btn-sm" onclick="setRadius(100)">100m (Supermarket)</button>
+            <button type="button" class="btn btn-outline btn-sm" onclick="setRadius(200)">200m (Mall/Complex)</button>
+          </div>
+        </div>
+
+        <!-- Indoor GPS Drift Tolerance Buffer -->
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label" style="font-weight: 700;">
+            Indoor GPS Accuracy Tolerance (Meters) <span class="text-danger">*</span>
+          </label>
+          <input type="number" name="gps_accuracy_tolerance_meters" id="tolerance-input" class="form-control" min="0" max="200" step="5" value="{{ settings.gps_accuracy_tolerance_meters }}" required>
+          <div class="form-text">
+            Soft tolerance added to allow for indoor concrete interference and smartphone GPS jitter.
+          </div>
+
+          <!-- Quick Buffer Buttons -->
+          <div class="d-flex gap-2" style="margin-top: 0.75rem; flex-wrap: wrap;">
+            <button type="button" class="btn btn-outline btn-sm" onclick="setTolerance(15)">15m (Strict)</button>
+            <button type="button" class="btn btn-outline btn-sm" onclick="setTolerance(25)">25m (Recommended)</button>
+            <button type="button" class="btn btn-outline btn-sm" onclick="setTolerance(50)">50m (Generous)</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Feature Toggle Switch -->
+      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: var(--radius-md); padding: 1rem 1.25rem; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between;">
+        <div>
+          <label for="geofence_enabled_cb" style="font-weight: 700; color: #0f172a; cursor: pointer; display: block;">
+            Enforce In-Store Physical Presence Globally
+          </label>
+          <span style="font-size: 0.8rem; color: #64748b;">
+            When checked, redemptions where distance &gt; effective radius will be blocked immediately and flagged in the security audit log.
+          </span>
+        </div>
+        <div style="margin-left: 1rem;">
+          <input type="checkbox" name="geofence_enabled" id="geofence_enabled_cb" {% if settings.geofence_enabled %}checked{% endif %} style="width: 22px; height: 22px; accent-color: #ef4444; cursor: pointer;">
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="font-weight: 700; padding: 0.65rem 1.5rem;">
+        <i class="bi bi-save-fill"></i> Save Geo-Fence Configuration
+      </button>
+
+    </form>
+  </div>
+
+  <!-- Security Audit Trail: Blocked Remote Scans -->
+  <div class="card card-padded">
+    <div class="d-flex align-center justify-between" style="margin-bottom: 1.25rem;">
+      <div>
+        <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--brand-navy-900);">
+          <i class="bi bi-shield-slash-fill text-danger"></i> Recent Proximity Violation Attempts
+        </h3>
+        <p style="font-size: 0.85rem; color: var(--text-muted);">
+          Real-time log of shopper scans rejected because the user was beyond the store's configured perimeter.
+        </p>
+      </div>
+      <span class="badge badge-neutral">{{ recent_violations|length }} Tracked Incidents</span>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table" style="font-size: 0.85rem;">
+        <thead>
+          <tr>
+            <th>Timestamp</th>
+            <th>Type</th>
+            <th>Details &amp; Distance Audit</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for v in recent_violations %}
+            <tr>
+              <td class="text-muted" style="white-space: nowrap;">{{ v.created_at|date:"d M Y, h:i:s A" }}</td>
+              <td>
+                <span class="badge badge-danger">OUT_OF_RANGE</span>
+              </td>
+              <td>
+                {{ v.details }}
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="3" class="text-center text-muted" style="padding: 2.5rem 0;">
+                <i class="bi bi-check-circle" style="font-size: 2rem; color: #10b981; display: block; margin-bottom: 0.5rem;"></i>
+                No proximity violations recorded. All customer counter redemptions have occurred inside store perimeters.
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function setRadius(val) {
+    document.getElementById('radius-input').value = val;
+  }
+  function setTolerance(val) {
+    document.getElementById('tolerance-input').value = val;
+  }
+</script>
+{% endblock %}

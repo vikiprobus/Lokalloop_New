@@ -1,0 +1,381 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="{% block meta_description %}LokalLoop Buyer Portal — Discover verified local store discounts and redeem counter QR deals.{% endblock %}">
+  <link rel="icon" type="image/svg+xml" href="{% static 'images/favicon.svg' %}">
+  
+  <!-- Progressive Web App (PWA) & Web Clip Meta Tags -->
+  <link rel="manifest" href="{% static 'manifest.json' %}">
+  <meta name="theme-color" content="#F97316">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="LokalLoop">
+  <link rel="apple-touch-icon" href="{% static 'images/icon-192.svg' %}">
+
+  <title>{% block title %}Buyer Experience — LokalLoop{% endblock %}</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="{% static 'css/design_tokens.css' %}?v=2.2">
+  <link rel="stylesheet" href="{% static 'css/main.css' %}?v=2.2">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  
+  <style>
+    /* Buyer specific UI enhancements */
+    .buyer-header {
+      background: #ffffff;
+      border-bottom: 1px solid var(--border-light);
+      position: sticky;
+      top: 0;
+      z-index: 90;
+    }
+    .buyer-nav-link {
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: var(--brand-navy-700);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.5rem 0.75rem;
+      border-radius: var(--radius-sm);
+      transition: background 0.15s ease;
+    }
+    .buyer-nav-link:hover, .buyer-nav-link.active {
+      color: var(--brand-indigo-600);
+      background-color: var(--brand-indigo-50);
+    }
+    .points-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: linear-gradient(135deg, #fef3c7, #fde68a);
+      color: #92400e;
+      border: 1px solid #fcd34d;
+      font-weight: 700;
+      padding: 0.4rem 0.85rem;
+      border-radius: var(--radius-full);
+      font-size: 0.85rem;
+    }
+    .scan-btn-highlight {
+      background: linear-gradient(135deg, var(--brand-saffron-500), var(--brand-saffron-600));
+      color: #fff !important;
+      border-radius: var(--radius-full);
+      padding: 0.45rem 1rem;
+      box-shadow: 0 4px 10px rgba(249, 115, 22, 0.3);
+    }
+    .user-dropdown-container {
+      position: relative;
+    }
+    .user-dropdown-container .dropdown-menu {
+      display: none;
+      position: absolute;
+      top: 100%;
+      right: 0;
+      z-index: 1050;
+    }
+    .user-dropdown-container .dropdown-menu.show {
+      display: block !important;
+    }
+    .dropdown-item:hover {
+      background-color: var(--bg-subtle, #f8fafc);
+    }
+  
+    /* Zero-Collision Status Bar & Notch Safe Area (BUG-Mobile) */
+    .buyer-header {
+      padding-top: max(env(safe-area-inset-top, 0px), 0px);
+    }
+    @media (max-width: 768px) {
+      .buyer-header .container {
+        height: auto !important;
+        min-height: 56px !important;
+        padding-top: 0.35rem !important;
+        padding-bottom: 0.35rem !important;
+      }
+      body.buyer-logged-in {
+        padding-bottom: calc(85px + env(safe-area-inset-bottom, 8px)) !important;
+      }
+    }
+
+  </style>
+  {% block extra_css %}{% endblock %}
+</head>
+<body class="buyer-logged-in">
+
+  <!-- Buyer Top Bar -->
+  <header class="buyer-header">
+    <div class="container d-flex align-center justify-between" style="height: 68px;">
+      
+      <!-- Brand & City Selector -->
+      <div class="d-flex align-center gap-3">
+        <a href="/buyer/dashboard/" class="d-flex align-center gap-2">
+          <div style="width: 34px; height: 34px; border-radius: 8px; background: linear-gradient(135deg, var(--brand-saffron-500), var(--brand-navy-900)); display: flex; align-items: center; justify-content: center; color: #fff;">
+            <i class="bi bi-geo-alt-fill"></i>
+          </div>
+          <span style="font-size: 1.25rem; font-weight: 800; color: var(--brand-navy-900);">Lokal<span style="color: var(--brand-saffron-500);">Loop</span></span>
+        </a>
+
+        <!-- Current City Badge / Selector -->
+        <div style="display: flex; align-items: center; gap: 0.35rem; background: var(--bg-subtle); padding: 0.35rem 0.75rem; border-radius: var(--radius-full); font-size: 0.825rem; font-weight: 600; color: var(--brand-navy-700);">
+          <i class="bi bi-geo" style="color: var(--brand-saffron-500);"></i>
+          <span>{{ user.buyer_profile.district|default:user.buyer_profile.preferred_city|default:user_profile.city|default:"Bengaluru, Karnataka" }}</span>
+        </div>
+      </div>
+
+      <!-- Buyer Navigation Links (Desktop) -->
+      <nav class="desktop-nav d-flex align-center gap-2">
+        <a href="/buyer/dashboard/" class="buyer-nav-link {% if request.path == '/buyer/dashboard/' %}active{% endif %}">
+          <i class="bi bi-house-door"></i> Home
+        </a>
+        <a href="/buyer/explore/" class="buyer-nav-link {% if '/buyer/explore/' in request.path %}active{% endif %}">
+          <i class="bi bi-compass"></i> Explore
+        </a>
+        <a href="/buyer/scan/" class="buyer-nav-link scan-btn-highlight">
+          <i class="bi bi-qr-code-scan"></i> Scan & Redeem
+        </a>
+        <a href="/buyer/rewards/" class="buyer-nav-link {% if '/buyer/rewards/' in request.path %}active{% endif %}">
+          <i class="bi bi-gift"></i> Rewards
+        </a>
+        <a href="/buyer/leaderboard/" class="buyer-nav-link {% if '/buyer/leaderboard/' in request.path %}active{% endif %}">
+          <i class="bi bi-trophy"></i> Leaderboard
+        </a>
+        <a href="/buyer/history/" class="buyer-nav-link {% if '/buyer/history/' in request.path %}active{% endif %}">
+          <i class="bi bi-clock-history"></i> History
+        </a>
+      </nav>
+
+      <!-- Right Actions: Points, Notifications, Profile Dropdown -->
+      <div class="d-flex align-center gap-3">
+        <!-- Reward Points ticker -->
+        <a href="/buyer/rewards/" class="points-badge" title="Your available reward points balance">
+          <i class="bi bi-coin"></i>
+          <span>{{ user.reward_account.current_points|default:50 }} Pts</span>
+        </a>
+
+        <!-- Notifications Bell -->
+        <a href="/buyer/notifications/" style="position: relative; color: var(--brand-navy-700); font-size: 1.25rem; padding: 0.4rem;">
+          <i class="bi bi-bell"></i>
+          {% if unread_notifications_count > 0 %}
+            <span style="position: absolute; top: 2px; right: 2px; width: 8px; height: 8px; background-color: var(--color-danger); border-radius: 50%;"></span>
+          {% endif %}
+        </a>
+
+        <!-- User Profile Dropdown Menu -->
+        <div class="user-dropdown-container" style="padding-left: 0.5rem; border-left: 1px solid var(--border-light);">
+          <button type="button" class="dropdown-toggle" id="buyerProfileDropdownBtn" style="background: var(--bg-subtle, #f8fafc); border: 1px solid var(--border-light, #e2e8f0); padding: 0.35rem 0.65rem 0.35rem 0.4rem; border-radius: var(--radius-full, 9999px); display: inline-flex; align-items: center; gap: 0.5rem; cursor: pointer; transition: all 0.2s ease;">
+            <div style="width: 30px; height: 30px; border-radius: 50%; background: var(--brand-saffron-100, #ffedd5); color: var(--brand-saffron-700, #c2410c); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.85rem;">
+              <i class="bi bi-person-fill"></i>
+            </div>
+            <span style="font-weight: 700; font-size: 0.85rem; color: var(--brand-navy-900, #0f172a); max-width: 130px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+              {{ user.buyer_profile.nickname|default:"Shopper" }}
+            </span>
+            <i class="bi bi-chevron-down" style="font-size: 0.75rem; color: var(--text-muted, #64748b);"></i>
+          </button>
+
+          <div class="dropdown-menu" style="right: 0; left: auto; min-width: 240px; margin-top: 0.5rem; border-radius: 12px; box-shadow: var(--shadow-lg, 0 10px 25px rgba(0,0,0,0.12)); border: 1px solid var(--border-light, #e2e8f0); padding: 0.5rem; background: #ffffff;">
+            <div style="padding: 0.75rem 0.85rem; border-bottom: 1px solid var(--border-light, #e2e8f0); margin-bottom: 0.35rem;">
+              <div style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: #94a3b8; letter-spacing: 0.05em;">Customer Pass</div>
+              <div style="font-weight: 800; color: var(--ink-950, #0f172a); font-size: 0.95rem;">
+                {{ user.buyer_profile.nickname|default:"Shopper" }}
+              </div>
+              <div style="font-size: 0.78rem; color: var(--brand-saffron-600, #ea580c); font-family: monospace; font-weight: 700; margin-top: 0.15rem;">
+                {{ user.buyer_profile.public_unique_id|default:"" }}
+              </div>
+            </div>
+
+            <a href="/buyer/account/" class="dropdown-item" style="display: flex; align-items: center; gap: 0.55rem; padding: 0.65rem 0.85rem; border-radius: 8px; font-weight: 600; font-size: 0.85rem; color: #1e293b; text-decoration: none; transition: background 0.15s ease;">
+              <i class="bi bi-person-circle" style="color: var(--brand-saffron-600, #ea580c); font-size: 1rem;"></i>
+              <span>👤 My Account</span>
+            </a>
+
+            <a href="/buyer/change-password/" class="dropdown-item" style="display: flex; align-items: center; gap: 0.55rem; padding: 0.65rem 0.85rem; border-radius: 8px; font-weight: 600; font-size: 0.85rem; color: #1e293b; text-decoration: none; transition: background 0.15s ease;">
+              <i class="bi bi-shield-lock-fill" style="color: var(--brand-saffron-600, #ea580c); font-size: 1rem;"></i>
+              <span>🛡️ Security &amp; Password</span>
+            </a>
+
+            <a href="/contact-us/" class="dropdown-item" style="display: flex; align-items: center; gap: 0.55rem; padding: 0.65rem 0.85rem; border-radius: 8px; font-weight: 600; font-size: 0.85rem; color: #1e293b; text-decoration: none; transition: background 0.15s ease;">
+              <i class="bi bi-headset" style="color: var(--brand-navy-700, #0f172a); font-size: 1rem;"></i>
+              <span>🎧 Help &amp; Grievances</span>
+            </a>
+
+            <div style="border-top: 1px solid var(--border-light, #e2e8f0); margin: 0.35rem 0;"></div>
+
+            <a href="/buyer/logout/" class="dropdown-item" style="display: flex; align-items: center; gap: 0.55rem; padding: 0.65rem 0.85rem; border-radius: 8px; font-weight: 600; font-size: 0.85rem; color: #dc2626; text-decoration: none; transition: background 0.15s ease;">
+              <i class="bi bi-box-arrow-right" style="font-size: 1rem;"></i>
+              <span>🚪 Sign Out</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Flash Messages -->
+  {% if messages %}
+    <div class="container" style="margin-top: 1rem;">
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+          <span>{{ message }}</span>
+          <button type="button" style="background: none; border: none; cursor: pointer; font-size: 1.1rem;" onclick="this.parentElement.remove();">&times;</button>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <!-- Page Main -->
+  <main style="padding: 1.5rem 0 3rem;">
+    {% block content %}{% endblock %}
+  </main>
+
+    <!-- Mobile Bottom Navigation Bar (Zero-CDN Inline High-Definition SVGs) -->
+  <div class="mobile-bottom-nav" style="position: fixed; bottom: 0; left: 0; right: 0; height: calc(62px + env(safe-area-inset-bottom, 8px)); padding-bottom: env(safe-area-inset-bottom, 8px); background: rgba(255, 255, 255, 0.96); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-top: 1px solid rgba(0, 0, 0, 0.08); z-index: 1000; display: flex; justify-content: space-around; align-items: center; box-shadow: 0 -4px 20px rgba(0,0,0,0.06);">
+    <!-- 1. Home -->
+    <a href="/buyer/dashboard/" style="text-align: center; color: {% if request.path == '/buyer/dashboard/' %}var(--brand-indigo-600){% else %}var(--text-muted){% endif %}; font-size: 0.72rem; text-decoration: none; display: flex; flex-direction: column; align-items: center; gap: 0.2rem; min-width: 48px;">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+        <polyline points="9 22 9 12 15 12 15 22"/>
+      </svg>
+      <span>Home</span>
+    </a>
+
+    <!-- 2. Explore -->
+    <a href="/buyer/explore/" style="text-align: center; color: {% if '/buyer/explore/' in request.path %}var(--brand-indigo-600){% else %}var(--text-muted){% endif %}; font-size: 0.72rem; text-decoration: none; display: flex; flex-direction: column; align-items: center; gap: 0.2rem; min-width: 48px;">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>
+      </svg>
+      <span>Explore</span>
+    </a>
+
+    <!-- 3. Scan & Redeem (Floating High-Contrast Orange Circle) -->
+    <a href="/buyer/scan/" style="text-align: center; color: #ffffff !important; background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-top: -20px; box-shadow: 0 6px 16px rgba(249, 115, 22, 0.45); border: 3px solid #ffffff; flex-shrink: 0;" aria-label="Scan QR Code">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 7V5a2 2 0 0 1 2-2h2"/>
+        <path d="M17 3h2a2 2 0 0 1 2 2v2"/>
+        <path d="M21 17v2a2 2 0 0 1-2 2h-2"/>
+        <path d="M7 21H5a2 2 0 0 1-2-2v-2"/>
+        <rect x="7" y="7" width="10" height="10" rx="1.5"/>
+        <line x1="7" y1="12" x2="17" y2="12"/>
+      </svg>
+    </a>
+
+    <!-- 4. Rewards -->
+    <a href="/buyer/rewards/" style="text-align: center; color: {% if '/buyer/rewards/' in request.path %}var(--brand-indigo-600){% else %}var(--text-muted){% endif %}; font-size: 0.72rem; text-decoration: none; display: flex; flex-direction: column; align-items: center; gap: 0.2rem; min-width: 48px;">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="20 12 20 22 4 22 4 12"/>
+        <rect x="2" y="7" width="20" height="5"/>
+        <line x1="12" y1="22" x2="12" y2="7"/>
+        <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/>
+        <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>
+      </svg>
+      <span>Rewards</span>
+    </a>
+
+    <!-- 5. Activity -->
+    <a href="/buyer/history/" style="text-align: center; color: {% if '/buyer/history/' in request.path %}var(--brand-indigo-600){% else %}var(--text-muted){% endif %}; font-size: 0.72rem; text-decoration: none; display: flex; flex-direction: column; align-items: center; gap: 0.2rem; min-width: 48px;">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <polyline points="12 6 12 12 16 14"/>
+      </svg>
+      <span>Activity</span>
+    </a>
+
+    <!-- 6. Account -->
+    <a href="/buyer/account/" style="text-align: center; color: {% if '/buyer/account/' in request.path %}var(--brand-indigo-600){% else %}var(--text-muted){% endif %}; font-size: 0.72rem; text-decoration: none; display: flex; flex-direction: column; align-items: center; gap: 0.2rem; min-width: 48px;">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
+        <circle cx="12" cy="7" r="4"/>
+      </svg>
+      <span>Account</span>
+    </a>
+  </div>
+
+  <!-- Mobile Account Drawer Modal (BUG-3.2) -->
+  <div id="mobileAccountBackdrop" style="display: none; position: fixed; inset: 0; background: rgba(15,23,42,0.6); z-index: 1050; backdrop-filter: blur(2px);" onclick="closeMobileAccountDrawer()"></div>
+  <div id="mobileAccountDrawer" style="display: none; position: fixed; bottom: 0; left: 0; right: 0; background: #ffffff; border-radius: 20px 20px 0 0; z-index: 1060; padding: 1.5rem; box-shadow: 0 -8px 30px rgba(0,0,0,0.25); max-height: 80vh; overflow-y: auto;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border-light, #e2e8f0);">
+      <div style="display: flex; align-items: center; gap: 0.75rem;">
+        <div style="width: 42px; height: 42px; border-radius: 50%; background: var(--brand-saffron-100, #ffedd5); color: var(--brand-saffron-700, #c2410c); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.1rem;">
+          <i class="bi bi-person-fill"></i>
+        </div>
+        <div>
+          <div style="font-weight: 800; color: var(--ink-950, #0f172a); font-size: 1.05rem;">
+            {{ user.buyer_profile.nickname|default:"Shopper" }}
+          </div>
+          <div style="font-size: 0.8rem; color: var(--brand-saffron-600, #ea580c); font-family: monospace; font-weight: 700;">
+            {{ user.buyer_profile.public_unique_id|default:"" }}
+          </div>
+        </div>
+      </div>
+      <button type="button" onclick="closeMobileAccountDrawer()" style="background: none; border: none; font-size: 1.4rem; color: #94a3b8; cursor: pointer; padding: 0.25rem;">
+        &times;
+      </button>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.25rem;">
+      <a href="/buyer/rewards/" class="btn btn-outline" style="display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1rem; border-radius: 10px; text-decoration: none; font-weight: 700; color: #0f172a;">
+        <span style="display: flex; align-items: center; gap: 0.5rem;"><i class="bi bi-coin text-saffron"></i> Points Balance</span>
+        <span class="badge badge-saffron">{{ user.reward_account.current_points|default:50 }} Pts</span>
+      </a>
+
+      <a href="/buyer/change-password/" class="btn btn-outline" style="display: flex; align-items: center; gap: 0.65rem; padding: 0.75rem 1rem; border-radius: 10px; text-decoration: none; font-weight: 600; color: #1e293b;">
+        <i class="bi bi-shield-lock-fill text-saffron"></i>
+        <span>Security &amp; Password</span>
+      </a>
+
+      <a href="/contact-us/" class="btn btn-outline" style="display: flex; align-items: center; gap: 0.65rem; padding: 0.75rem 1rem; border-radius: 10px; text-decoration: none; font-weight: 600; color: #1e293b;">
+        <i class="bi bi-headset text-saffron"></i>
+        <span>Help &amp; Grievances</span>
+      </a>
+    </div>
+
+    <div style="padding-top: 0.5rem;">
+      <a href="/buyer/logout/" class="btn btn-block" style="background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; font-weight: 700; width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.75rem; border-radius: 10px;">
+        <i class="bi bi-box-arrow-right"></i> Sign Out
+      </a>
+    </div>
+  </div>
+
+  <script>
+    function openMobileAccountDrawer() {
+      document.getElementById('mobileAccountBackdrop').style.display = 'block';
+      document.getElementById('mobileAccountDrawer').style.display = 'block';
+    }
+    function closeMobileAccountDrawer() {
+      document.getElementById('mobileAccountBackdrop').style.display = 'none';
+      document.getElementById('mobileAccountDrawer').style.display = 'none';
+    }
+  </script>
+
+  <!-- Floating PWA Smart Mobile Install Banner -->
+  <div id="pwaInstallBanner" style="display: none; position: fixed; bottom: 5rem; left: 1rem; right: 1rem; max-width: 440px; margin: 0 auto; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #ffffff; padding: 1rem 1.25rem; border-radius: 16px; z-index: 999; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 12px 30px rgba(0,0,0,0.45); align-items: center; justify-content: space-between; gap: 0.75rem;">
+    <div style="display: flex; align-items: center; gap: 0.75rem;">
+      <div style="width: 44px; height: 44px; border-radius: 10px; background: linear-gradient(135deg, #f97316, #0f172a); display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 4px 10px rgba(249,115,22,0.35);">
+        <i class="bi bi-geo-alt-fill" style="color: #ffffff; font-size: 1.4rem;"></i>
+      </div>
+      <div>
+        <div style="font-weight: 800; font-size: 0.92rem; color: #ffffff; letter-spacing: -0.01em;">Install LokalLoop App</div>
+        <div style="font-size: 0.75rem; color: #94a3b8; line-height: 1.3;">Add to home screen for 1-tap QR scanning</div>
+      </div>
+    </div>
+    <div style="display: flex; align-items: center; gap: 0.4rem;">
+      <button type="button" onclick="promptPwaInstall()" class="btn btn-sm btn-primary" style="padding: 0.45rem 0.85rem; font-size: 0.8rem; font-weight: 700; white-space: nowrap;">
+        Install
+      </button>
+      <button type="button" onclick="dismissPwaBanner()" style="background: none; border: none; color: #94a3b8; font-size: 1.25rem; cursor: pointer; padding: 0.25rem; line-height: 1;" aria-label="Close">
+        &times;
+      </button>
+    </div>
+  </div>
+
+  <script src="{% static 'js/main.js' %}?v=2.1"></script>
+  <script src="{% static 'js/pwa.js' %}?v=1.0"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

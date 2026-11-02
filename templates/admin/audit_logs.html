@@ -1,0 +1,133 @@
+{% extends "base/admin_base.html" %}
+
+{% block title %}Admin Audit Log — {{ BRAND_NAME }} Console{% endblock %}
+{% block page_title %}Administrative Security Audit Log{% endblock %}
+
+{% block content %}
+<div class="card card-padded">
+  <div class="d-flex align-center justify-between" style="margin-bottom: 1.25rem;">
+    <div>
+      <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--brand-navy-900);">System Audit Trail</h3>
+      <p style="font-size: 0.85rem; color: var(--text-muted);">Immutable record of administrator actions, approvals, suspensions and adjustments</p>
+    </div>
+    <span class="badge badge-neutral">{{ actions|length }} Audit Records</span>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table" style="font-size: 0.85rem;">
+      <thead>
+        <tr>
+          <th>Timestamp</th>
+          <th>Admin User</th>
+          <th>Action Type</th>
+          <th>Target Entity</th>
+          <th>Details</th>
+          <th>IP Address</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for a in actions %}
+          <tr>
+            <td class="text-muted">{{ a.created_at|date:"d M Y, h:i A" }}</td>
+            <td><strong>{{ a.admin.username|default:"System" }}</strong></td>
+            <td>
+              <span class="badge badge-indigo">{{ a.action_type }}</span>
+            </td>
+            <td style="font-family: var(--font-mono); font-size: 0.8rem;">
+              {{ a.target_model }} #{{ a.target_id }}
+            </td>
+            <td>{{ a.details }}</td>
+            <td class="text-muted" style="font-family: var(--font-mono); font-size: 0.75rem;">
+              {{ a.ip_address|default:"127.0.0.1" }}
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="6" class="text-center text-muted" style="padding: 2.5rem 0;">
+              No administrative actions logged yet.
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="card card-padded" style="margin-top: 2rem;">
+  <div class="d-flex align-center justify-between" style="margin-bottom: 1.25rem;">
+    <div>
+      <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--brand-navy-900);">
+        <i class="bi bi-shield-x text-danger"></i> Statutory Account Deletion & DPDP Audit Trail
+      </h3>
+      <p style="font-size: 0.85rem; color: var(--text-muted);">
+        Immutable audit trail of customer & merchant account deletions, reason categories, store delisting counts, and statutory financial retention compliance
+      </p>
+    </div>
+    <span class="badge badge-neutral">{{ deletion_logs|length }} Deletion Records</span>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table" style="font-size: 0.85rem;">
+      <thead>
+        <tr>
+          <th>Deleted At</th>
+          <th>User Identifier</th>
+          <th>Role</th>
+          <th>Reason Category</th>
+          <th>Notes / Feedback</th>
+          <th>Stores Delisted</th>
+          <th>Financial Retained</th>
+          <th>IP Address</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for dl in deletion_logs %}
+          <tr>
+            <td class="text-muted" style="font-variant-numeric: tabular-nums;">{{ dl.deleted_at|date:"d M Y, h:i A" }}</td>
+            <td><strong style="font-family: var(--font-mono, monospace);">{{ dl.user_identifier }}</strong></td>
+            <td>
+              {% if dl.role == 'SELLER' %}
+                <span class="badge" style="background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; font-weight: 700;">
+                  <i class="bi bi-shop"></i> Merchant
+                </span>
+              {% else %}
+                <span class="badge" style="background: #fff7ed; color: #ea580c; border: 1px solid #fed7aa; font-weight: 700;">
+                  <i class="bi bi-person"></i> Shopper
+                </span>
+              {% endif %}
+            </td>
+            <td><strong>{{ dl.get_reason_category_display }}</strong></td>
+            <td style="max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+              {{ dl.reason_notes|default:"-" }}
+            </td>
+            <td>
+              {% if dl.stores_delisted_count > 0 %}
+                <span class="badge badge-warning">{{ dl.stores_delisted_count }} Delisted</span>
+              {% else %}
+                <span class="text-muted">0</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if dl.financial_records_retained %}
+                <span class="badge badge-success"><i class="bi bi-check-circle"></i> Retained (IT & GST)</span>
+              {% else %}
+                <span class="badge badge-neutral">Purged</span>
+              {% endif %}
+            </td>
+            <td class="text-muted" style="font-family: var(--font-mono, monospace); font-size: 0.75rem;">
+              {{ dl.ip_address|default:"127.0.0.1" }}
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="8" class="text-center text-muted" style="padding: 2.5rem 0;">
+              No account deletion logs recorded yet.
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}

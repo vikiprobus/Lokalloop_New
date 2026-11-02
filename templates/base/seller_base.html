@@ -1,0 +1,878 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="{% block meta_description %}LokalLoop Merchant Business Portal — Manage store profile, launch campaigns, track redemptions and counter QR codes.{% endblock %}">
+  <link rel="icon" type="image/svg+xml" href="{% static 'images/favicon.svg' %}">
+  <title>{% block title %}Merchant Portal — LokalLoop Business{% endblock %}</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="{% static 'css/design_tokens.css' %}?v=2.5">
+  <link rel="stylesheet" href="{% static 'css/main.css' %}?v=2.5">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  
+  <style>
+    .credit-badge-seller {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      color: #065f46;
+      font-weight: 700;
+      padding: 0.4rem 0.9rem;
+      border-radius: var(--radius-full);
+      font-size: 0.875rem;
+    }
+    .btn-merchant-excel {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #ffffff;
+      border: 1px solid #047857;
+      font-weight: 700;
+      padding: 0.45rem 0.95rem;
+      border-radius: var(--radius-md);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.82rem;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+    .btn-merchant-excel:hover {
+      background: linear-gradient(135deg, #059669, #047857);
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+    }
+    .user-dropdown-container {
+      position: relative;
+    }
+    .user-dropdown-container .dropdown-menu {
+      display: none;
+      position: absolute;
+      top: 100%;
+      right: 0;
+      z-index: 1050;
+    }
+    .user-dropdown-container .dropdown-menu.show {
+      display: block !important;
+    }
+    .dropdown-item:hover {
+      background-color: var(--bg-subtle, #f8fafc);
+    }
+
+    /* Mobile Responsive Enhancements for Merchant Portal */
+    .mobile-sidebar-toggle {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: #f8fafc;
+      border: 1px solid var(--border-light, #e2e8f0);
+      border-radius: var(--radius-md, 8px);
+      color: var(--brand-navy-900, #0f172a);
+      font-size: 1.25rem;
+      padding: 0.35rem 0.65rem;
+      cursor: pointer;
+      line-height: 1;
+    }
+    .seller-sidebar-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(3px);
+      z-index: 1040;
+    }
+    .seller-sidebar-backdrop.show {
+      display: block;
+    }
+    .seller-bottom-nav {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 64px;
+      background: #ffffff;
+      border-top: 1px solid var(--border-light, #e2e8f0);
+      box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.08);
+      z-index: 999;
+      justify-content: space-around;
+      align-items: center;
+      padding: 0 0.25rem;
+    }
+    .seller-bottom-nav a {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.2rem;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: #64748b;
+      text-decoration: none;
+      flex: 1;
+      padding: 0.35rem 0;
+      transition: color 0.15s ease;
+    }
+    .seller-bottom-nav a.active {
+      color: #ea580c;
+      font-weight: 800;
+    }
+    .seller-bottom-nav a i {
+      font-size: 1.25rem;
+    }
+    .seller-bottom-nav .seller-nav-qr-btn {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, #ea580c, #f97316);
+      color: #ffffff !important;
+      border-radius: 50%;
+      margin-top: -20px;
+      box-shadow: 0 4px 14px rgba(234, 88, 12, 0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 3px solid #ffffff;
+      flex: 0 0 48px;
+    }
+    .seller-bottom-nav .seller-nav-qr-btn i {
+      font-size: 1.35rem;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding-bottom: 72px;
+      }
+      .mobile-sidebar-toggle {
+        display: inline-flex;
+      }
+      .portal-sidebar {
+        display: flex !important;
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        width: 275px;
+        z-index: 1050;
+        transform: translateX(-100%);
+        transition: transform 0.28s ease-in-out;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      }
+      .portal-sidebar.show {
+        transform: translateX(0);
+      }
+      .seller-bottom-nav {
+        display: flex;
+      }
+      .portal-layout {
+        overflow-x: hidden;
+      }
+      .portal-main {
+        min-width: 100%;
+        overflow-x: hidden;
+      }
+      .portal-topbar {
+        padding: 0.75rem 1rem !important;
+        flex-wrap: wrap !important;
+        gap: 0.5rem !important;
+      }
+      .portal-main > div:nth-of-type(2) {
+        padding: 1rem 0.85rem 5rem !important;
+      }
+      .credit-badge-seller {
+        padding: 0.3rem 0.6rem;
+        font-size: 0.75rem;
+      }
+      .d-none-mobile {
+        display: none !important;
+      }
+      .portal-topbar h2 {
+        font-size: 1.05rem !important;
+      }
+    }
+  </style>
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+  <div class="portal-layout">
+    
+    <!-- Merchant Sidebar -->
+    <aside class="portal-sidebar">
+      
+      <!-- Brand & Portal Tag -->
+      <div style="padding: 1.5rem 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.08);">
+        <a href="/seller/dashboard/" class="d-flex align-center gap-2" style="text-decoration: none;">
+          <div style="width: 36px; height: 36px; border-radius: 8px; background: var(--brand-saffron-500); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1.2rem;">
+            <i class="bi bi-shop"></i>
+          </div>
+          <div>
+            <span style="font-size: 1.2rem; font-weight: 800; color: #ffffff;">Lokal<span style="color: var(--brand-saffron-500);">Loop</span></span>
+            <span style="display: block; font-size: 0.65rem; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Merchant Portal</span>
+          </div>
+        </a>
+      </div>
+
+      <!-- Navigation Links -->
+      <nav style="padding: 1rem 0; flex: 1;">
+        <div style="padding: 0.5rem 1.25rem; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: #64748b; letter-spacing: 0.05em;">Overview</div>
+        <a href="/seller/dashboard/" class="portal-nav-item {% if request.path == '/seller/dashboard/' %}active{% endif %}">
+          <i class="bi bi-grid"></i> Dashboard
+        </a>
+        <a href="/seller/shop/" class="portal-nav-item {% if '/seller/shop/' in request.path %}active{% endif %}">
+          <i class="bi bi-shop-window"></i> My Shop Profile
+        </a>
+
+        <div style="padding: 1rem 1.25rem 0.5rem; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: #64748b; letter-spacing: 0.05em;">Promotions &amp; QR</div>
+        <a href="/seller/offers/" class="portal-nav-item {% if '/seller/offers/' in request.path %}active{% endif %}" style="display: flex; align-items: center;">
+          <i class="bi bi-tags"></i> <span>Offer Management</span>
+          {% if not user.seller_profile.is_verified %}<i class="bi bi-lock-fill" style="margin-left: auto; color: #f59e0b; font-size: 0.8rem;" title="Locked pending compliance approval"></i>{% endif %}
+        </a>
+        <a href="/seller/qr/" class="portal-nav-item {% if '/seller/qr/' in request.path %}active{% endif %}" style="display: flex; align-items: center;">
+          <i class="bi bi-qr-code"></i> <span>Counter QR Desk</span>
+          {% if not user.seller_profile.is_verified %}<i class="bi bi-lock-fill" style="margin-left: auto; color: #f59e0b; font-size: 0.8rem;" title="Locked pending compliance approval"></i>{% endif %}
+        </a>
+        <a href="/seller/redemptions/" class="portal-nav-item {% if '/seller/redemptions/' in request.path %}active{% endif %}" style="display: flex; align-items: center;">
+          <i class="bi bi-check2-circle"></i> <span>Live Redemptions</span>
+          {% if not user.seller_profile.is_verified %}<i class="bi bi-lock-fill" style="margin-left: auto; color: #f59e0b; font-size: 0.8rem;" title="Locked pending compliance approval"></i>{% endif %}
+        </a>
+        <a href="/seller/bill-verifications/" class="portal-nav-item {% if '/seller/bill-verifications/' in request.path %}active{% endif %}" style="display: flex; align-items: center;">
+          <i class="bi bi-receipt"></i> <span>Bumper Bills (₹10k+)</span>
+          {% if not user.seller_profile.is_verified %}<i class="bi bi-lock-fill" style="margin-left: auto; color: #f59e0b; font-size: 0.8rem;" title="Locked pending compliance approval"></i>{% endif %}
+        </a>
+        <a href="/seller/vouchers/verify/" class="portal-nav-item {% if '/seller/vouchers/' in request.path %}active{% endif %}" style="display: flex; align-items: center;">
+          <i class="bi bi-gift"></i> <span>Catalog Vouchers</span>
+          {% if not user.seller_profile.is_verified %}<i class="bi bi-lock-fill" style="margin-left: auto; color: #f59e0b; font-size: 0.8rem;" title="Locked pending compliance approval"></i>{% endif %}
+        </a>
+
+        <div style="padding: 1rem 1.25rem 0.5rem; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: #64748b; letter-spacing: 0.05em;">Billing &amp; Insights</div>
+        <a href="/seller/credits/" class="portal-nav-item {% if '/seller/credits/' in request.path %}active{% endif %}" style="display: flex; align-items: center;">
+          <i class="bi bi-wallet2"></i> <span>Credit Wallet</span>
+          {% if not user.seller_profile.is_verified %}<i class="bi bi-lock-fill" style="margin-left: auto; color: #f59e0b; font-size: 0.8rem;" title="Locked pending compliance approval"></i>{% endif %}
+        </a>
+        <a href="/seller/analytics/" class="portal-nav-item {% if '/seller/analytics/' in request.path %}active{% endif %}">
+          <i class="bi bi-graph-up-arrow"></i> Footfall Analytics
+        </a>
+        <a href="/seller/notifications/" class="portal-nav-item {% if '/seller/notifications/' in request.path %}active{% endif %}">
+          <i class="bi bi-bell"></i> Alerts & Activity
+        </a>
+      </nav>
+
+      <!-- Merchant Info Footer -->
+      <div style="padding: 1rem; border-top: 1px solid rgba(255,255,255,0.08); background-color: rgba(0,0,0,0.15);">
+        <div class="d-flex align-center justify-between">
+          <div style="font-size: 0.825rem; line-height: 1.3;">
+            <div style="font-weight: 600; color: #fff;">{{ user.seller_profile.business_name|default:user.username }}</div>
+            <div style="color: #94a3b8; font-size: 0.75rem;">{{ user.profile.city|default:"Bengaluru" }} Merchant</div>
+          </div>
+          <a href="/seller/logout/" title="Sign out" style="color: #94a3b8; font-size: 1.1rem;">
+            <i class="bi bi-box-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="portal-main">
+      
+      <!-- Merchant Top Bar -->
+      <header class="portal-topbar">
+        <div class="d-flex align-center gap-2">
+          <!-- Mobile Sidebar Drawer Toggle -->
+          <button type="button" class="mobile-sidebar-toggle" id="sellerMobileMenuBtn" aria-label="Toggle Navigation">
+            <i class="bi bi-list"></i>
+          </button>
+          
+          <div class="d-flex align-center gap-2 flex-wrap">
+            <h2 style="font-size: 1.25rem; font-weight: 700; color: var(--brand-navy-900); margin-bottom: 0;">
+              {% block page_title %}Dashboard{% endblock %}
+            </h2>
+          {% if user.seller_profile.is_verified %}
+            <span class="badge badge-success"><i class="bi bi-patch-check-fill"></i> Verified Merchant</span>
+          {% else %}
+            <span class="badge" style="background: #fef3c7; color: #b45309; border: 1px solid #fde68a;"><i class="bi bi-clock-history"></i> Approval Pending</span>
+          {% endif %}
+          {% if user.seller_profile.merchant_id %}
+            <span class="badge d-inline-flex align-center gap-1" style="background: #0f172a; color: #38bdf8; font-family: monospace; font-size: 0.85rem; cursor: pointer;" onclick="if(typeof copyToClipboard==='function'){copyToClipboard('{{ user.seller_profile.merchant_id }}',this);}else{navigator.clipboard&&navigator.clipboard.writeText('{{ user.seller_profile.merchant_id }}');} alert('Merchant ID copied: {{ user.seller_profile.merchant_id }}');" title="Click to copy Merchant ID">
+              <i class="bi bi-hash"></i> {{ user.seller_profile.merchant_id }} <i class="bi bi-clipboard" style="font-size: 0.75rem; margin-left: 2px;"></i>
+            </span>
+          {% endif %}
+        </div>
+
+        <!-- Top Right Actions: Credits Ticker & Buy Credits CTA -->
+        <div class="d-flex align-center gap-3">
+          <div class="credit-badge-seller" title="Available promotional credits">
+            <i class="bi bi-lightning-charge-fill" style="color: {% if user.seller_profile.is_verified %}#10b981{% else %}#f59e0b{% endif %};"></i>
+            <span>
+              {% if user.seller_profile.is_verified %}
+                {{ user.wallet.balance_credits|default:100 }} Credits Available
+              {% else %}
+                {{ user.wallet.balance_credits|default:0 }} Credits (Standby ⏳)
+              {% endif %}
+            </span>
+          </div>
+
+          <a href="/seller/credits/" class="btn btn-primary btn-sm d-none-mobile">
+            <i class="bi bi-plus-circle"></i> Recharge Credits
+          </a>
+
+          <a href="/seller/notifications/" style="position: relative; font-size: 1.25rem; color: var(--text-muted); margin-left: 0.5rem;">
+            <i class="bi bi-bell"></i>
+            {% if unread_notifications_count > 0 %}
+              <span style="position: absolute; top: 0; right: 0; width: 8px; height: 8px; background: var(--color-danger); border-radius: 50%;"></span>
+            {% endif %}
+          </a>
+
+          <!-- Merchant User Dropdown -->
+          <div class="user-dropdown-container" style="position: relative; margin-left: 0.5rem; padding-left: 0.75rem; border-left: 1px solid var(--border-light, #e2e8f0);">
+            <button type="button" class="dropdown-toggle" id="sellerProfileDropdownBtn" style="background: var(--bg-subtle, #f8fafc); border: 1px solid var(--border-light, #e2e8f0); padding: 0.35rem 0.65rem 0.35rem 0.4rem; border-radius: var(--radius-full, 9999px); display: inline-flex; align-items: center; gap: 0.5rem; cursor: pointer; transition: all 0.2s ease;">
+              <div style="width: 28px; height: 28px; border-radius: 50%; background: #0f172a; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 0.85rem;">
+                <i class="bi bi-shop"></i>
+              </div>
+              <span style="font-weight: 700; font-size: 0.825rem; color: var(--brand-navy-900, #0f172a); max-width: 130px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                {{ user.seller_profile.business_name|default:"Merchant Outlet" }}
+              </span>
+              <i class="bi bi-chevron-down" style="font-size: 0.75rem; color: var(--text-muted, #64748b);"></i>
+            </button>
+
+            <div class="dropdown-menu" style="right: 0; left: auto; min-width: 240px; margin-top: 0.5rem; border-radius: 12px; box-shadow: var(--shadow-lg, 0 10px 25px rgba(0,0,0,0.12)); border: 1px solid var(--border-light, #e2e8f0); padding: 0.5rem; background: #ffffff;">
+              <div style="padding: 0.75rem 0.85rem; border-bottom: 1px solid var(--border-light, #e2e8f0); margin-bottom: 0.35rem;">
+                <div style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: #94a3b8; letter-spacing: 0.05em;">Merchant Portal</div>
+                <div style="font-weight: 800; color: var(--ink-950, #0f172a); font-size: 0.95rem;">
+                  {{ user.seller_profile.business_name|default:"Merchant Outlet" }}
+                </div>
+                <div style="font-size: 0.78rem; color: var(--text-muted, #64748b); margin-top: 0.15rem;">
+                  {{ user.email }}
+                </div>
+              </div>
+
+              <a href="/seller/change-password/" class="dropdown-item" style="display: flex; align-items: center; gap: 0.55rem; padding: 0.65rem 0.85rem; border-radius: 8px; font-weight: 600; font-size: 0.85rem; color: #1e293b; text-decoration: none; transition: background 0.15s ease;">
+                <i class="bi bi-shield-lock-fill" style="color: var(--brand-indigo-600, #4f46e5); font-size: 1rem;"></i>
+                <span>🛡️ Security &amp; Password</span>
+              </a>
+
+              <a href="/contact-us/" class="dropdown-item" style="display: flex; align-items: center; gap: 0.55rem; padding: 0.65rem 0.85rem; border-radius: 8px; font-weight: 600; font-size: 0.85rem; color: #1e293b; text-decoration: none; transition: background 0.15s ease;">
+                <i class="bi bi-headset" style="color: var(--brand-indigo-600, #4f46e5); font-size: 1rem;"></i>
+                <span>🎧 Help &amp; Grievance Desk</span>
+              </a>
+
+              <div style="border-top: 1px solid var(--border-light, #e2e8f0); margin: 0.35rem 0;"></div>
+
+              <a href="/seller/logout/" class="dropdown-item" style="display: flex; align-items: center; gap: 0.55rem; padding: 0.65rem 0.85rem; border-radius: 8px; font-weight: 600; font-size: 0.85rem; color: #dc2626; text-decoration: none; transition: background 0.15s ease;">
+                <i class="bi bi-box-arrow-right" style="font-size: 1rem;"></i>
+                <span>🚪 Sign Out</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Flash Messages -->
+      {% if messages %}
+        <div style="padding: 1.5rem 2rem 0;">
+          {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+              <span>{{ message }}</span>
+              <button type="button" style="background: none; border: none; cursor: pointer; font-size: 1.1rem;" onclick="this.parentElement.remove();">&times;</button>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <!-- Content Body -->
+      <div style="padding: 1.5rem 2rem; flex: 1;">
+        {% block content %}{% endblock %}
+      </div>
+
+      <!-- Merchant Minimal Footer -->
+      <footer style="padding: 1rem 2rem; border-top: 1px solid var(--border-light); font-size: 0.8rem; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; background: #fff;">
+        <span>LokalLoop Merchant Suite &bull; Retail Network Hub</span>
+        <span>Dedicated Merchant Support: <a href="/contact-us/" style="color: var(--brand-indigo-600, #4f46e5); font-weight: 600; text-decoration: none;">Help &amp; Grievance Desk</a></span>
+      </footer>
+
+    </div>
+
+  </div>
+
+  <!-- CSRF Helper -->
+  <div style="display:none;" id="csrfHelper">{% csrf_token %}</div>
+
+  <!-- Real-Time Counter Redemption Request Modal -->
+  <div id="counterRequestModal" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(4px); z-index: 9999; align-items: center; justify-content: center; padding: 1rem;">
+    <div style="background: #ffffff; border-radius: 20px; max-width: 480px; width: 100%; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35); border: 2px solid #3b82f6; overflow: hidden; animation: popIn 0.25s ease-out; position: relative;">
+      
+      <!-- Modal Header -->
+      <div style="background: linear-gradient(135deg, #1e3a8a, #2563eb); padding: 1.25rem 1.5rem; color: #ffffff; display: flex; justify-content: space-between; align-items: center;">
+        <div style="display: flex; align-items: center; gap: 0.65rem;">
+          <span style="display: inline-flex; width: 12px; height: 12px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 10px #22c55e; animation: pulseGlow 1.5s infinite;"></span>
+          <h3 style="font-size: 1.15rem; font-weight: 800; margin: 0; color: #ffffff; letter-spacing: -0.01em;">
+            🚨 Counter Checkout Request
+          </h3>
+        </div>
+        <button type="button" onclick="closeCounterModal()" style="background: rgba(255,255,255,0.18); border: none; color: #ffffff; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.1rem; line-height: 1; transition: background 0.15s ease;">
+          &times;
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div style="padding: 1.5rem;" id="counterModalBody">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.85rem;">
+          <span style="font-size: 0.75rem; font-weight: 800; text-transform: uppercase; color: #2563eb; background: #eff6ff; padding: 0.25rem 0.6rem; border-radius: 6px; letter-spacing: 0.05em;" id="counterQueueCount">1 Pending Request</span>
+          <span style="font-size: 0.75rem; color: #64748b; font-weight: 600;" id="counterTimeDisplay">Just now</span>
+        </div>
+
+        <!-- Alert Notification Box -->
+        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 1.1rem; margin-bottom: 1.25rem;">
+          <div style="font-size: 0.95rem; color: #334155; line-height: 1.5;">
+            Customer <strong id="counterCustomerName" style="color: #0f172a; font-size: 1.05rem;">—</strong> wants to redeem:
+            <div style="font-weight: 800; color: #1e40af; font-size: 1.15rem; margin-top: 0.35rem;" id="counterOfferTitle">—</div>
+          </div>
+          <div style="margin-top: 0.65rem; font-size: 0.85rem; color: #475569; display: flex; gap: 1.25rem; border-top: 1px dashed #cbd5e1; padding-top: 0.5rem;">
+            <span>Min Bill: <strong id="counterMinBill" style="color: #0f172a;">₹0</strong></span>
+            <span>Benefit: <strong id="counterDiscount" style="color: #16a34a;">—</strong></span>
+          </div>
+        </div>
+
+        <!-- Counter OTP Verification Box -->
+        <div style="text-align: center; background: linear-gradient(135deg, #fef3c7, #fef9c3); border: 2px dashed #f59e0b; border-radius: 14px; padding: 1.1rem; margin-bottom: 1.25rem;">
+          <div style="font-size: 0.75rem; font-weight: 800; text-transform: uppercase; color: #b45309; letter-spacing: 0.05em; margin-bottom: 0.25rem;">
+            Customer 4-Digit Counter Token
+          </div>
+          <div id="counterOtpDisplay" style="font-family: monospace, ui-monospace; font-size: 2.5rem; font-weight: 900; letter-spacing: 0.25em; color: #92400e;">
+            0000
+          </div>
+          <div style="font-size: 0.78rem; color: #78350f; margin-top: 0.25rem; font-weight: 500;">
+            Match with the 4-digit token displayed on customer's smartphone
+          </div>
+        </div>
+
+        <div id="counterActionFeedback" style="display: none; padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.85rem; font-weight: 700; text-align: center;"></div>
+
+        <!-- Action Buttons -->
+        <div style="display: flex; gap: 0.75rem;" id="counterActionButtons">
+          <button type="button" id="counterRejectBtn" onclick="handleCounterReject()" style="flex: 1; padding: 0.75rem 1rem; border: 1px solid #cbd5e1; background: #ffffff; color: #dc2626; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 0.9rem; transition: all 0.15s ease;">
+            <i class="bi bi-x-circle"></i> Reject
+          </button>
+          <button type="button" id="counterApproveBtn" onclick="handleCounterApprove()" style="flex: 2; padding: 0.75rem 1.25rem; border: none; background: linear-gradient(135deg, #16a34a, #15803d); color: #ffffff; border-radius: 10px; font-weight: 800; cursor: pointer; font-size: 0.95rem; box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3); transition: all 0.15s ease;">
+            <i class="bi bi-check-circle-fill"></i> Approve &amp; Redeem
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating Counter Pill when minimized -->
+  <div id="floatingCounterPill" onclick="openCounterModal()" style="display: none; position: fixed; bottom: 25px; right: 25px; background: linear-gradient(135deg, #1e40af, #2563eb); color: #ffffff; padding: 0.75rem 1.25rem; border-radius: 9999px; box-shadow: 0 10px 25px rgba(37,99,235,0.4); cursor: pointer; z-index: 9998; font-weight: 800; font-size: 0.85rem; align-items: center; gap: 0.6rem; border: 2px solid #ffffff;">
+    <span style="display: inline-flex; width: 10px; height: 10px; border-radius: 50%; background: #22c55e; animation: pulseGlow 1.2s infinite;"></span>
+    <span>🚨 Counter Request (<span id="floatingCounterCount">1</span>)</span>
+  </div>
+
+  <style>
+    @keyframes pulseGlow {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.3); opacity: 0.7; }
+    }
+    @keyframes popIn {
+      0% { transform: scale(0.92); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    /* Mobile Responsive Enhancements for Merchant Portal */
+    .mobile-sidebar-toggle {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: #f8fafc;
+      border: 1px solid var(--border-light, #e2e8f0);
+      border-radius: var(--radius-md, 8px);
+      color: var(--brand-navy-900, #0f172a);
+      font-size: 1.25rem;
+      padding: 0.35rem 0.65rem;
+      cursor: pointer;
+      line-height: 1;
+    }
+    .seller-sidebar-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(3px);
+      z-index: 1040;
+    }
+    .seller-sidebar-backdrop.show {
+      display: block;
+    }
+    .seller-bottom-nav {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 64px;
+      background: #ffffff;
+      border-top: 1px solid var(--border-light, #e2e8f0);
+      box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.08);
+      z-index: 999;
+      justify-content: space-around;
+      align-items: center;
+      padding: 0 0.25rem;
+    }
+    .seller-bottom-nav a {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.2rem;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: #64748b;
+      text-decoration: none;
+      flex: 1;
+      padding: 0.35rem 0;
+      transition: color 0.15s ease;
+    }
+    .seller-bottom-nav a.active {
+      color: #ea580c;
+      font-weight: 800;
+    }
+    .seller-bottom-nav a i {
+      font-size: 1.25rem;
+    }
+    .seller-bottom-nav .seller-nav-qr-btn {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, #ea580c, #f97316);
+      color: #ffffff !important;
+      border-radius: 50%;
+      margin-top: -20px;
+      box-shadow: 0 4px 14px rgba(234, 88, 12, 0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 3px solid #ffffff;
+      flex: 0 0 48px;
+    }
+    .seller-bottom-nav .seller-nav-qr-btn i {
+      font-size: 1.35rem;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding-bottom: 72px;
+      }
+      .mobile-sidebar-toggle {
+        display: inline-flex;
+      }
+      .portal-sidebar {
+        display: flex !important;
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        width: 275px;
+        z-index: 1050;
+        transform: translateX(-100%);
+        transition: transform 0.28s ease-in-out;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      }
+      .portal-sidebar.show {
+        transform: translateX(0);
+      }
+      .seller-bottom-nav {
+        display: flex;
+      }
+      .portal-layout {
+        overflow-x: hidden;
+      }
+      .portal-main {
+        min-width: 100%;
+        overflow-x: hidden;
+      }
+      .portal-topbar {
+        padding: 0.75rem 1rem !important;
+        flex-wrap: wrap !important;
+        gap: 0.5rem !important;
+      }
+      .portal-main > div:nth-of-type(2) {
+        padding: 1rem 0.85rem 5rem !important;
+      }
+      .credit-badge-seller {
+        padding: 0.3rem 0.6rem;
+        font-size: 0.75rem;
+      }
+      .d-none-mobile {
+        display: none !important;
+      }
+      .portal-topbar h2 {
+        font-size: 1.05rem !important;
+      }
+    }
+  </style>
+
+  <script>
+    (function() {
+      let pendingRequests = [];
+      let currentRequest = null;
+      let modalDismissedForIds = new Set();
+      let pollTimer = null;
+
+      function getCsrfToken() {
+        const input = document.querySelector('#csrfHelper input[name=csrfmiddlewaretoken]');
+        if (input && input.value) return input.value;
+        const cookie = document.cookie.split('; ').find(row => row.startsWith('csrftoken='));
+        return cookie ? cookie.split('=')[1] : '';
+      }
+
+      function updateModalUI() {
+        const modal = document.getElementById('counterRequestModal');
+        const pill = document.getElementById('floatingCounterPill');
+        const countSpan = document.getElementById('floatingCounterCount');
+        const queueSpan = document.getElementById('counterQueueCount');
+
+        if (!pendingRequests || pendingRequests.length === 0) {
+          modal.style.display = 'none';
+          pill.style.display = 'none';
+          currentRequest = null;
+          return;
+        }
+
+        // Pick top request
+        currentRequest = pendingRequests[0];
+        countSpan.textContent = pendingRequests.length;
+        queueSpan.textContent = pendingRequests.length > 1 
+          ? `Pending Request 1 of ${pendingRequests.length}` 
+          : 'Pending Counter Request';
+
+        document.getElementById('counterCustomerName').textContent = currentRequest.customer_name || 'Customer';
+        document.getElementById('counterOfferTitle').textContent = currentRequest.offer_title || 'Store Deal';
+        document.getElementById('counterMinBill').textContent = '₹' + (currentRequest.min_purchase || 0);
+        document.getElementById('counterDiscount').textContent = currentRequest.discount_display || 'Discount';
+        document.getElementById('counterOtpDisplay').textContent = currentRequest.verification_otp || '----';
+        document.getElementById('counterTimeDisplay').textContent = currentRequest.created_at || 'Just now';
+
+        // Reset feedback
+        const fb = document.getElementById('counterActionFeedback');
+        fb.style.display = 'none';
+        fb.textContent = '';
+        document.getElementById('counterActionButtons').style.display = 'flex';
+
+        // Check if user dismissed this specific request
+        if (!modalDismissedForIds.has(currentRequest.id)) {
+          modal.style.display = 'flex';
+          pill.style.display = 'none';
+        } else {
+          modal.style.display = 'none';
+          pill.style.display = 'inline-flex';
+        }
+      }
+
+      window.openCounterModal = function() {
+        if (currentRequest) {
+          modalDismissedForIds.delete(currentRequest.id);
+          document.getElementById('counterRequestModal').style.display = 'flex';
+          document.getElementById('floatingCounterPill').style.display = 'none';
+        }
+      };
+
+      window.closeCounterModal = function() {
+        if (currentRequest) {
+          modalDismissedForIds.add(currentRequest.id);
+        }
+        document.getElementById('counterRequestModal').style.display = 'none';
+        if (pendingRequests.length > 0) {
+          document.getElementById('floatingCounterPill').style.display = 'inline-flex';
+        }
+      };
+
+      window.handleCounterApprove = function() {
+        if (!currentRequest) return;
+        const reqId = currentRequest.id;
+        const fb = document.getElementById('counterActionFeedback');
+        const btns = document.getElementById('counterActionButtons');
+
+        fb.style.display = 'block';
+        fb.style.background = '#fef3c7';
+        fb.style.color = '#92400e';
+        fb.style.border = '1px solid #fde68a';
+        fb.textContent = 'Processing counter approval...';
+        btns.style.pointerEvents = 'none';
+        btns.style.opacity = '0.6';
+
+        fetch(`/api/seller/redemptions/${reqId}/approve/`, {
+          method: 'POST',
+          headers: {
+            'X-CSRFToken': getCsrfToken(),
+            'Content-Type': 'application/json'
+          }
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            fb.style.background = '#dcfce7';
+            fb.style.color = '#166534';
+            fb.style.border = '1px solid #86efac';
+            fb.innerHTML = '<i class="bi bi-check-circle-fill"></i> Approved! 1 Credit Deducted &amp; 1 Merchant Point Earned.';
+            setTimeout(() => {
+              pendingRequests = pendingRequests.filter(r => r.id !== reqId);
+              btns.style.pointerEvents = 'auto';
+              btns.style.opacity = '1';
+              updateModalUI();
+            }, 1200);
+          } else {
+            fb.style.background = '#fee2e2';
+            fb.style.color = '#991b1b';
+            fb.style.border = '1px solid #fca5a5';
+            fb.textContent = data.message || 'Approval failed. Please try again.';
+            btns.style.pointerEvents = 'auto';
+            btns.style.opacity = '1';
+          }
+        })
+        .catch(err => {
+          fb.style.background = '#fee2e2';
+          fb.style.color = '#991b1b';
+          fb.textContent = 'Network error while processing request.';
+          btns.style.pointerEvents = 'auto';
+          btns.style.opacity = '1';
+        });
+      };
+
+      window.handleCounterReject = function() {
+        if (!currentRequest) return;
+        if (!confirm('Are you sure you want to decline this redemption request?')) return;
+        
+        const reqId = currentRequest.id;
+        const fb = document.getElementById('counterActionFeedback');
+        const btns = document.getElementById('counterActionButtons');
+
+        fb.style.display = 'block';
+        fb.style.background = '#fef3c7';
+        fb.style.color = '#92400e';
+        fb.style.border = '1px solid #fde68a';
+        fb.textContent = 'Declining request...';
+        btns.style.pointerEvents = 'none';
+        btns.style.opacity = '0.6';
+
+        fetch(`/api/seller/redemptions/${reqId}/reject/`, {
+          method: 'POST',
+          headers: {
+            'X-CSRFToken': getCsrfToken(),
+            'Content-Type': 'application/json'
+          }
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            fb.style.background = '#f1f5f9';
+            fb.style.color = '#475569';
+            fb.style.border = '1px solid #cbd5e1';
+            fb.textContent = 'Request declined.';
+            setTimeout(() => {
+              pendingRequests = pendingRequests.filter(r => r.id !== reqId);
+              btns.style.pointerEvents = 'auto';
+              btns.style.opacity = '1';
+              updateModalUI();
+            }, 800);
+          } else {
+            fb.style.background = '#fee2e2';
+            fb.style.color = '#991b1b';
+            fb.textContent = data.message || 'Action failed.';
+            btns.style.pointerEvents = 'auto';
+            btns.style.opacity = '1';
+          }
+        })
+        .catch(err => {
+          fb.style.background = '#fee2e2';
+          fb.style.color = '#991b1b';
+          fb.textContent = 'Network error.';
+          btns.style.pointerEvents = 'auto';
+          btns.style.opacity = '1';
+        });
+      };
+
+      function fetchPendingRedemptions() {
+        fetch('/api/seller/pending-redemptions/')
+          .then(res => {
+            if (!res.ok) return null;
+            return res.json();
+          })
+          .then(data => {
+            if (data && Array.isArray(data.requests)) {
+              pendingRequests = data.requests;
+              updateModalUI();
+            }
+          })
+          .catch(() => {});
+      }
+
+      document.addEventListener('DOMContentLoaded', () => {
+        fetchPendingRedemptions();
+        pollTimer = setInterval(fetchPendingRedemptions, 8000);
+      });
+    })();
+  </script>
+
+  <script src="{% static 'js/main.js' %}?v=2.1"></script>
+  {% block extra_js %}{% endblock %}
+
+  <!-- Backdrop for offcanvas sidebar on mobile -->
+  <div class="seller-sidebar-backdrop" id="sellerSidebarBackdrop"></div>
+
+  <!-- Mobile Bottom Navigation Bar for Merchants -->
+  <div class="mobile-bottom-nav seller-bottom-nav">
+    <a href="/seller/dashboard/" class="{% if request.path == '/seller/dashboard/' %}active{% endif %}">
+      <i class="bi bi-grid-fill"></i>
+      <span>Home</span>
+    </a>
+    <a href="/seller/offers/" class="{% if '/seller/offers/' in request.path %}active{% endif %}">
+      <i class="bi bi-tags-fill"></i>
+      <span>Offers</span>
+    </a>
+    <a href="/seller/qr/" class="seller-nav-qr-btn {% if '/seller/qr/' in request.path %}active{% endif %}" title="Counter QR Desk">
+      <i class="bi bi-qr-code-scan"></i>
+    </a>
+    <a href="/seller/redemptions/" class="{% if '/seller/redemptions/' in request.path %}active{% endif %}">
+      <i class="bi bi-check2-circle"></i>
+      <span>Redeem</span>
+    </a>
+    <a href="/seller/shop/" class="{% if '/seller/shop/' in request.path %}active{% endif %}">
+      <i class="bi bi-shop-window"></i>
+      <span>Shop</span>
+    </a>
+  </div>
+
+  <script>
+    // Mobile Sidebar Drawer Toggle for Merchant Portal
+    const sellerMobileBtn = document.getElementById('sellerMobileMenuBtn');
+    const sellerSidebar = document.querySelector('.portal-sidebar');
+    const sellerBackdrop = document.getElementById('sellerSidebarBackdrop');
+
+    function toggleSellerSidebar() {
+      if (sellerSidebar) sellerSidebar.classList.toggle('show');
+      if (sellerBackdrop) sellerBackdrop.classList.toggle('show');
+    }
+
+    function closeSellerSidebar() {
+      if (sellerSidebar) sellerSidebar.classList.remove('show');
+      if (sellerBackdrop) sellerBackdrop.classList.remove('show');
+    }
+
+    if (sellerMobileBtn) {
+      sellerMobileBtn.addEventListener('click', toggleSellerSidebar);
+    }
+    if (sellerBackdrop) {
+      sellerBackdrop.addEventListener('click', closeSellerSidebar);
+    }
+    document.querySelectorAll('.portal-sidebar .portal-nav-item').forEach(link => {
+      link.addEventListener('click', closeSellerSidebar);
+    });
+  </script>
+</body>
+</html>

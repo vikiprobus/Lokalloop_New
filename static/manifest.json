@@ -1,0 +1,86 @@
+{
+  "name": "LokalLoop \u2014 Hyperlocal Deals & Rewards",
+  "short_name": "LokalLoop",
+  "description": "Discover verified neighborhood store discounts and redeem counter QR deals instantly.",
+  "start_url": "/",
+  "id": "/",
+  "display": "standalone",
+  "background_color": "#0F172A",
+  "theme_color": "#F97316",
+  "orientation": "portrait-primary",
+  "categories": [
+    "shopping",
+    "lifestyle",
+    "finance"
+  ],
+  "icons": [
+    {
+      "src": "/static/images/icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/static/images/icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/static/images/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/static/images/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/static/images/favicon.svg",
+      "sizes": "32x32",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Scan Counter QR",
+      "short_name": "Scan QR",
+      "description": "Instantly scan billing counter QR to redeem discount",
+      "url": "/buyer/scan/",
+      "icons": [
+        {
+          "src": "/static/images/icon-192.svg",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Explore Deals",
+      "short_name": "Explore",
+      "description": "Browse nearest neighborhood store deals",
+      "url": "/explore/",
+      "icons": [
+        {
+          "src": "/static/images/icon-192.svg",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Rewards Wallet",
+      "short_name": "Rewards",
+      "description": "Check loyalty points and savings ledger",
+      "url": "/buyer/rewards/",
+      "icons": [
+        {
+          "src": "/static/images/icon-192.svg",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
+}

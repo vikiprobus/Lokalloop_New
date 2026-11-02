@@ -1,0 +1,142 @@
+{% extends "base/buyer_base.html" %}
+
+{% block title %}Meet Gennie — {{ BRAND_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container container-narrow" style="padding-top: 3.5rem; padding-bottom: 5rem;">
+  
+  <div class="card" style="max-width: 520px; margin: 0 auto; box-shadow: 0 20px 40px -15px rgba(124, 58, 237, 0.25); border: 1px solid rgba(124, 58, 237, 0.2); border-radius: var(--radius-xl); background: #ffffff; overflow: hidden; text-align: center;">
+    
+    <!-- Top Decorative Banner -->
+    <div style="background: linear-gradient(135deg, #4f46e5, #7c3aed, #ec4899); padding: 2.5rem 1.5rem 2rem; color: #ffffff; position: relative;">
+      <div style="width: 72px; height: 72px; margin: 0 auto 1rem; border-radius: 50%; background: rgba(255,255,255,0.2); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; font-size: 2.2rem; box-shadow: 0 8px 20px rgba(0,0,0,0.15); border: 2px solid rgba(255,255,255,0.4);">
+        ✨
+      </div>
+      <span class="badge" style="background: rgba(255,255,255,0.25); color: #ffffff; font-weight: 700; font-size: 0.75rem; letter-spacing: 0.05em; padding: 0.25rem 0.75rem; border-radius: var(--radius-full);">
+        GENNIE AI ASSISTANT
+      </span>
+      <h1 style="font-size: 1.85rem; font-weight: 800; color: #ffffff; margin: 0.75rem 0 0.25rem; font-family: var(--font-display); letter-spacing: -0.02em;">
+        Welcome User <span style="font-family: monospace; color: #fde047;">{{ public_unique_id }}</span>!
+      </h1>
+      <p style="font-size: 0.95rem; color: rgba(255,255,255,0.9); margin: 0;">
+        Your high-privacy anonymous shopping pass is active.
+      </p>
+    </div>
+
+    <!-- Interactive Prompt Body -->
+    <div class="card-body" style="padding: 2.25rem 2rem;">
+      
+      <!-- Official Minted Public Unique ID Card -->
+      <div style="background: #faf5ff; border: 2px dashed #c084fc; border-radius: var(--radius-lg); padding: 1.35rem 1rem; margin-bottom: 2rem; box-shadow: 0 4px 15px rgba(168, 85, 247, 0.08); text-align: center;">
+        <div style="font-size: 0.75rem; font-weight: 800; color: #7e22ce; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.5rem;">
+          🔐 YOUR OFFICIAL 3-BLOCK UNIQUE PASS ID
+        </div>
+        <div style="font-size: 1.85rem; font-weight: 800; font-family: monospace; letter-spacing: 0.14em; color: #581c87; margin-bottom: 0.65rem;" id="publicIdText">
+          {{ public_unique_id }}
+        </div>
+        <div>
+          <button type="button" class="btn btn-sm btn-outline" id="copyIdBtn" onclick="copyUniqueId()" style="font-size: 0.8rem; font-weight: 700; padding: 0.3rem 0.85rem; border-color: #a855f7; color: #7e22ce;">
+            <i class="bi bi-clipboard" id="copyIcon"></i> <span id="copyBtnText">Copy Unique ID</span>
+          </button>
+        </div>
+        <div style="font-size: 0.72rem; color: #7e22ce; margin-top: 0.65rem; line-height: 1.4;">
+          Please save this 12-character ID. You can sign in securely from any mobile handset or computer.
+        </div>
+      </div>
+
+      <div style="background: #fdf4ff; border: 1px solid #f5d0fe; border-radius: var(--radius-lg); padding: 1.25rem; margin-bottom: 2rem;">
+        <div style="font-size: 1.15rem; font-weight: 700; color: #701a75; font-family: var(--font-display); margin-bottom: 0.35rem;">
+          Gennie wants to know your nickname to call you :)
+        </div>
+        <div style="font-size: 0.85rem; color: #86198f;">
+          This will be your personalized greeting across your dashboard and store visits.
+        </div>
+      </div>
+
+      <form method="POST" action="/buyer/set-nickname/" id="nicknameForm">
+        {% csrf_token %}
+        
+        <div class="form-group" style="margin-bottom: 1.5rem; text-align: left;">
+          <label class="form-label" style="font-weight: 700; font-size: 0.85rem; color: var(--brand-navy-900);">
+            Your Nickname (e.g. Viki, Sunny, Rahul)
+          </label>
+          <div style="position: relative;">
+            <input type="text" name="nickname" id="nicknameInput" class="form-control form-control-lg" placeholder="e.g. Viki" value="{{ nickname|default:first_name }}" maxlength="40" autofocus style="font-size: 1.1rem; font-weight: 600; padding: 0.75rem 1rem; border: 2px solid #e2e8f0; border-radius: var(--radius-md);">
+          </div>
+          <div class="form-text" style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.35rem;">
+            You can change this anytime from your dashboard.
+          </div>
+        </div>
+
+        <button type="submit" id="saveNicknameBtn" class="btn btn-primary btn-block btn-lg" style="background: linear-gradient(135deg, #7c3aed, #4f46e5); border: none; font-weight: 700; font-size: 1.05rem; padding: 0.85rem; border-radius: var(--radius-md); box-shadow: 0 4px 15px rgba(124, 58, 237, 0.35);">
+          <i class="bi bi-sparkles"></i> Save &amp; Continue
+        </button>
+
+        <div style="margin-top: 1.25rem;">
+          <a href="/buyer/dashboard/" style="font-size: 0.85rem; color: var(--text-muted); text-decoration: underline; font-weight: 500;">
+            Skip for now &rarr;
+          </a>
+        </div>
+      </form>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+  function copyUniqueId() {
+    const idText = document.getElementById('publicIdText').textContent.trim();
+    if (!idText) return;
+
+    function markCopied() {
+      const copyBtn = document.getElementById('copyIdBtn');
+      const copyBtnText = document.getElementById('copyBtnText');
+      const copyIcon = document.getElementById('copyIcon');
+      if (copyBtnText) copyBtnText.textContent = "Copied!";
+      if (copyIcon) copyIcon.className = "bi bi-check2-circle";
+      if (copyBtn) {
+        copyBtn.style.color = "#16a34a";
+        copyBtn.style.borderColor = "#16a34a";
+      }
+      setTimeout(() => {
+        if (copyBtnText) copyBtnText.textContent = "Copy Unique ID";
+        if (copyIcon) copyIcon.className = "bi bi-clipboard";
+        if (copyBtn) {
+          copyBtn.style.color = "#7e22ce";
+          copyBtn.style.borderColor = "#a855f7";
+        }
+      }, 2500);
+    }
+
+    if (typeof copyToClipboard === 'function') {
+      copyToClipboard(idText);
+      markCopied();
+    } else if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(idText).then(markCopied).catch(() => {
+        fallbackCopy(idText);
+        markCopied();
+      });
+    } else {
+      fallbackCopy(idText);
+      markCopied();
+    }
+  }
+
+  function fallbackCopy(str) {
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = str;
+      ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed';
+      ta.style.left = '-9999px';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+    } catch(e) {
+      console.warn("Fallback copy failed:", e);
+    }
+  }
+</script>
+{% endblock %}

@@ -1,0 +1,291 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="{% block meta_description %}LokalLoop connects Indian buyers with verified local neighborhood stores, cafes, and boutiques for instant counter QR discounts and loyalty rewards.{% endblock %}">
+  
+  <!-- Open Graph / Facebook / WhatsApp -->
+  <meta property="og:type" content="{% block og_type %}website{% endblock %}">
+  <meta property="og:title" content="{% block og_title %}LokalLoop — Discover Local. Save More. Shop Nearby.{% endblock %}">
+  <meta property="og:description" content="{% block og_description %}Discover verified neighborhood deals and save instantly at checkout across Bengaluru, Mumbai, and Pune.{% endblock %}">
+  <meta property="og:image" content="{% block og_image %}https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=1200&auto=format&fit=crop&q=80{% endblock %}">
+  <meta property="og:site_name" content="LokalLoop">
+
+  <!-- Twitter / X Cards -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{% block twitter_title %}LokalLoop — Discover Local. Save More. Shop Nearby.{% endblock %}">
+  <meta name="twitter:description" content="{% block twitter_description %}Discover verified neighborhood deals and save instantly at checkout.{% endblock %}">
+  <meta name="twitter:image" content="{% block twitter_image %}https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=1200&auto=format&fit=crop&q=80{% endblock %}">
+
+  <link rel="icon" type="image/svg+xml" href="{% static 'images/favicon.svg' %}">
+  
+  <!-- Progressive Web App (PWA) & Web Clip Meta Tags -->
+  <link rel="manifest" href="{% static 'manifest.json' %}">
+  <meta name="theme-color" content="#F97316">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="LokalLoop">
+  <link rel="apple-touch-icon" href="{% static 'images/icon-192.svg' %}">
+  
+  <title>{% block title %}LokalLoop — Discover Local. Save More. Shop Nearby.{% endblock %}</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="{% static 'css/design_tokens.css' %}?v=2.5">
+  <link rel="stylesheet" href="{% static 'css/main.css' %}?v=2.5">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  
+  <style>
+    /* Safe-Area Status Bar Notch & Punch-hole Support */
+    header {
+      padding-top: max(env(safe-area-inset-top, 0px), 0px);
+    }
+  </style>
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+  <!-- Top Announcement Bar -->
+  <div style="background: var(--ink-950); color: #fff; padding: 0.45rem 1rem; font-size: 0.8rem; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.08);">
+    <span>Now live in <strong>Bengaluru, Mumbai &amp; Pune</strong> &bull; Discover 100+ local store counter offers</span>
+    <a href="/for-sellers/" style="color: var(--brand-saffron-400); margin-left: 0.75rem; text-decoration: underline; font-weight: 600;">Partner your shop</a>
+  </div>
+
+  <!-- Public Header (Modern Dark Theme Matching Mockup) -->
+  <header style="background: #0b0f19; border-bottom: 1px solid rgba(255,255,255,0.08); position: sticky; top: 0; z-index: 100;">
+    <div class="container d-flex align-center justify-between" style="height: 72px;">
+      
+      <!-- Brand Logo & Tagline -->
+      <a href="/" class="d-flex align-center gap-2" style="text-decoration: none; cursor: pointer;">
+        <div style="width: 38px; height: 38px; border-radius: 10px; background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1.25rem; box-shadow: 0 4px 12px rgba(249,115,22,0.35);">
+          <i class="bi bi-geo-alt-fill"></i>
+        </div>
+        <div>
+          <span style="font-size: 1.35rem; font-weight: 800; color: #ffffff; letter-spacing: -0.02em;">Lokal<span style="color: #f97316;">Loop</span></span>
+          <span style="display: block; font-size: 0.65rem; color: #94a3b8; font-weight: 500; letter-spacing: 0.02em; line-height: 1;">Local Shops. Bigger Dreams.</span>
+        </div>
+      </a>
+
+      <!-- Desktop Public Navigation Links -->
+      <nav class="desktop-nav d-flex align-center gap-4">
+        <a href="/" style="font-weight: 600; color: #f97316; font-size: 0.92rem;">Home</a>
+        <a href="/explore/" style="font-weight: 600; color: #e2e8f0; font-size: 0.92rem;">Explore</a>
+        <a href="/#how-it-works" style="font-weight: 600; color: #94a3b8; font-size: 0.92rem;">How It Works</a>
+        <a href="/explore/?type=offers" style="font-weight: 600; color: #94a3b8; font-size: 0.92rem;">Offers</a>
+        <a href="/for-sellers/" style="font-weight: 600; color: #94a3b8; font-size: 0.92rem;">For Merchants</a>
+        <a href="/contact-us/" style="font-weight: 600; color: #94a3b8; font-size: 0.92rem;">Contact</a>
+      </nav>
+
+      <!-- Desktop Location Pill, Search Icon & Auth Actions -->
+      <div class="d-flex align-center gap-2">
+        <div class="desktop-nav d-flex align-center gap-3">
+          <!-- Location Pill -->
+          <a href="/explore/?city=Pune" class="d-flex align-center gap-1" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); color: #e2e8f0; padding: 0.35rem 0.75rem; border-radius: var(--radius-full); font-size: 0.82rem; font-weight: 600; text-decoration: none;">
+            <i class="bi bi-geo-alt-fill" style="color: #f97316;"></i>
+            <span>Pune</span>
+            <i class="bi bi-chevron-down" style="font-size: 0.65rem; color: #94a3b8;"></i>
+          </a>
+
+          <!-- Quick Search Icon -->
+          <a href="/explore/" style="color: #94a3b8; font-size: 1.1rem; padding: 0.25rem;" aria-label="Search">
+            <i class="bi bi-search"></i>
+          </a>
+
+          {% if user.is_authenticated %}
+            {% if is_buyer %}
+              <a href="/buyer/dashboard/" class="btn btn-primary btn-sm"><i class="bi bi-compass"></i> My Buyer App</a>
+            {% elif is_seller %}
+              <a href="/seller/dashboard/" class="btn btn-outline btn-sm" style="color: #fff; background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.15);"><i class="bi bi-shop"></i> Merchant Portal</a>
+            {% elif is_admin %}
+              <a href="/admin-portal/dashboard/" class="btn btn-outline btn-sm" style="color: #fff; background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.15);"><i class="bi bi-shield-check"></i> Admin Console</a>
+            {% endif %}
+          {% else %}
+            <a href="/buyer/login/" style="color: #e2e8f0; font-weight: 600; font-size: 0.9rem; text-decoration: none; padding: 0.4rem 0.8rem;">Login</a>
+            <a href="/buyer/register/" class="btn btn-sm" style="background: #f97316; color: #ffffff; font-weight: 700; border-radius: var(--radius-full); padding: 0.45rem 1.15rem; box-shadow: 0 4px 12px rgba(249,115,22,0.35);">Sign Up</a>
+          {% endif %}
+        </div>
+
+        <!-- Mobile Hamburger Menu Button -->
+        <button type="button" class="mobile-nav-toggle" id="mobileNavToggle" aria-label="Toggle Navigation Menu" style="color: #ffffff;">
+          <i class="bi bi-list"></i>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Mobile Menu Drawer (Toggles on mobile) -->
+    <div class="mobile-menu-drawer" id="mobileMenuDrawer" style="background: #0b0f19; border-bottom: 1px solid rgba(255,255,255,0.1);">
+      <a href="/explore/" class="btn btn-outline btn-block text-left" style="justify-content: flex-start; color: #fff; background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1);">
+        <i class="bi bi-compass"></i> Explore Shops
+      </a>
+      <a href="/explore/?type=offers" class="btn btn-outline btn-block text-left" style="justify-content: flex-start; color: #fff; background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1);">
+        <i class="bi bi-tag-fill text-saffron"></i> Hot Offers
+      </a>
+      <a href="/for-sellers/" class="btn btn-outline btn-block text-left" style="justify-content: flex-start; color: #fff; background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1);">
+        <i class="bi bi-shop"></i> For Businesses &amp; Retailers
+      </a>
+      <a href="/contact-us/" class="btn btn-outline btn-block text-left" style="justify-content: flex-start; color: #fff; background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1);">
+        <i class="bi bi-headset"></i> Contact Us &amp; Grievances
+      </a>
+      <div style="border-top: 1px solid rgba(255,255,255,0.1); margin: 0.5rem 0; padding-top: 0.75rem; display: flex; flex-direction: column; gap: 0.5rem;">
+        {% if user.is_authenticated %}
+          {% if is_buyer %}
+            <a href="/buyer/dashboard/" class="btn btn-primary btn-block"><i class="bi bi-compass"></i> Open Buyer Dashboard</a>
+          {% elif is_seller %}
+            <a href="/seller/dashboard/" class="btn btn-block" style="background: rgba(255,255,255,0.1); color: #fff;"><i class="bi bi-shop"></i> Open Merchant Portal</a>
+          {% elif is_admin %}
+            <a href="/admin-portal/dashboard/" class="btn btn-block" style="background: rgba(255,255,255,0.1); color: #fff;"><i class="bi bi-shield-check"></i> Open Admin Portal</a>
+          {% endif %}
+        {% else %}
+          <a href="/buyer/login/" class="btn btn-block" style="background: rgba(255,255,255,0.1); color: #fff;">Buyer Login</a>
+          <a href="/seller/login/" class="btn btn-block" style="background: rgba(255,255,255,0.1); color: #fff;"><i class="bi bi-shop"></i> Merchant Login</a>
+          <a href="/buyer/register/" class="btn btn-primary btn-block">Get Started Free</a>
+        {% endif %}
+      </div>
+    </div>
+  </header>
+
+  <!-- Flash Messages -->
+  {% if messages %}
+    <div class="container" style="margin-top: 1.5rem;">
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+          <span>{{ message }}</span>
+          <button type="button" style="background: none; border: none; cursor: pointer; font-size: 1.1rem;" onclick="this.parentElement.remove();">&times;</button>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <!-- Main Content -->
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Public Footer -->
+  <footer style="background-color: var(--brand-navy-900); color: #94a3b8; padding: 4.5rem 0 2rem; margin-top: 5rem; border-top: 1px solid rgba(255,255,255,0.08);">
+    <div class="container">
+      <div class="d-grid grid-4 gap-4" style="margin-bottom: 3.5rem;">
+        
+        <div>
+          <a href="/" class="d-flex align-center gap-2" style="margin-bottom: 1rem; text-decoration: none;">
+            <div style="width: 32px; height: 32px; border-radius: 8px; background: var(--brand-saffron-500); display: flex; align-items: center; justify-content: center; color: #fff;">
+              <i class="bi bi-geo-alt-fill"></i>
+            </div>
+            <span style="font-size: 1.25rem; font-weight: 800; color: #fff;">Lokal<span style="color: var(--brand-saffron-500);">Loop</span></span>
+          </a>
+          <p style="font-size: 0.875rem; line-height: 1.6; margin-bottom: 1.25rem;">
+            Connecting Indian shoppers with local brick-and-mortar merchants through neighborhood discounts, instant counter QR redemption, and loyalty rewards.
+          </p>
+          <span style="display: inline-block; font-size: 0.8rem; background: rgba(255,255,255,0.06); padding: 0.35rem 0.75rem; border-radius: var(--radius-sm); color: #e2e8f0;">
+            📍 Headquartered in Bengaluru, KA
+          </span>
+        </div>
+
+        <div>
+          <h4 style="color: #fff; font-size: 0.95rem; margin-bottom: 1.25rem; font-weight: 700;">Discover</h4>
+          <ul style="list-style: none; font-size: 0.875rem; display: flex; flex-direction: column; gap: 0.65rem;">
+            <li><a href="/explore/?category=food-dining" style="color: #94a3b8;">Food &amp; Cafes</a></li>
+            <li><a href="/explore/?category=fashion-retail" style="color: #94a3b8;">Fashion &amp; Apparel</a></li>
+            <li><a href="/explore/?category=electronics" style="color: #94a3b8;">Electronics &amp; Gadgets</a></li>
+            <li><a href="/explore/?category=grocery-essentials" style="color: #94a3b8;">Grocery &amp; Supermarts</a></li>
+            <li><a href="/explore/" style="color: #94a3b8;">All Local Outlets</a></li>
+            <li>
+              <button type="button" onclick="promptPwaInstall()" class="btn-install-pwa" style="background: none; border: none; padding: 0; color: var(--brand-saffron-400); font-size: 0.875rem; cursor: pointer; display: flex; align-items: center; gap: 0.4rem; font-weight: 600;">
+                <i class="bi bi-phone"></i> Install Mobile App
+              </button>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 style="color: #fff; font-size: 0.95rem; margin-bottom: 1.25rem; font-weight: 700;">For Merchants</h4>
+          <ul style="list-style: none; font-size: 0.875rem; display: flex; flex-direction: column; gap: 0.65rem;">
+            <li><a href="/for-sellers/" style="color: #94a3b8;">Merchant Growth Platform</a></li>
+            <li><a href="/seller/register/" style="color: #94a3b8;">Register Your Storefront</a></li>
+            <li><a href="/seller/login/" style="color: #94a3b8;">Seller Portal Login</a></li>
+            <li><a href="/for-sellers/#pricing" style="color: #94a3b8;">Promotional Credit Packages (₹)</a></li>
+            <li><a href="/contact-us/" style="color: #94a3b8;">Help &amp; Grievances</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 style="color: #fff; font-size: 0.95rem; margin-bottom: 1.25rem; font-weight: 700;">Active Retail Hubs</h4>
+          <p style="font-size: 0.85rem; line-height: 1.6; margin-bottom: 1rem;">
+            Serving high-street offline retail corridors across metro hubs:
+          </p>
+          <div style="font-size: 0.8rem; display: flex; flex-wrap: wrap; gap: 0.4rem;">
+            <a href="/explore/?city=Bengaluru" class="badge" style="background: rgba(255,255,255,0.08); color: #e2e8f0; text-decoration: none;">Bengaluru (Indiranagar)</a>
+            <a href="/explore/?city=Mumbai" class="badge" style="background: rgba(255,255,255,0.08); color: #e2e8f0; text-decoration: none;">Mumbai (Bandra)</a>
+            <a href="/explore/?city=Pune" class="badge" style="background: rgba(255,255,255,0.08); color: #e2e8f0; text-decoration: none;">Pune (Koregaon Park)</a>
+          </div>
+          <div style="margin-top: 1.5rem;">
+            <a href="/admin-login/" style="font-size: 0.75rem; color: #64748b; text-decoration: underline;">Platform Administration Console</a>
+          </div>
+        </div>
+
+      </div>
+
+      <div style="padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.06); display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; flex-wrap: wrap; gap: 1rem;">
+        <span>&copy; {% now "Y" %} LokalLoop Technologies India Pvt. Ltd. All rights reserved.</span>
+        <div class="d-flex gap-3 flex-wrap">
+          <a href="/terms/" style="color: #94a3b8; text-decoration: none;">Terms &amp; Conditions</a>
+          <a href="/privacy-policy/" style="color: #94a3b8; text-decoration: none;">Privacy Policy</a>
+          <a href="/refund-policy/" style="color: #94a3b8; text-decoration: none;">Refund Policy</a>
+          <a href="/cookie-policy/" style="color: #94a3b8; text-decoration: none;">Cookie Policy</a>
+          <a href="/contact-us/" style="color: #94a3b8; text-decoration: none;">Contact &amp; Grievances</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Cookie Consent Banner (GDPR / Privacy Compliance) -->
+  <div id="cookieConsentBanner" style="display: none; position: fixed; bottom: 0; left: 0; right: 0; background: var(--ink-950); color: #ffffff; padding: 1rem 1.5rem; z-index: 1000; border-top: 1px solid rgba(255,255,255,0.15); box-shadow: 0 -4px 16px rgba(0,0,0,0.3);">
+    <div class="container d-flex align-center justify-between flex-wrap gap-3">
+      <div style="font-size: 0.88rem; line-height: 1.5; max-width: 820px; color: #cbd5e1;">
+        <i class="bi bi-shield-lock text-saffron" style="font-size: 1.1rem; margin-right: 0.35rem;"></i>
+        We use essential cookies to keep you signed in and optional analytics to measure in-store deal interest. By continuing, you agree to our <a href="/privacy-policy/" style="color: var(--brand-saffron-400); text-decoration: underline;">Privacy Policy</a> and <a href="/cookie-policy/" style="color: var(--brand-saffron-400); text-decoration: underline;">Cookie Policy</a>.
+      </div>
+      <div class="d-flex gap-2">
+        <button type="button" class="btn btn-outline btn-sm" id="rejectCookiesBtn" style="color: #ffffff; border-color: rgba(255,255,255,0.3); background: transparent;">
+          Essential Only
+        </button>
+        <button type="button" class="btn btn-primary btn-sm" id="acceptCookiesBtn">
+          Accept All
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating PWA Smart Mobile Install Banner -->
+  <div id="pwaInstallBanner" style="display: none; position: fixed; bottom: 1.5rem; left: 1rem; right: 1rem; max-width: 440px; margin: 0 auto; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #ffffff; padding: 1rem 1.25rem; border-radius: 16px; z-index: 999; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 12px 30px rgba(0,0,0,0.45); align-items: center; justify-content: space-between; gap: 0.75rem;">
+    <div style="display: flex; align-items: center; gap: 0.75rem;">
+      <div style="width: 44px; height: 44px; border-radius: 10px; background: linear-gradient(135deg, #f97316, #0f172a); display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 4px 10px rgba(249,115,22,0.35);">
+        <i class="bi bi-geo-alt-fill" style="color: #ffffff; font-size: 1.4rem;"></i>
+      </div>
+      <div>
+        <div style="font-weight: 800; font-size: 0.92rem; color: #ffffff; letter-spacing: -0.01em;">Install LokalLoop App</div>
+        <div style="font-size: 0.75rem; color: #94a3b8; line-height: 1.3;">Add to home screen for 1-tap QR scanning</div>
+      </div>
+    </div>
+    <div style="display: flex; align-items: center; gap: 0.4rem;">
+      <button type="button" onclick="promptPwaInstall()" class="btn btn-sm btn-primary" style="padding: 0.45rem 0.85rem; font-size: 0.8rem; font-weight: 700; white-space: nowrap;">
+        Install
+      </button>
+      <button type="button" onclick="dismissPwaBanner()" style="background: none; border: none; color: #94a3b8; font-size: 1.25rem; cursor: pointer; padding: 0.25rem; line-height: 1;" aria-label="Close">
+        &times;
+      </button>
+    </div>
+  </div>
+
+  <script src="{% static 'js/main.js' %}?v=2.2"></script>
+  <script src="{% static 'js/pwa.js' %}?v=1.0"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

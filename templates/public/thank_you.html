@@ -1,0 +1,152 @@
+{% extends "base/public_base.html" %}
+
+{% block title %}Registration Confirmed — LokalLoop{% endblock %}
+
+{% block meta_description %}Welcome to LokalLoop! Your account has been created successfully. Explore local neighborhood discounts or start listing your storefront.{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Google Analytics 4 key event push for successful registration
+  if (typeof gtag === 'function') {
+    gtag('event', 'sign_up', {
+      'method': 'web_form',
+      'user_role': '{{ role|escapejs }}'
+    });
+  }
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="container container-narrow text-center" style="padding: 5rem 1.5rem;">
+  
+  <div style="width: 72px; height: 72px; border-radius: 50%; background: rgba(16, 185, 129, 0.15); border: 2px solid #10b981; color: #10b981; display: flex; align-items: center; justify-content: center; font-size: 2.25rem; margin: 0 auto 1.5rem;">
+    <i class="bi bi-check-lg"></i>
+  </div>
+
+  <span class="badge badge-success" style="font-size: 0.85rem; margin-bottom: 0.75rem;">
+    Registration Successful
+  </span>
+
+  <h1 style="font-size: 2.5rem; font-weight: 800; color: var(--brand-navy-900); margin-bottom: 1rem; letter-spacing: -0.02em;">
+    Welcome to the LokalLoop Community!
+  </h1>
+
+  <p style="font-size: 1.1rem; color: var(--text-muted); line-height: 1.6; max-width: 580px; margin: 0 auto 1.5rem;">
+    {% if role == 'merchant' %}
+      Your merchant partner profile is active. You have received <strong>50 free promotional credits</strong> to launch your first in-store discount campaign.
+    {% else %}
+      Your anonymous shopper account is active! You have received <strong>+25 welcome loyalty points</strong>. No email or phone is required.
+    {% endif %}
+  </p>
+
+  {% if shopper_pass %}
+  <!-- Shopper Digital Pass Card -->
+  <div id="shopperPassCard" style="max-width: 440px; margin: 0 auto 2.5rem; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border-radius: 16px; padding: 1.75rem; color: #ffffff; text-align: left; box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.4); border: 1px solid rgba(255, 255, 255, 0.1); position: relative; overflow: hidden;">
+    <div style="position: absolute; right: -20px; top: -20px; width: 100px; height: 100px; background: radial-gradient(circle, rgba(249, 115, 22, 0.3) 0%, transparent 70%); border-radius: 50%;"></div>
+    
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+      <div style="display: flex; align-items: center; gap: 0.5rem;">
+        <span style="font-size: 1.25rem;">🛍️</span>
+        <span style="font-weight: 800; font-size: 1.1rem; letter-spacing: -0.01em; color: #f8fafc;">LokalLoop Shopper Pass</span>
+      </div>
+      <span style="background: rgba(249, 115, 22, 0.2); border: 1px solid rgba(249, 115, 22, 0.4); color: #fb923c; font-size: 0.7rem; font-weight: 700; padding: 0.25rem 0.6rem; border-radius: 9999px;">
+        100% PRIVATE
+      </span>
+    </div>
+
+    <div style="background: rgba(0, 0, 0, 0.35); border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 1.25rem; border: 1px dashed rgba(255, 255, 255, 0.2);">
+      <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: #94a3b8; margin-bottom: 0.25rem;">
+        Permanent Shopper ID
+      </div>
+      <div id="passShopperId" style="font-size: 1.85rem; font-weight: 900; font-family: monospace; letter-spacing: 0.08em; color: #f97316;">
+        {{ shopper_pass.shopper_id }}
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; font-size: 0.82rem; margin-bottom: 1.25rem; color: #cbd5e1;">
+      <div>
+        <span style="color: #64748b; display: block; font-size: 0.72rem;">DISTRICT</span>
+        <strong style="color: #f1f5f9;">{{ shopper_pass.district }}</strong>
+      </div>
+      <div>
+        <span style="color: #64748b; display: block; font-size: 0.72rem;">STATE</span>
+        <strong style="color: #f1f5f9;">{{ shopper_pass.state }}</strong>
+      </div>
+    </div>
+
+    <div style="background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.25); border-radius: 8px; padding: 0.65rem 0.85rem; font-size: 0.75rem; color: #fca5a5; line-height: 1.4; margin-bottom: 1.25rem;">
+      <i class="bi bi-shield-exclamation"></i> <strong>Save or screenshot your Shopper ID.</strong> No email or phone is stored! Use this ID + your password to log in or recover.
+    </div>
+
+    <div style="display: flex; gap: 0.5rem;">
+      <button type="button" onclick="copyShopperId('{{ shopper_pass.shopper_id }}')" class="btn btn-sm" style="flex: 1; background: #334155; color: #f8fafc; border: 1px solid #475569; font-weight: 600; padding: 0.5rem; border-radius: 8px; font-size: 0.8rem;">
+        <i class="bi bi-clipboard"></i> Copy Shopper ID
+      </button>
+      <button type="button" onclick="downloadPass()" class="btn btn-sm" style="flex: 1; background: #f97316; color: #ffffff; border: none; font-weight: 600; padding: 0.5rem; border-radius: 8px; font-size: 0.8rem;">
+        <i class="bi bi-download"></i> Save Pass Card
+      </button>
+    </div>
+  </div>
+
+  <script>
+    function copyShopperId(id) {
+      if (typeof copyToClipboard === 'function') {
+        copyToClipboard(id);
+      } else if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(id).catch(function() {});
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = id;
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); } catch(e) {}
+        document.body.removeChild(ta);
+      }
+      alert("Shopper ID " + id + " copied to clipboard! Keep it safe.");
+    }
+
+    function downloadPass() {
+      const text = "=== LOKALLOOP SHOPPER DIGITAL PASS ===\n" +
+                   "Shopper ID: {{ shopper_pass.shopper_id }}\n" +
+                   "District: {{ shopper_pass.district }}\n" +
+                   "State: {{ shopper_pass.state }}\n" +
+                   "Welcome Reward Points: +50 Pts\n" +
+                   "Login Portal: " + window.location.origin + "/buyer/login/\n" +
+                   "Note: Keep your Shopper ID and password safe. No personal info is stored on LokalLoop.";
+      const blob = new Blob([text], { type: 'text/plain' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = "LokalLoop_ShopperPass_{{ shopper_pass.shopper_id }}.txt";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+  </script>
+  {% endif %}
+
+  <div class="d-flex align-center justify-center gap-3 flex-wrap">
+    {% if role == 'merchant' %}
+      <a href="/seller/dashboard/" class="btn btn-dark btn-lg">
+        <i class="bi bi-shop"></i> Open Merchant Dashboard
+      </a>
+      <a href="/seller/qr/" class="btn btn-outline btn-lg">
+        <i class="bi bi-qr-code"></i> Print Counter Standee
+      </a>
+    {% else %}
+      <a href="/buyer/dashboard/" class="btn btn-primary btn-lg">
+        <i class="bi bi-compass"></i> Go to Buyer Dashboard
+      </a>
+      <a href="/explore/" class="btn btn-outline btn-lg">
+        <i class="bi bi-tag-fill text-saffron"></i> Browse Hot Deals
+      </a>
+    {% endif %}
+  </div>
+
+  <div style="margin-top: 3.5rem; padding-top: 2rem; border-top: 1px solid var(--border-light); font-size: 0.85rem; color: var(--text-muted);">
+    Need help setting up? Check our <a href="/#faq" style="font-weight: 600;">Frequently Asked Questions</a> or email <strong>support@lokalloop.in</strong>.
+  </div>
+
+</div>
+{% endblock %}

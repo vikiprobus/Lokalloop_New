@@ -1,0 +1,119 @@
+{% extends "base/seller_base.html" %}
+
+{% block title %}Verify Catalog Vouchers &bull; Merchant Portal{% endblock %}
+{% block page_title %}Verify Catalog Vouchers{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 2rem;">
+  
+  <div class="d-flex align-center justify-between flex-wrap gap-2" style="margin-bottom: 1.5rem;">
+    <div>
+      <h1 style="font-size: 1.5rem; font-weight: 800; color: var(--brand-navy-900); margin: 0 0 0.25rem;">
+        Customer Catalog Voucher Verification Desk
+      </h1>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">
+        Validate and burn reward catalog vouchers presented by shoppers during store billing checkout.
+      </p>
+    </div>
+  </div>
+
+  <!-- Voucher Code Input Card -->
+  <div class="card card-padded" style="background: #ffffff; border: 1px solid var(--border-light); border-radius: 14px; margin-bottom: 2rem;">
+    <h2 style="font-size: 1.1rem; font-weight: 700; color: var(--brand-navy-900); margin-bottom: 1rem;">
+      <i class="bi bi-upc-scan text-primary" style="margin-right: 0.5rem;"></i> Redeem Shopper Voucher
+    </h2>
+    <form method="POST" action="{% url 'seller_verify_catalog_claim' %}" style="display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap;">
+      {% csrf_token %}
+      <div style="flex: 1; min-width: 250px;">
+        <label for="voucher_code" style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--brand-navy-800); margin-bottom: 0.35rem;">
+          Voucher Code (e.g. VOUCHER-A1B2C3 / COFFEE-XYZ123)
+        </label>
+        <input type="text" id="voucher_code" name="voucher_code" required
+               placeholder="Enter voucher code presented by customer..."
+               style="width: 100%; padding: 0.75rem 1rem; font-family: monospace; font-size: 1.05rem; font-weight: 700; text-transform: uppercase; border: 2px solid var(--border-light); border-radius: 8px; letter-spacing: 0.05em;">
+      </div>
+      <div>
+        <button type="submit" class="btn btn-primary" style="padding: 0.75rem 1.75rem; font-weight: 700; border-radius: 8px;">
+          <i class="bi bi-check-circle-fill"></i> Verify &amp; Burn Voucher
+        </button>
+      </div>
+    </form>
+
+    {% if verified_claim %}
+    <div style="margin-top: 1.5rem; padding: 1.25rem; background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 10px;">
+      <div class="d-flex align-center gap-2" style="color: #065f46; font-weight: 800; font-size: 1rem;">
+        <i class="bi bi-patch-check-fill" style="font-size: 1.25rem;"></i> Voucher Successfully Verified &amp; Burned!
+      </div>
+      <div style="margin-top: 0.5rem; font-size: 0.88rem; color: #047857;">
+        <strong>Item:</strong> {{ verified_claim.catalog_item.title }} &bull;
+        <strong>Customer:</strong> {{ verified_claim.buyer.username }} &bull;
+        <strong>Points Burned:</strong> {{ verified_claim.points_spent }} Pts &bull;
+        <strong>Code:</strong> <code>{{ verified_claim.voucher_code }}</code>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Verification History Table -->
+  <div class="card" style="border: 1px solid var(--border-light); border-radius: 14px; overflow: hidden; background: #fff;">
+    <div style="padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border-light); display: flex; justify-content: space-between; align-items: center;">
+      <h3 style="font-size: 1rem; font-weight: 800; margin: 0; color: var(--brand-navy-900);">
+        Recently Redeemed Vouchers (This Outlet)
+      </h3>
+      <span style="font-size: 0.8rem; color: var(--text-muted);">Last 20 In-Store Claims</span>
+    </div>
+
+    {% if recent_verifications %}
+    <div style="overflow-x: auto;">
+      <table style="width: 100%; border-collapse: collapse; font-size: 0.88rem; text-align: left;">
+        <thead>
+          <tr style="background: #f8fafc; border-bottom: 1px solid var(--border-light); color: var(--text-muted); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em;">
+            <th style="padding: 0.75rem 1.5rem;">Voucher Code</th>
+            <th style="padding: 0.75rem 1rem;">Reward Perk</th>
+            <th style="padding: 0.75rem 1rem;">Customer</th>
+            <th style="padding: 0.75rem 1rem;">Points Spent</th>
+            <th style="padding: 0.75rem 1rem;">Redeemed At</th>
+            <th style="padding: 0.75rem 1.5rem;">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for claim in recent_verifications %}
+          <tr style="border-bottom: 1px solid var(--border-light);">
+            <td style="padding: 1rem 1.5rem; font-family: monospace; font-weight: 700; color: var(--brand-navy-900);">
+              {{ claim.voucher_code }}
+            </td>
+            <td style="padding: 1rem; font-weight: 600; color: var(--brand-navy-800);">
+              {{ claim.catalog_item.title }}
+            </td>
+            <td style="padding: 1rem; color: var(--text-muted);">
+              {{ claim.buyer.username }}
+            </td>
+            <td style="padding: 1rem; font-weight: 700; color: #d97706;">
+              {{ claim.points_spent }} Pts
+            </td>
+            <td style="padding: 1rem; color: var(--text-muted); font-size: 0.82rem;">
+              {{ claim.used_at|date:"d M Y, h:i A"|default:"Just now" }}
+            </td>
+            <td style="padding: 1rem 1.5rem;">
+              <span class="badge" style="background: #ecfdf5; color: #047857; font-weight: 700; padding: 0.25rem 0.6rem; border-radius: 6px;">
+                <i class="bi bi-check2"></i> REDEEMED
+              </span>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div style="padding: 3rem 1.5rem; text-align: center; color: var(--text-muted);">
+      <i class="bi bi-gift" style="font-size: 2.5rem; color: #cbd5e1; display: block; margin-bottom: 0.75rem;"></i>
+      <h4 style="font-weight: 700; color: var(--brand-navy-800); margin-bottom: 0.25rem;">No Vouchers Redeemed Yet</h4>
+      <p style="font-size: 0.85rem; margin: 0;">
+        When shoppers present reward catalog vouchers, verify them above to complete the redemption.
+      </p>
+    </div>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}

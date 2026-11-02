@@ -1,0 +1,135 @@
+{% extends "base/public_base.html" %}
+
+{% block title %}{{ offer.title }} @ {{ offer.shop.name }} — LokalLoop{% endblock %}
+
+{% block content %}
+<div class="container container-narrow" style="padding-top: 1.5rem; padding-bottom: 4rem;">
+  
+  <!-- Breadcrumbs -->
+  <div style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.4rem;">
+    <a href="/" style="color: var(--text-muted); text-decoration: none;">Home</a>
+    <i class="bi bi-chevron-right" style="font-size: 0.7rem;"></i>
+    <a href="/explore/?type=offers" style="color: var(--text-muted); text-decoration: none;">Offers</a>
+    <i class="bi bi-chevron-right" style="font-size: 0.7rem;"></i>
+    <a href="/shops/{{ offer.shop.slug }}/" style="color: var(--text-muted); text-decoration: none;">{{ offer.shop.name }}</a>
+    <i class="bi bi-chevron-right" style="font-size: 0.7rem;"></i>
+    <span style="color: var(--brand-navy-900); font-weight: 600;">{{ offer.title }}</span>
+  </div>
+
+  <div class="card" style="box-shadow: var(--shadow-sm); overflow: hidden; margin-bottom: 2rem; border: 1px solid var(--border-light); border-radius: var(--radius-lg); background: #ffffff;">
+    
+    <!-- Hero Banner with Discount Badge -->
+    <div style="position: relative; height: 300px;">
+      <img src="{{ offer.image_url }}" alt="{{ offer.title }}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='/static/images/placeholder_offer.svg'">
+      <div style="position: absolute; inset: 0; background: linear-gradient(180deg, rgba(12, 16, 23, 0.2) 20%, rgba(12, 16, 23, 0.88) 100%);"></div>
+
+      <div style="position: absolute; top: 20px; left: 20px; background: var(--brand-saffron-500); color: #ffffff; font-weight: 800; font-size: 1.15rem; padding: 0.45rem 1.15rem; border-radius: var(--radius-full); box-shadow: var(--shadow-md); letter-spacing: -0.01em;">
+        {{ offer.discount_display }}
+      </div>
+
+      <div style="position: absolute; bottom: 20px; left: 20px; right: 20px; color: #ffffff;">
+        <a href="/shops/{{ offer.shop.slug }}/" style="text-decoration: none;">
+          <span class="badge" style="background: rgba(255,255,255,0.18); backdrop-filter: blur(8px); color: #ffffff; margin-bottom: 0.5rem; font-size: 0.8rem; border: 1px solid rgba(255,255,255,0.25);">
+            <i class="bi bi-shop"></i> {{ offer.shop.name }} &bull; {{ offer.shop.locality }}
+          </span>
+        </a>
+        <h1 style="font-size: 1.85rem; font-weight: 800; color: #ffffff; margin: 0; line-height: 1.25; letter-spacing: -0.02em;">
+          {{ offer.title }}
+        </h1>
+      </div>
+    </div>
+
+    <!-- Body Information -->
+    <div class="card-body" style="padding: 2rem;">
+      
+      <!-- Key Conditions Highlights -->
+      <div class="d-grid grid-3 gap-3" style="margin-bottom: 2rem; background: var(--bg-subtle); padding: 1.15rem; border-radius: var(--radius-md); border: 1px solid var(--border-light);">
+        <div>
+          <span style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em;">Min. Bill Requirement</span>
+          <div style="font-size: 1.2rem; font-weight: 800; color: var(--brand-navy-900); font-variant-numeric: tabular-nums; margin-top: 0.2rem;">
+            {% if offer.min_purchase > 0 %}₹{{ offer.min_purchase|floatformat:0 }}{% else %}No Minimum{% endif %}
+          </div>
+        </div>
+
+        <div>
+          <span style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em;">Loyalty Reward</span>
+          <div style="font-size: 1.2rem; font-weight: 800; color: var(--brand-saffron-600); font-variant-numeric: tabular-nums; margin-top: 0.2rem;">
+            +{{ offer.reward_points_per_redemption }} Points
+          </div>
+        </div>
+
+        <div>
+          <span style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em;">Valid Until</span>
+          <div style="font-size: 1.2rem; font-weight: 800; color: var(--brand-navy-900); font-variant-numeric: tabular-nums; margin-top: 0.2rem;">
+            {{ offer.end_date|date:"d M Y" }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Quota Status -->
+      <div style="margin-bottom: 2rem;">
+        <div style="display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.4rem;">
+          <span style="color: var(--brand-navy-800);">Redemptions Claimed: <strong style="font-variant-numeric: tabular-nums;">{{ offer.current_redemptions }}</strong> of {{ offer.max_redemptions }}</span>
+          <span class="text-saffron" style="font-weight: 700; font-variant-numeric: tabular-nums;">{{ offer.remaining_redemptions }} Remaining</span>
+        </div>
+        <div style="width: 100%; height: 7px; background: var(--border-light); border-radius: var(--radius-full); overflow: hidden;">
+          <div style="width: {{ offer.percentage_claimed }}%; height: 100%; background: var(--brand-saffron-500);"></div>
+        </div>
+      </div>
+
+      <!-- Offer Description -->
+      <div style="margin-bottom: 1.75rem;">
+        <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--brand-navy-900); margin-bottom: 0.45rem;">Offer Details</h3>
+        <p style="font-size: 0.92rem; color: var(--text-main); line-height: 1.6; white-space: pre-line; margin: 0;">
+          {{ offer.description }}
+        </p>
+      </div>
+
+      <!-- Terms & Conditions -->
+      <div style="margin-bottom: 2rem;">
+        <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--brand-navy-900); margin-bottom: 0.45rem;">Terms & Conditions</h3>
+        <div style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; background: #fafbfc; border: 1px solid var(--border-light); padding: 1.15rem; border-radius: var(--radius-md); white-space: pre-line;">
+          {{ offer.terms }}
+        </div>
+      </div>
+
+      <!-- How to Redeem Steps Box -->
+      <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: var(--radius-md); padding: 1.35rem; margin-bottom: 2rem;">
+        <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--color-success); margin-bottom: 0.65rem; display: flex; align-items: center; gap: 0.4rem;">
+          <i class="bi bi-qr-code-scan"></i> In-Store Checkout Redemption Process:
+        </h4>
+        <ol style="margin-left: 1.25rem; font-size: 0.85rem; color: var(--brand-navy-800); line-height: 1.65; margin-bottom: 0;">
+          <li>Visit <strong>{{ offer.shop.name }}</strong> at {{ offer.shop.locality }}, {{ offer.shop.city }}.</li>
+          <li>At checkout, inform the cashier you are redeeming a deal via <strong>LokalLoop</strong>.</li>
+          <li>Scan their billing counter acrylic QR standee or provide your store voucher code.</li>
+          <li>Your bill discount is applied instantly and <strong>+{{ offer.reward_points_per_redemption }} reward points</strong> are deposited into your wallet.</li>
+        </ol>
+      </div>
+
+      <!-- Action Button -->
+      {% if is_quota_exhausted %}
+        <div style="background: #fffbeb; border: 1px solid #fde68a; border-radius: var(--radius-md); padding: 1rem; text-align: center; margin-bottom: 1rem;">
+          <strong style="color: #b45309;"><i class="bi bi-exclamation-triangle-fill"></i> Campaign Claim Quota Fully Exhausted</strong>
+          <p style="font-size: 0.85rem; color: #78350f; margin: 0.25rem 0 0 0;">All promotional redemptions for this deal have been claimed.</p>
+        </div>
+        <button type="button" class="btn btn-secondary btn-block btn-lg" disabled style="width: 100%;">
+          Offer Fully Claimed
+        </button>
+      {% elif is_buyer %}
+        <button type="button" onclick="openOfferTermsModal(function(){ window.location.href='/buyer/scan/?offer={{ offer.id }}'; }, '{{ offer.title|escapejs }}', '{{ offer.shop.name|escapejs }}', '{{ offer.terms|escapejs }}')" class="btn btn-primary btn-block btn-lg" style="box-shadow: var(--shadow-sm); width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+          <i class="bi bi-qr-code-scan"></i> Redeem at Store Counter
+        </button>
+      {% else %}
+        <a href="/buyer/login/?next={{ request.path }}" class="btn btn-primary btn-block btn-lg">
+          <i class="bi bi-box-arrow-in-right"></i> Sign In to Redeem Deal
+        </a>
+      {% endif %}
+
+    </div>
+
+  </div>
+
+</div>
+
+{% include "offers/terms_modal.html" %}
+{% endblock %}

@@ -1,0 +1,250 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="{% block meta_description %}LokalLoop Admin Console — Platform governance, merchant KYC approvals, offer vetting, and transaction audit ledger.{% endblock %}">
+  <link rel="icon" type="image/svg+xml" href="{% static 'images/favicon.svg' %}">
+  <title>{% block title %}Platform Governance &bull; LokalLoop Admin Console{% endblock %}</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="{% static 'css/design_tokens.css' %}?v=2.5">
+  <link rel="stylesheet" href="{% static 'css/main.css' %}?v=2.5">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  
+  <style>
+    .admin-badge-env {
+      background: rgba(239, 68, 68, 0.1);
+      color: #b91c1c;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.2rem 0.6rem;
+      border-radius: var(--radius-sm);
+    }
+    .btn-admin-search {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      color: #ffffff;
+      border: 1px solid #b91c1c;
+      font-weight: 700;
+      padding: 0.5rem 1.15rem;
+      border-radius: var(--radius-md);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+    .btn-admin-search:hover {
+      background: linear-gradient(135deg, #dc2626, #b91c1c);
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+    }
+    .admin-filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .admin-filter-select {
+      background-color: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: var(--radius-md);
+      padding: 0.5rem 0.85rem;
+      font-size: 0.875rem;
+      color: var(--brand-navy-900);
+      min-width: 175px;
+      cursor: pointer;
+    }
+    .admin-filter-select:focus {
+      border-color: #ef4444;
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+    }
+    .btn-admin-excel {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #ffffff;
+      border: 1px solid #047857;
+      font-weight: 700;
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius-md);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .btn-admin-excel:hover {
+      background: linear-gradient(135deg, #059669, #047857);
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+    }
+  </style>
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+  <div class="portal-layout">
+    
+    <!-- Admin Operations Sidebar -->
+    <aside class="portal-sidebar" style="background-color: #090d16; border-right: 1px solid rgba(255,255,255,0.1);">
+      
+      <!-- Brand & Admin Tag -->
+      <div style="padding: 1.5rem 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.08);">
+        <a href="/admin-portal/dashboard/" class="d-flex align-center gap-2" style="text-decoration: none;">
+          <div style="width: 36px; height: 36px; border-radius: 8px; background: linear-gradient(135deg, #ef4444, #991b1b); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1.2rem;">
+            <i class="bi bi-shield-lock-fill"></i>
+          </div>
+          <div>
+            <span style="font-size: 1.2rem; font-weight: 800; color: #ffffff;">Lokal<span style="color: var(--brand-saffron-500);">Loop</span></span>
+            <span style="display: block; font-size: 0.65rem; color: #ef4444; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Admin Console</span>
+          </div>
+        </a>
+      </div>
+
+      <!-- Navigation Links -->
+      <nav style="padding: 1rem 0; flex: 1;">
+        <div style="padding: 0.5rem 1.25rem; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: #475569; letter-spacing: 0.05em;">Platform Overview</div>
+        <a href="/admin-portal/dashboard/" class="portal-nav-item {% if request.path == '/admin-portal/dashboard/' %}active{% endif %}">
+          <i class="bi bi-speedometer2"></i> Executive Dashboard
+        </a>
+
+        <div style="padding: 1rem 1.25rem 0.5rem; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: #475569; letter-spacing: 0.05em;">Entities & Moderation</div>
+        <a href="/admin-portal/sellers/" class="portal-nav-item {% if '/admin-portal/sellers/' in request.path %}active{% endif %}">
+          <i class="bi bi-person-badge"></i> Merchants / Sellers
+        </a>
+        <a href="/admin-portal/shops/" class="portal-nav-item {% if '/admin-portal/shops/' in request.path %}active{% endif %}">
+          <i class="bi bi-shop"></i> Shops & Outlets
+        </a>
+        <a href="/admin-portal/categories/" class="portal-nav-item {% if '/admin-portal/categories/' in request.path %}active{% endif %}">
+          <i class="bi bi-diagram-3"></i> Category Hierarchy
+        </a>
+        <a href="/admin-portal/verifications/" class="portal-nav-item {% if '/admin-portal/verifications/' in request.path %}active{% endif %}">
+          <i class="bi bi-shield-check"></i> Merchant Compliance
+        </a>
+        <a href="/admin-portal/agreement-logs/" class="portal-nav-item {% if '/admin-portal/agreement-logs/' in request.path %}active{% endif %}">
+          <i class="bi bi-file-earmark-check"></i> Digital Agreement Logs
+        </a>
+        <a href="/admin-portal/buyers/" class="portal-nav-item {% if '/admin-portal/buyers/' in request.path %}active{% endif %}">
+          <i class="bi bi-people"></i> Registered Buyers
+        </a>
+        <a href="/admin-portal/offers/" class="portal-nav-item {% if '/admin-portal/offers/' in request.path %}active{% endif %}">
+          <i class="bi bi-tags"></i> Offer Approvals
+        </a>
+        <a href="/admin-portal/rewards/" class="portal-nav-item {% if '/admin-portal/rewards/' in request.path %}active{% endif %}">
+          <i class="bi bi-gift"></i> Reward Burn Catalog
+        </a>
+        <a href="/admin-portal/bumper-bills/" class="portal-nav-item {% if '/admin-portal/bumper-bills/' in request.path %}active{% endif %}">
+          <i class="bi bi-receipt-cutoff"></i> Bumper Bills (₹10k+)
+        </a>
+        <a href="/admin-portal/leaderboard/" class="portal-nav-item {% if '/admin-portal/leaderboard/' in request.path %}active{% endif %}">
+          <i class="bi bi-trophy"></i> Weekly Leaderboard
+        </a>
+
+        <div style="padding: 1rem 1.25rem 0.5rem; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: #475569; letter-spacing: 0.05em;">Ledger & Security</div>
+        <a href="/admin-portal/redemptions/" class="portal-nav-item {% if '/admin-portal/redemptions/' in request.path %}active{% endif %}">
+          <i class="bi bi-qr-code-scan"></i> Redemptions Audit
+        </a>
+        <a href="/admin-portal/credits/" class="portal-nav-item {% if '/admin-portal/credits/' in request.path %}active{% endif %}">
+          <i class="bi bi-wallet2"></i> Credit Packages & Sales
+        </a>
+        <a href="/admin-portal/audit/" class="portal-nav-item {% if '/admin-portal/audit/' in request.path %}active{% endif %}">
+          <i class="bi bi-journal-text"></i> Admin Audit Log
+        </a>
+        <a href="/admin-portal/error-logs/" class="portal-nav-item {% if '/admin-portal/error-logs/' in request.path %}active{% endif %}">
+          <i class="bi bi-exclamation-triangle"></i> System Error Logs
+        </a>
+        <a href="/admin-portal/tickets/" class="portal-nav-item {% if '/admin-portal/tickets/' in request.path %}active{% endif %}">
+          <i class="bi bi-life-preserver"></i> Support & Disputes
+        </a>
+        <a href="/admin-portal/settings/" class="portal-nav-item {% if '/admin-portal/settings/' in request.path %}active{% endif %}">
+          <i class="bi bi-geo-alt-fill"></i> Geo-Fence &amp; Proximity
+        </a>
+      </nav>
+
+      <!-- Admin Identity Footer -->
+      <div style="padding: 1rem; border-top: 1px solid rgba(255,255,255,0.08); background-color: rgba(0,0,0,0.3);">
+        <div class="d-flex align-center justify-between">
+          <div style="font-size: 0.825rem; line-height: 1.3;">
+            <div style="font-weight: 600; color: #fff;">{{ user.username }}</div>
+            <div style="color: #ef4444; font-size: 0.75rem;">Root Administrator</div>
+          </div>
+          <a href="/admin-logout/" title="Sign out" style="color: #94a3b8; font-size: 1.1rem;">
+            <i class="bi bi-box-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="portal-main">
+      
+      <!-- Admin Top Bar -->
+      <header class="portal-topbar">
+        <div class="d-flex align-center gap-2">
+          <button type="button" class="mobile-sidebar-toggle" id="adminSidebarToggle" onclick="toggleAdminSidebar()" aria-label="Toggle Navigation">
+            <i class="bi bi-list"></i>
+          </button>
+          <h2 style="font-size: 1.25rem; font-weight: 700; color: var(--brand-navy-900); margin: 0;">
+            {% block page_title %}Platform Dashboard{% endblock %}
+          </h2>
+          <span class="admin-badge-env"><i class="bi bi-shield-check"></i> Superuser Mode</span>
+          <span class="badge badge-success" style="display: inline-flex; align-items: center; gap: 0.35rem; font-weight: 600;"><i class="bi bi-circle-fill" style="font-size: 0.45rem;"></i> System Live</span>
+        </div>
+
+        <div class="d-flex align-center gap-2">
+          <a href="/" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm">
+            <i class="bi bi-box-arrow-up-right"></i> View Public Site
+          </a>
+          <a href="/{{ DJANGO_ADMIN_URL|default:'portal-admin/' }}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm" title="Built-in Django Model Admin for Developers">
+            <i class="bi bi-tools"></i> Django Core Admin
+          </a>
+          <a href="/admin-logout/" class="btn btn-dark btn-sm">Sign Out</a>
+        </div>
+      </header>
+
+      <!-- Flash Messages -->
+      {% if messages %}
+        <div style="padding: 1.5rem 2rem 0;">
+          {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+              <span>{{ message }}</span>
+              <button type="button" style="background: none; border: none; cursor: pointer; font-size: 1.1rem;" onclick="this.parentElement.remove();">&times;</button>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <!-- Content Body -->
+      <div style="padding: 1.5rem 2rem; flex: 1;">
+        {% block content %}{% endblock %}
+      </div>
+
+      <!-- Admin Footer -->
+      <footer style="padding: 1rem 2rem; border-top: 1px solid var(--border-light); font-size: 0.8rem; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; background: #fff;">
+        <span>LokalLoop Platform Operations Console &bull; Security Level: High</span>
+        <span>Internal Use Only</span>
+      </footer>
+
+    </div>
+
+  </div>
+
+  <script src="{% static 'js/main.js' %}?v=2.1"></script>
+  {% block extra_js %}{% endblock %}
+
+  <script>
+    function toggleAdminSidebar() {
+      const sidebar = document.querySelector('.portal-sidebar');
+      if (sidebar) sidebar.classList.toggle('show');
+    }
+  </script>
+</body>
+</html>

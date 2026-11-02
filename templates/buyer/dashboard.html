@@ -1,0 +1,183 @@
+{% extends "base/buyer_base.html" %}
+
+{% block title %}Customer Hub — {{ BRAND_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container">
+  
+  <!-- Gennie Personalized Greeting Banner -->
+  <div class="card card-padded" style="background: linear-gradient(135deg, #4f46e5, #7c3aed, #ec4899); color: #ffffff; border-radius: var(--radius-xl); margin-bottom: 1.5rem; padding: 1.25rem 1.75rem; box-shadow: 0 10px 25px -5px rgba(124, 58, 237, 0.35); border: none; position: relative; overflow: hidden;">
+    <div style="position: absolute; right: -15px; bottom: -20px; font-size: 7rem; opacity: 0.12; pointer-events: none;">
+      <i class="bi bi-stars"></i>
+    </div>
+    <div class="d-flex align-center justify-between flex-wrap gap-2">
+      <div style="position: relative; z-index: 2;">
+        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+          <span class="badge" style="background: rgba(255,255,255,0.22); color: #ffffff; font-weight: 700; font-size: 0.72rem; letter-spacing: 0.05em; backdrop-filter: blur(4px);">
+            ✨ GENNIE COMPANION
+          </span>
+          <span style="font-size: 0.8rem; color: rgba(255,255,255,0.85); font-family: monospace; font-weight: 700;">
+            {{ buyer.buyer_profile.public_unique_id|default:buyer.buyer_profile.shopper_id|default:"ID Pending" }}
+          </span>
+        </div>
+        <h2 style="font-size: 1.6rem; font-weight: 800; color: #ffffff; margin: 0; font-family: var(--font-display); letter-spacing: -0.01em;">
+          ✨ Welcome to the Gennie App {{ buyer.buyer_profile.nickname|default:"Shopper" }} !!!
+        </h2>
+        <p style="margin: 0.3rem 0 0; font-size: 0.875rem; color: rgba(255,255,255,0.9); max-width: 620px;">
+          Your shopper pass is active for {{ buyer.buyer_profile.district|default:city }}. Collect billing discounts with 100% privacy.
+        </p>
+      </div>
+      <div class="d-flex align-center gap-2">
+        {% if not buyer.buyer_profile.is_nickname_set %}
+          <a href="/buyer/onboarding/" class="btn btn-sm" style="background: #ffffff; color: #6d28d9; font-weight: 800; border-radius: var(--radius-full); padding: 0.45rem 1.15rem; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+            <i class="bi bi-pencil-fill text-danger"></i> Set Nickname
+          </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Buyer Welcome Hero Banner -->
+  <div class="card" style="background: var(--ink-950); color: #ffffff; padding: 2.25rem; margin-bottom: 2rem; border: none; box-shadow: var(--shadow-md); border-radius: var(--radius-xl);">
+    <div class="d-flex align-center justify-between flex-wrap gap-3">
+      <div>
+        <div style="font-size: 0.8rem; color: var(--brand-saffron-400); font-weight: 700; margin-bottom: 0.35rem;">
+          📍 {{ buyer.buyer_profile.district|default:city }} anonymous shopping pass
+        </div>
+        <h1 style="font-size: 2.25rem; font-weight: 800; color: #ffffff; margin-bottom: 0.5rem; font-family: var(--font-display);">
+          Pass: <span style="color: var(--brand-saffron-400); font-family: monospace;">{{ buyer.buyer_profile.public_unique_id|default:buyer.buyer_profile.shopper_id|default:"ID Pending" }}</span>
+        </h1>
+        <p style="color: #94a3b8; font-size: 0.95rem; max-width: 520px; line-height: 1.5;">
+          Your anonymous pass is active. No phone or email is tracked. Scan counter standees to earn points on every visit.
+        </p>
+      </div>
+
+      <!-- Points Summary Card -->
+      <div style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: var(--radius-lg); padding: 1.25rem 1.75rem; text-align: right; min-width: 220px;">
+        <span style="font-size: 0.75rem; color: #cbd5e1; font-weight: 600;">Available reward points</span>
+        <div class="stat-val" style="font-size: 2.25rem; font-weight: 800; color: #fde047; line-height: 1.15;">
+          {{ reward_account.current_points }} <span style="font-size: 1rem; color: #fff; font-weight: 500;">pts</span>
+        </div>
+        <div style="font-size: 0.775rem; color: #94a3b8; margin-top: 0.35rem;">
+          Membership tier: <strong style="color: #fff;">{{ reward_account.tier_name }}</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Action Bar -->
+    <div class="d-flex gap-2 flex-wrap" style="margin-top: 1.75rem; padding-top: 1.25rem; border-top: 1px solid rgba(255,255,255,0.1);">
+      <a href="/buyer/scan/" class="btn btn-primary btn-sm">
+        <i class="bi bi-qr-code-scan"></i> Scan billing counter QR
+      </a>
+      <a href="/buyer/explore/" class="btn btn-outline btn-sm" style="color: #fff; border-color: rgba(255,255,255,0.25); background: transparent;">
+        <i class="bi bi-compass"></i> Discover nearby deals
+      </a>
+      <a href="/buyer/rewards/" class="btn btn-outline btn-sm" style="color: #fff; border-color: rgba(255,255,255,0.25); background: transparent;">
+        <i class="bi bi-gift"></i> Rewards wallet
+      </a>
+      <button type="button" onclick="promptPwaInstall()" class="btn btn-outline btn-sm btn-install-pwa" style="color: #fde047; border-color: rgba(253,224,71,0.4); background: rgba(253,224,71,0.08); font-weight: 700;">
+        <i class="bi bi-phone"></i> Install App
+      </button>
+    </div>
+  </div>
+
+  <!-- Category Quick Links -->
+  <div style="margin-bottom: 2.5rem;">
+    <h3 style="font-size: 1.25rem; font-weight: 800; color: var(--ink-950); margin-bottom: 1rem; font-family: var(--font-display);">
+      Browse by category
+    </h3>
+    <div class="d-grid grid-4 gap-2">
+      {% for category in categories %}
+        <a href="/buyer/explore/?category={{ category.slug }}" class="card card-padded d-flex align-center gap-2" style="padding: 0.85rem 1rem; text-decoration: none; border-radius: var(--radius-md);">
+          <div style="width: 36px; height: 36px; border-radius: var(--radius-sm); background: var(--brand-indigo-50); color: var(--brand-indigo-600); display: flex; align-items: center; justify-content: center; font-size: 1.1rem;">
+            <i class="bi {{ category.icon }}"></i>
+          </div>
+          <div>
+            <h5 style="font-size: 0.9rem; font-weight: 700; color: var(--ink-950); margin: 0; font-family: var(--font-display);">{{ category.name }}</h5>
+          </div>
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Popular Offers Near You -->
+  <div style="margin-bottom: 3rem;">
+    <div class="d-flex align-center justify-between" style="margin-bottom: 1.25rem;">
+      <div>
+        <h2 style="font-size: 1.4rem; font-weight: 800; color: var(--ink-950); font-family: var(--font-display);">
+          Active in-store deals in {{ city }}
+        </h2>
+        <p style="font-size: 0.85rem; color: var(--text-muted);">Redeemable at retail billing counters</p>
+      </div>
+      <a href="/buyer/explore/?type=offers" class="btn btn-outline btn-sm">See all offers</a>
+    </div>
+
+    <div class="d-grid grid-4 gap-3">
+      {% for offer in popular_offers %}
+        {% include "components/offer_card.html" with offer=offer %}
+      {% empty %}
+        <div style="grid-column: 1 / -1;">
+          {% include "components/empty_state.html" with title="No offers found" description="Check back soon for new discounts in your city." %}
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Top Rated Stores Nearby -->
+  <div style="margin-bottom: 3rem;">
+    <div class="d-flex align-center justify-between" style="margin-bottom: 1.25rem;">
+      <div>
+        <h2 style="font-size: 1.4rem; font-weight: 800; color: var(--ink-950); font-family: var(--font-display);">
+          Neighborhood stores
+        </h2>
+        <p style="font-size: 0.85rem; color: var(--text-muted);">Verified local boutiques, roasteries and specialty shops</p>
+      </div>
+      <a href="/buyer/explore/?type=shops" class="btn btn-outline btn-sm">View all shops</a>
+    </div>
+
+    <div class="d-grid grid-4 gap-3">
+      {% for shop in nearby_shops %}
+        {% include "components/shop_card.html" with shop=shop %}
+      {% empty %}
+        <div style="grid-column: 1 / -1;">
+          {% include "components/empty_state.html" with title="No shops found" description="Check back soon." %}
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Recent Redemption Activity -->
+  {% if recent_redemptions %}
+    <div class="card card-padded" style="margin-bottom: 2rem;">
+      <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--ink-950); margin-bottom: 1rem; font-family: var(--font-display);">
+        Recent in-store redemptions
+      </h3>
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Store</th>
+              <th>Offer</th>
+              <th>Discount saved</th>
+              <th>Points earned</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in recent_redemptions %}
+              <tr>
+                <td><strong>{{ item.shop.name }}</strong> ({{ item.shop.locality }})</td>
+                <td>{{ item.offer.title }}</td>
+                <td class="text-success fw-600">₹{{ item.discount_given|floatformat:0 }}</td>
+                <td style="color: #b45309; font-weight: 700;">+{{ item.reward_points_earned }} pts</td>
+                <td class="text-muted">{{ item.redeemed_at|date:"d M Y, h:i A" }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}
