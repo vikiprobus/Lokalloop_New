@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="description" content="{% block meta_description %}LokalLoop Merchant Business Portal — Manage store profile, launch campaigns, track redemptions and counter QR codes.{% endblock %}">
   <link rel="icon" type="image/svg+xml" href="{% static 'images/favicon.svg' %}">
   <title>{% block title %}Merchant Portal — LokalLoop Business{% endblock %}</title>
@@ -18,6 +18,24 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   
   <style>
+    html, body {
+      overflow-x: hidden !important;
+      max-width: 100vw;
+    }
+    .portal-layout {
+      min-height: 100vh;
+      display: flex;
+      overflow-x: hidden;
+      width: 100%;
+    }
+    .portal-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      overflow-x: hidden;
+      background: #f8fafc;
+    }
     .credit-badge-seller {
       display: inline-flex;
       align-items: center;
@@ -27,8 +45,9 @@
       color: #065f46;
       font-weight: 700;
       padding: 0.4rem 0.9rem;
-      border-radius: var(--radius-full);
+      border-radius: var(--radius-full, 9999px);
       font-size: 0.875rem;
+      white-space: nowrap;
     }
     .btn-merchant-excel {
       background: linear-gradient(135deg, #10b981, #059669);
@@ -36,7 +55,7 @@
       border: 1px solid #047857;
       font-weight: 700;
       padding: 0.45rem 0.95rem;
-      border-radius: var(--radius-md);
+      border-radius: var(--radius-md, 8px);
       display: inline-flex;
       align-items: center;
       gap: 0.4rem;
@@ -72,14 +91,18 @@
       display: none;
       align-items: center;
       justify-content: center;
-      background: #f8fafc;
+      background: #ffffff;
       border: 1px solid var(--border-light, #e2e8f0);
       border-radius: var(--radius-md, 8px);
       color: var(--brand-navy-900, #0f172a);
-      font-size: 1.25rem;
-      padding: 0.35rem 0.65rem;
+      font-size: 1.35rem;
+      width: 40px;
+      height: 40px;
+      padding: 0;
       cursor: pointer;
       line-height: 1;
+      flex-shrink: 0;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
     }
     .seller-sidebar-backdrop {
       display: none;
@@ -87,25 +110,32 @@
       inset: 0;
       background: rgba(15, 23, 42, 0.65);
       backdrop-filter: blur(3px);
+      -webkit-backdrop-filter: blur(3px);
       z-index: 1040;
     }
     .seller-sidebar-backdrop.show {
       display: block;
     }
+
+    /* Bottom Navigation Bar with Zero-CDN High-Definition SVGs */
     .seller-bottom-nav {
       display: none;
       position: fixed;
       bottom: 0;
       left: 0;
       right: 0;
-      height: 64px;
-      background: #ffffff;
-      border-top: 1px solid var(--border-light, #e2e8f0);
-      box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.08);
-      z-index: 999;
+      height: calc(62px + env(safe-area-inset-bottom, 8px));
+      padding-bottom: env(safe-area-inset-bottom, 8px);
+      background: rgba(255, 255, 255, 0.98);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-top: 1px solid rgba(0, 0, 0, 0.08);
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.06);
+      z-index: 1000;
       justify-content: space-around;
       align-items: center;
-      padding: 0 0.25rem;
+      padding-left: 0.25rem;
+      padding-right: 0.25rem;
     }
     .seller-bottom-nav a {
       display: flex;
@@ -118,37 +148,32 @@
       color: #64748b;
       text-decoration: none;
       flex: 1;
+      min-width: 48px;
       padding: 0.35rem 0;
       transition: color 0.15s ease;
     }
     .seller-bottom-nav a.active {
-      color: #ea580c;
+      color: #ea580c !important;
       font-weight: 800;
     }
-    .seller-bottom-nav a i {
-      font-size: 1.25rem;
-    }
     .seller-bottom-nav .seller-nav-qr-btn {
-      width: 48px;
-      height: 48px;
-      background: linear-gradient(135deg, #ea580c, #f97316);
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
       color: #ffffff !important;
       border-radius: 50%;
       margin-top: -20px;
-      box-shadow: 0 4px 14px rgba(234, 88, 12, 0.45);
+      box-shadow: 0 6px 16px rgba(249, 115, 22, 0.45);
       display: flex;
       align-items: center;
       justify-content: center;
       border: 3px solid #ffffff;
-      flex: 0 0 48px;
-    }
-    .seller-bottom-nav .seller-nav-qr-btn i {
-      font-size: 1.35rem;
+      flex: 0 0 50px;
     }
 
     @media (max-width: 768px) {
       body {
-        padding-bottom: 72px;
+        padding-bottom: calc(78px + env(safe-area-inset-bottom, 8px)) !important;
       }
       .mobile-sidebar-toggle {
         display: inline-flex;
@@ -159,11 +184,12 @@
         top: 0;
         bottom: 0;
         left: 0;
-        width: 275px;
+        width: 280px;
         z-index: 1050;
         transform: translateX(-100%);
-        transition: transform 0.28s ease-in-out;
+        transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
         box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        border-radius: 0 20px 20px 0;
       }
       .portal-sidebar.show {
         transform: translateX(0);
@@ -171,30 +197,26 @@
       .seller-bottom-nav {
         display: flex;
       }
-      .portal-layout {
-        overflow-x: hidden;
-      }
-      .portal-main {
-        min-width: 100%;
-        overflow-x: hidden;
-      }
       .portal-topbar {
-        padding: 0.75rem 1rem !important;
-        flex-wrap: wrap !important;
+        padding-top: max(env(safe-area-inset-top, 0px), 0.75rem) !important;
+        padding-left: 0.85rem !important;
+        padding-right: 0.85rem !important;
+        padding-bottom: 0.75rem !important;
         gap: 0.5rem !important;
+        flex-wrap: wrap !important;
+      }
+      .portal-topbar h2 {
+        font-size: 1.05rem !important;
       }
       .portal-main > div:nth-of-type(2) {
-        padding: 1rem 0.85rem 5rem !important;
+        padding: 0.85rem 0.85rem 4rem !important;
       }
       .credit-badge-seller {
-        padding: 0.3rem 0.6rem;
+        padding: 0.25rem 0.6rem;
         font-size: 0.75rem;
       }
       .d-none-mobile {
         display: none !important;
-      }
-      .portal-topbar h2 {
-        font-size: 1.05rem !important;
       }
     }
   </style>
@@ -208,9 +230,9 @@
     <aside class="portal-sidebar">
       
       <!-- Brand & Portal Tag -->
-      <div style="padding: 1.5rem 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <div style="padding: 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: space-between;">
         <a href="/seller/dashboard/" class="d-flex align-center gap-2" style="text-decoration: none;">
-          <div style="width: 36px; height: 36px; border-radius: 8px; background: var(--brand-saffron-500); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1.2rem;">
+          <div style="width: 36px; height: 36px; border-radius: 8px; background: var(--brand-saffron-500); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1.2rem; flex-shrink: 0;">
             <i class="bi bi-shop"></i>
           </div>
           <div>
@@ -218,10 +240,13 @@
             <span style="display: block; font-size: 0.65rem; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Merchant Portal</span>
           </div>
         </a>
+        <button type="button" class="d-none-desktop" onclick="closeSellerSidebar()" style="background: none; border: none; color: #94a3b8; font-size: 1.5rem; cursor: pointer; padding: 0.25rem; line-height: 1;">
+          &times;
+        </button>
       </div>
 
       <!-- Navigation Links -->
-      <nav style="padding: 1rem 0; flex: 1;">
+      <nav style="padding: 1rem 0; flex: 1; overflow-y: auto;">
         <div style="padding: 0.5rem 1.25rem; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: #64748b; letter-spacing: 0.05em;">Overview</div>
         <a href="/seller/dashboard/" class="portal-nav-item {% if request.path == '/seller/dashboard/' %}active{% endif %}">
           <i class="bi bi-grid"></i> Dashboard
@@ -261,7 +286,7 @@
           <i class="bi bi-graph-up-arrow"></i> Footfall Analytics
         </a>
         <a href="/seller/notifications/" class="portal-nav-item {% if '/seller/notifications/' in request.path %}active{% endif %}">
-          <i class="bi bi-bell"></i> Alerts & Activity
+          <i class="bi bi-bell"></i> Alerts &amp; Activity
         </a>
       </nav>
 
@@ -284,63 +309,67 @@
     <div class="portal-main">
       
       <!-- Merchant Top Bar -->
-      <header class="portal-topbar">
-        <div class="d-flex align-center gap-2">
-          <!-- Mobile Sidebar Drawer Toggle -->
+      <header class="portal-topbar" style="display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; background: #ffffff; border-bottom: 1px solid var(--border-light, #e2e8f0); padding: 0.85rem 1.5rem;">
+        
+        <!-- Left Section: Toggle & Title -->
+        <div class="d-flex align-center gap-2" style="min-width: 0;">
           <button type="button" class="mobile-sidebar-toggle" id="sellerMobileMenuBtn" aria-label="Toggle Navigation">
             <i class="bi bi-list"></i>
           </button>
           
-          <div class="d-flex align-center gap-2 flex-wrap">
-            <h2 style="font-size: 1.25rem; font-weight: 700; color: var(--brand-navy-900); margin-bottom: 0;">
-              {% block page_title %}Dashboard{% endblock %}
-            </h2>
-          {% if user.seller_profile.is_verified %}
-            <span class="badge badge-success"><i class="bi bi-patch-check-fill"></i> Verified Merchant</span>
-          {% else %}
-            <span class="badge" style="background: #fef3c7; color: #b45309; border: 1px solid #fde68a;"><i class="bi bi-clock-history"></i> Approval Pending</span>
-          {% endif %}
-          {% if user.seller_profile.merchant_id %}
-            <span class="badge d-inline-flex align-center gap-1" style="background: #0f172a; color: #38bdf8; font-family: monospace; font-size: 0.85rem; cursor: pointer;" onclick="if(typeof copyToClipboard==='function'){copyToClipboard('{{ user.seller_profile.merchant_id }}',this);}else{navigator.clipboard&&navigator.clipboard.writeText('{{ user.seller_profile.merchant_id }}');} alert('Merchant ID copied: {{ user.seller_profile.merchant_id }}');" title="Click to copy Merchant ID">
-              <i class="bi bi-hash"></i> {{ user.seller_profile.merchant_id }} <i class="bi bi-clipboard" style="font-size: 0.75rem; margin-left: 2px;"></i>
-            </span>
-          {% endif %}
+          <div style="min-width: 0;">
+            <div class="d-flex align-center gap-2 flex-wrap">
+              <h2 style="font-size: 1.25rem; font-weight: 800; color: var(--brand-navy-900); margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                {% block page_title %}Dashboard{% endblock %}
+              </h2>
+              {% if user.seller_profile.is_verified %}
+                <span class="badge badge-success" style="font-size: 0.72rem; padding: 0.2rem 0.5rem;"><i class="bi bi-patch-check-fill"></i> Verified</span>
+              {% else %}
+                <span class="badge" style="background: #fef3c7; color: #b45309; border: 1px solid #fde68a; font-size: 0.72rem; padding: 0.2rem 0.5rem;"><i class="bi bi-clock-history"></i> Pending</span>
+              {% endif %}
+            </div>
+            {% if user.seller_profile.merchant_id %}
+              <div style="font-size: 0.75rem; color: #0284c7; font-family: monospace; font-weight: 700; margin-top: 0.15rem; cursor: pointer; display: inline-flex; align-items: center; gap: 0.25rem;" onclick="navigator.clipboard&&navigator.clipboard.writeText('{{ user.seller_profile.merchant_id }}'); alert('Merchant ID copied: {{ user.seller_profile.merchant_id }}');" title="Click to copy Merchant ID">
+                <i class="bi bi-hash"></i>{{ user.seller_profile.merchant_id }} <i class="bi bi-clipboard" style="font-size: 0.68rem;"></i>
+              </div>
+            {% endif %}
+          </div>
         </div>
 
-        <!-- Top Right Actions: Credits Ticker & Buy Credits CTA -->
-        <div class="d-flex align-center gap-3">
+        <!-- Right Section: Credits & Profile Actions -->
+        <div class="d-flex align-center gap-2 flex-shrink-0">
           <div class="credit-badge-seller" title="Available promotional credits">
             <i class="bi bi-lightning-charge-fill" style="color: {% if user.seller_profile.is_verified %}#10b981{% else %}#f59e0b{% endif %};"></i>
             <span>
               {% if user.seller_profile.is_verified %}
-                {{ user.wallet.balance_credits|default:100 }} Credits Available
+                {{ user.wallet.balance_credits|default:100 }} Cr
               {% else %}
-                {{ user.wallet.balance_credits|default:0 }} Credits (Standby ⏳)
+                {{ user.wallet.balance_credits|default:0 }} Cr (Standby)
               {% endif %}
             </span>
           </div>
 
           <a href="/seller/credits/" class="btn btn-primary btn-sm d-none-mobile">
-            <i class="bi bi-plus-circle"></i> Recharge Credits
+            <i class="bi bi-plus-circle"></i> Top-Up
           </a>
 
-          <a href="/seller/notifications/" style="position: relative; font-size: 1.25rem; color: var(--text-muted); margin-left: 0.5rem;">
+          <a href="/seller/notifications/" style="position: relative; font-size: 1.25rem; color: var(--text-muted); padding: 0.35rem;" title="Alerts &amp; Activity">
             <i class="bi bi-bell"></i>
             {% if unread_notifications_count > 0 %}
-              <span style="position: absolute; top: 0; right: 0; width: 8px; height: 8px; background: var(--color-danger); border-radius: 50%;"></span>
+              <span style="position: absolute; top: 4px; right: 4px; width: 8px; height: 8px; background: var(--color-danger, #ef4444); border-radius: 50%;"></span>
             {% endif %}
           </a>
 
           <!-- Merchant User Dropdown -->
-          <div class="user-dropdown-container" style="position: relative; margin-left: 0.5rem; padding-left: 0.75rem; border-left: 1px solid var(--border-light, #e2e8f0);">
-            <button type="button" class="dropdown-toggle" id="sellerProfileDropdownBtn" style="background: var(--bg-subtle, #f8fafc); border: 1px solid var(--border-light, #e2e8f0); padding: 0.35rem 0.65rem 0.35rem 0.4rem; border-radius: var(--radius-full, 9999px); display: inline-flex; align-items: center; gap: 0.5rem; cursor: pointer; transition: all 0.2s ease;">
-              <div style="width: 28px; height: 28px; border-radius: 50%; background: #0f172a; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 0.85rem;">
+          <div class="user-dropdown-container">
+            <button type="button" class="dropdown-toggle" id="sellerProfileDropdownBtn" style="background: var(--bg-subtle, #f8fafc); border: 1px solid var(--border-light, #e2e8f0); padding: 0.35rem 0.65rem 0.35rem 0.4rem; border-radius: var(--radius-full, 9999px); display: inline-flex; align-items: center; gap: 0.4rem; cursor: pointer; transition: all 0.2s ease;">
+              <div style="width: 28px; height: 28px; border-radius: 50%; background: #0f172a; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; flex-shrink: 0;">
                 <i class="bi bi-shop"></i>
               </div>
-              <span style="font-weight: 700; font-size: 0.825rem; color: var(--brand-navy-900, #0f172a); max-width: 130px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+              <span class="d-none-mobile" style="font-weight: 700; font-size: 0.825rem; color: var(--brand-navy-900, #0f172a); max-width: 120px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                 {{ user.seller_profile.business_name|default:"Merchant Outlet" }}
               </span>
-              <i class="bi bi-chevron-down" style="font-size: 0.75rem; color: var(--text-muted, #64748b);"></i>
+              <i class="bi bi-chevron-down" style="font-size: 0.72rem; color: var(--text-muted, #64748b);"></i>
             </button>
 
             <div class="dropdown-menu" style="right: 0; left: auto; min-width: 240px; margin-top: 0.5rem; border-radius: 12px; box-shadow: var(--shadow-lg, 0 10px 25px rgba(0,0,0,0.12)); border: 1px solid var(--border-light, #e2e8f0); padding: 0.5rem; background: #ffffff;">
@@ -353,6 +382,11 @@
                   {{ user.email }}
                 </div>
               </div>
+
+              <a href="/seller/shop/" class="dropdown-item" style="display: flex; align-items: center; gap: 0.55rem; padding: 0.65rem 0.85rem; border-radius: 8px; font-weight: 600; font-size: 0.85rem; color: #1e293b; text-decoration: none; transition: background 0.15s ease;">
+                <i class="bi bi-shop-window" style="color: var(--brand-saffron-600, #ea580c); font-size: 1rem;"></i>
+                <span>🏪 My Shop Profile</span>
+              </a>
 
               <a href="/seller/change-password/" class="dropdown-item" style="display: flex; align-items: center; gap: 0.55rem; padding: 0.65rem 0.85rem; border-radius: 8px; font-weight: 600; font-size: 0.85rem; color: #1e293b; text-decoration: none; transition: background 0.15s ease;">
                 <i class="bi bi-shield-lock-fill" style="color: var(--brand-indigo-600, #4f46e5); font-size: 1rem;"></i>
@@ -377,7 +411,7 @@
 
       <!-- Flash Messages -->
       {% if messages %}
-        <div style="padding: 1.5rem 2rem 0;">
+        <div style="padding: 1rem 1.5rem 0;">
           {% for message in messages %}
             <div class="alert alert-{{ message.tags }}">
               <span>{{ message }}</span>
@@ -388,14 +422,14 @@
       {% endif %}
 
       <!-- Content Body -->
-      <div style="padding: 1.5rem 2rem; flex: 1;">
+      <div style="padding: 1.25rem 1.5rem; flex: 1;">
         {% block content %}{% endblock %}
       </div>
 
       <!-- Merchant Minimal Footer -->
-      <footer style="padding: 1rem 2rem; border-top: 1px solid var(--border-light); font-size: 0.8rem; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; background: #fff;">
+      <footer style="padding: 1rem 1.5rem; border-top: 1px solid var(--border-light); font-size: 0.78rem; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; background: #fff;">
         <span>LokalLoop Merchant Suite &bull; Retail Network Hub</span>
-        <span>Dedicated Merchant Support: <a href="/contact-us/" style="color: var(--brand-indigo-600, #4f46e5); font-weight: 600; text-decoration: none;">Help &amp; Grievance Desk</a></span>
+        <span>Dedicated Support: <a href="/contact-us/" style="color: var(--brand-indigo-600, #4f46e5); font-weight: 600; text-decoration: none;">Help &amp; Grievance Desk</a></span>
       </footer>
 
     </div>
@@ -406,7 +440,7 @@
   <div style="display:none;" id="csrfHelper">{% csrf_token %}</div>
 
   <!-- Real-Time Counter Redemption Request Modal -->
-  <div id="counterRequestModal" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(4px); z-index: 9999; align-items: center; justify-content: center; padding: 1rem;">
+  <div id="counterRequestModal" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); z-index: 9999; align-items: center; justify-content: center; padding: 1rem;">
     <div style="background: #ffffff; border-radius: 20px; max-width: 480px; width: 100%; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35); border: 2px solid #3b82f6; overflow: hidden; animation: popIn 0.25s ease-out; position: relative;">
       
       <!-- Modal Header -->
@@ -470,154 +504,72 @@
   </div>
 
   <!-- Floating Counter Pill when minimized -->
-  <div id="floatingCounterPill" onclick="openCounterModal()" style="display: none; position: fixed; bottom: 25px; right: 25px; background: linear-gradient(135deg, #1e40af, #2563eb); color: #ffffff; padding: 0.75rem 1.25rem; border-radius: 9999px; box-shadow: 0 10px 25px rgba(37,99,235,0.4); cursor: pointer; z-index: 9998; font-weight: 800; font-size: 0.85rem; align-items: center; gap: 0.6rem; border: 2px solid #ffffff;">
+  <div id="floatingCounterPill" onclick="openCounterModal()" style="display: none; position: fixed; bottom: calc(75px + env(safe-area-inset-bottom, 8px)); right: 20px; background: linear-gradient(135deg, #1e40af, #2563eb); color: #ffffff; padding: 0.65rem 1.1rem; border-radius: 9999px; box-shadow: 0 10px 25px rgba(37,99,235,0.4); cursor: pointer; z-index: 9998; font-weight: 800; font-size: 0.82rem; align-items: center; gap: 0.5rem; border: 2px solid #ffffff;">
     <span style="display: inline-flex; width: 10px; height: 10px; border-radius: 50%; background: #22c55e; animation: pulseGlow 1.2s infinite;"></span>
     <span>🚨 Counter Request (<span id="floatingCounterCount">1</span>)</span>
   </div>
 
-  <style>
-    @keyframes pulseGlow {
-      0%, 100% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.3); opacity: 0.7; }
-    }
-    @keyframes popIn {
-      0% { transform: scale(0.92); opacity: 0; }
-      100% { transform: scale(1); opacity: 1; }
-    }
+  <!-- Backdrop for offcanvas sidebar on mobile -->
+  <div class="seller-sidebar-backdrop" id="sellerSidebarBackdrop"></div>
 
-    /* Mobile Responsive Enhancements for Merchant Portal */
-    .mobile-sidebar-toggle {
-      display: none;
-      align-items: center;
-      justify-content: center;
-      background: #f8fafc;
-      border: 1px solid var(--border-light, #e2e8f0);
-      border-radius: var(--radius-md, 8px);
-      color: var(--brand-navy-900, #0f172a);
-      font-size: 1.25rem;
-      padding: 0.35rem 0.65rem;
-      cursor: pointer;
-      line-height: 1;
-    }
-    .seller-sidebar-backdrop {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(15, 23, 42, 0.65);
-      backdrop-filter: blur(3px);
-      z-index: 1040;
-    }
-    .seller-sidebar-backdrop.show {
-      display: block;
-    }
-    .seller-bottom-nav {
-      display: none;
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 64px;
-      background: #ffffff;
-      border-top: 1px solid var(--border-light, #e2e8f0);
-      box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.08);
-      z-index: 999;
-      justify-content: space-around;
-      align-items: center;
-      padding: 0 0.25rem;
-    }
-    .seller-bottom-nav a {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 0.2rem;
-      font-size: 0.72rem;
-      font-weight: 600;
-      color: #64748b;
-      text-decoration: none;
-      flex: 1;
-      padding: 0.35rem 0;
-      transition: color 0.15s ease;
-    }
-    .seller-bottom-nav a.active {
-      color: #ea580c;
-      font-weight: 800;
-    }
-    .seller-bottom-nav a i {
-      font-size: 1.25rem;
-    }
-    .seller-bottom-nav .seller-nav-qr-btn {
-      width: 48px;
-      height: 48px;
-      background: linear-gradient(135deg, #ea580c, #f97316);
-      color: #ffffff !important;
-      border-radius: 50%;
-      margin-top: -20px;
-      box-shadow: 0 4px 14px rgba(234, 88, 12, 0.45);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border: 3px solid #ffffff;
-      flex: 0 0 48px;
-    }
-    .seller-bottom-nav .seller-nav-qr-btn i {
-      font-size: 1.35rem;
-    }
+  <!-- Mobile Bottom Navigation Bar for Merchants (High-Definition Zero-CDN Inline SVGs) -->
+  <div class="seller-bottom-nav">
+    <!-- 1. Home / Dashboard -->
+    <a href="/seller/dashboard/" class="{% if request.path == '/seller/dashboard/' %}active{% endif %}">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="7" height="7"/>
+        <rect x="14" y="3" width="7" height="7"/>
+        <rect x="14" y="14" width="7" height="7"/>
+        <rect x="3" y="14" width="7" height="7"/>
+      </svg>
+      <span>Dashboard</span>
+    </a>
 
-    @media (max-width: 768px) {
-      body {
-        padding-bottom: 72px;
-      }
-      .mobile-sidebar-toggle {
-        display: inline-flex;
-      }
-      .portal-sidebar {
-        display: flex !important;
-        position: fixed;
-        top: 0;
-        bottom: 0;
-        left: 0;
-        width: 275px;
-        z-index: 1050;
-        transform: translateX(-100%);
-        transition: transform 0.28s ease-in-out;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-      }
-      .portal-sidebar.show {
-        transform: translateX(0);
-      }
-      .seller-bottom-nav {
-        display: flex;
-      }
-      .portal-layout {
-        overflow-x: hidden;
-      }
-      .portal-main {
-        min-width: 100%;
-        overflow-x: hidden;
-      }
-      .portal-topbar {
-        padding: 0.75rem 1rem !important;
-        flex-wrap: wrap !important;
-        gap: 0.5rem !important;
-      }
-      .portal-main > div:nth-of-type(2) {
-        padding: 1rem 0.85rem 5rem !important;
-      }
-      .credit-badge-seller {
-        padding: 0.3rem 0.6rem;
-        font-size: 0.75rem;
-      }
-      .d-none-mobile {
-        display: none !important;
-      }
-      .portal-topbar h2 {
-        font-size: 1.05rem !important;
-      }
-    }
-  </style>
+    <!-- 2. Offers -->
+    <a href="/seller/offers/" class="{% if '/seller/offers/' in request.path %}active{% endif %}">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2H2v10l9.29 9.29c.94.94 2.48.94 3.42 0l6.58-6.58c.94-.94.94-2.48 0-3.42L12 2Z"/>
+        <path d="M7 7h.01"/>
+      </svg>
+      <span>Offers</span>
+    </a>
+
+    <!-- 3. QR Desk (Floating Center Orange Circle) -->
+    <a href="/seller/qr/" class="seller-nav-qr-btn {% if '/seller/qr/' in request.path %}active{% endif %}" title="Counter QR Desk" aria-label="Counter QR Desk">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 7V5a2 2 0 0 1 2-2h2"/>
+        <path d="M17 3h2a2 2 0 0 1 2 2v2"/>
+        <path d="M21 17v2a2 2 0 0 1-2 2h-2"/>
+        <path d="M7 21H5a2 2 0 0 1-2-2v-2"/>
+        <rect x="7" y="7" width="10" height="10" rx="1.5"/>
+        <line x1="7" y1="12" x2="17" y2="12"/>
+      </svg>
+    </a>
+
+    <!-- 4. Redemptions -->
+    <a href="/seller/redemptions/" class="{% if '/seller/redemptions/' in request.path %}active{% endif %}">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/>
+        <polyline points="9 15 11 17 15 13"/>
+      </svg>
+      <span>Redeem</span>
+    </a>
+
+    <!-- 5. Shop Profile -->
+    <a href="/seller/shop/" class="{% if '/seller/shop/' in request.path %}active{% endif %}">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/>
+        <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+        <path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/>
+        <path d="M2 7h20"/>
+      </svg>
+      <span>Shop</span>
+    </a>
+  </div>
 
   <script>
+    // Real-Time Counter Redemption Polling
     (function() {
       let pendingRequests = [];
       let currentRequest = null;
@@ -638,162 +590,127 @@
         const queueSpan = document.getElementById('counterQueueCount');
 
         if (!pendingRequests || pendingRequests.length === 0) {
-          modal.style.display = 'none';
-          pill.style.display = 'none';
+          if (modal) modal.style.display = 'none';
+          if (pill) pill.style.display = 'none';
           currentRequest = null;
           return;
         }
 
-        // Pick top request
         currentRequest = pendingRequests[0];
-        countSpan.textContent = pendingRequests.length;
-        queueSpan.textContent = pendingRequests.length > 1 
-          ? `Pending Request 1 of ${pendingRequests.length}` 
-          : 'Pending Counter Request';
+        if (countSpan) countSpan.textContent = pendingRequests.length;
+        if (queueSpan) {
+          queueSpan.textContent = pendingRequests.length > 1 
+            ? `Pending Request 1 of ${pendingRequests.length}` 
+            : 'Pending Counter Request';
+        }
 
-        document.getElementById('counterCustomerName').textContent = currentRequest.customer_name || 'Customer';
-        document.getElementById('counterOfferTitle').textContent = currentRequest.offer_title || 'Store Deal';
-        document.getElementById('counterMinBill').textContent = '₹' + (currentRequest.min_purchase || 0);
-        document.getElementById('counterDiscount').textContent = currentRequest.discount_display || 'Discount';
-        document.getElementById('counterOtpDisplay').textContent = currentRequest.verification_otp || '----';
-        document.getElementById('counterTimeDisplay').textContent = currentRequest.created_at || 'Just now';
+        const nameEl = document.getElementById('counterCustomerName');
+        const titleEl = document.getElementById('counterOfferTitle');
+        const minBillEl = document.getElementById('counterMinBill');
+        const discEl = document.getElementById('counterDiscount');
+        const otpEl = document.getElementById('counterOtpDisplay');
+        const timeEl = document.getElementById('counterTimeDisplay');
 
-        // Reset feedback
-        const fb = document.getElementById('counterActionFeedback');
-        fb.style.display = 'none';
-        fb.textContent = '';
-        document.getElementById('counterActionButtons').style.display = 'flex';
+        if (nameEl) nameEl.textContent = currentRequest.customer_name || 'Customer';
+        if (titleEl) titleEl.textContent = currentRequest.offer_title || 'Store Deal';
+        if (minBillEl) minBillEl.textContent = '₹' + (currentRequest.min_purchase || 0);
+        if (discEl) discEl.textContent = currentRequest.discount_display || 'Discount';
+        if (otpEl) otpEl.textContent = currentRequest.verification_otp || '----';
+        if (timeEl) timeEl.textContent = currentRequest.created_at || 'Just now';
 
-        // Check if user dismissed this specific request
         if (!modalDismissedForIds.has(currentRequest.id)) {
-          modal.style.display = 'flex';
-          pill.style.display = 'none';
+          if (modal) modal.style.display = 'flex';
+          if (pill) pill.style.display = 'none';
         } else {
-          modal.style.display = 'none';
-          pill.style.display = 'inline-flex';
+          if (modal) modal.style.display = 'none';
+          if (pill) pill.style.display = 'flex';
         }
       }
 
       window.openCounterModal = function() {
+        const modal = document.getElementById('counterRequestModal');
+        const pill = document.getElementById('floatingCounterPill');
         if (currentRequest) {
           modalDismissedForIds.delete(currentRequest.id);
-          document.getElementById('counterRequestModal').style.display = 'flex';
-          document.getElementById('floatingCounterPill').style.display = 'none';
         }
+        if (modal) modal.style.display = 'flex';
+        if (pill) pill.style.display = 'none';
       };
 
       window.closeCounterModal = function() {
+        const modal = document.getElementById('counterRequestModal');
+        const pill = document.getElementById('floatingCounterPill');
         if (currentRequest) {
           modalDismissedForIds.add(currentRequest.id);
         }
-        document.getElementById('counterRequestModal').style.display = 'none';
-        if (pendingRequests.length > 0) {
-          document.getElementById('floatingCounterPill').style.display = 'inline-flex';
+        if (modal) modal.style.display = 'none';
+        if (pendingRequests && pendingRequests.length > 0 && pill) {
+          pill.style.display = 'flex';
         }
       };
 
       window.handleCounterApprove = function() {
         if (!currentRequest) return;
-        const reqId = currentRequest.id;
+        const btn = document.getElementById('counterApproveBtn');
         const fb = document.getElementById('counterActionFeedback');
-        const btns = document.getElementById('counterActionButtons');
+        if (btn) btn.disabled = true;
 
-        fb.style.display = 'block';
-        fb.style.background = '#fef3c7';
-        fb.style.color = '#92400e';
-        fb.style.border = '1px solid #fde68a';
-        fb.textContent = 'Processing counter approval...';
-        btns.style.pointerEvents = 'none';
-        btns.style.opacity = '0.6';
-
-        fetch(`/api/seller/redemptions/${reqId}/approve/`, {
+        fetch(`/api/seller/redemptions/${currentRequest.id}/approve/`, {
           method: 'POST',
           headers: {
             'X-CSRFToken': getCsrfToken(),
             'Content-Type': 'application/json'
           }
         })
-        .then(res => res.json())
-        .then(data => {
-          if (data.success) {
-            fb.style.background = '#dcfce7';
-            fb.style.color = '#166534';
-            fb.style.border = '1px solid #86efac';
-            fb.innerHTML = '<i class="bi bi-check-circle-fill"></i> Approved! 1 Credit Deducted &amp; 1 Merchant Point Earned.';
+        .then(r => r.json())
+        .then(res => {
+          if (res.success) {
+            if (fb) {
+              fb.style.display = 'block';
+              fb.style.background = '#dcfce7';
+              fb.style.color = '#15803d';
+              fb.textContent = '✓ Redemption approved successfully!';
+            }
             setTimeout(() => {
-              pendingRequests = pendingRequests.filter(r => r.id !== reqId);
-              btns.style.pointerEvents = 'auto';
-              btns.style.opacity = '1';
-              updateModalUI();
-            }, 1200);
+              if (fb) fb.style.display = 'none';
+              if (btn) btn.disabled = false;
+              fetchPendingRedemptions();
+            }, 1000);
           } else {
-            fb.style.background = '#fee2e2';
-            fb.style.color = '#991b1b';
-            fb.style.border = '1px solid #fca5a5';
-            fb.textContent = data.message || 'Approval failed. Please try again.';
-            btns.style.pointerEvents = 'auto';
-            btns.style.opacity = '1';
+            alert(res.message || 'Approval failed.');
+            if (btn) btn.disabled = false;
           }
         })
         .catch(err => {
-          fb.style.background = '#fee2e2';
-          fb.style.color = '#991b1b';
-          fb.textContent = 'Network error while processing request.';
-          btns.style.pointerEvents = 'auto';
-          btns.style.opacity = '1';
+          alert('Network communication error: ' + err);
+          if (btn) btn.disabled = false;
         });
       };
 
       window.handleCounterReject = function() {
         if (!currentRequest) return;
-        if (!confirm('Are you sure you want to decline this redemption request?')) return;
-        
-        const reqId = currentRequest.id;
-        const fb = document.getElementById('counterActionFeedback');
-        const btns = document.getElementById('counterActionButtons');
+        const reason = prompt('Please enter a brief rejection reason (optional):', 'Counter condition not met');
+        if (reason === null) return;
 
-        fb.style.display = 'block';
-        fb.style.background = '#fef3c7';
-        fb.style.color = '#92400e';
-        fb.style.border = '1px solid #fde68a';
-        fb.textContent = 'Declining request...';
-        btns.style.pointerEvents = 'none';
-        btns.style.opacity = '0.6';
+        const btn = document.getElementById('counterRejectBtn');
+        if (btn) btn.disabled = true;
 
-        fetch(`/api/seller/redemptions/${reqId}/reject/`, {
+        fetch(`/api/seller/redemptions/${currentRequest.id}/reject/`, {
           method: 'POST',
           headers: {
             'X-CSRFToken': getCsrfToken(),
             'Content-Type': 'application/json'
-          }
+          },
+          body: JSON.stringify({ reason: reason })
         })
-        .then(res => res.json())
-        .then(data => {
-          if (data.success) {
-            fb.style.background = '#f1f5f9';
-            fb.style.color = '#475569';
-            fb.style.border = '1px solid #cbd5e1';
-            fb.textContent = 'Request declined.';
-            setTimeout(() => {
-              pendingRequests = pendingRequests.filter(r => r.id !== reqId);
-              btns.style.pointerEvents = 'auto';
-              btns.style.opacity = '1';
-              updateModalUI();
-            }, 800);
-          } else {
-            fb.style.background = '#fee2e2';
-            fb.style.color = '#991b1b';
-            fb.textContent = data.message || 'Action failed.';
-            btns.style.pointerEvents = 'auto';
-            btns.style.opacity = '1';
-          }
+        .then(r => r.json())
+        .then(res => {
+          if (btn) btn.disabled = false;
+          fetchPendingRedemptions();
         })
         .catch(err => {
-          fb.style.background = '#fee2e2';
-          fb.style.color = '#991b1b';
-          fb.textContent = 'Network error.';
-          btns.style.pointerEvents = 'auto';
-          btns.style.opacity = '1';
+          alert('Network communication error: ' + err);
+          if (btn) btn.disabled = false;
         });
       };
 
@@ -817,38 +734,7 @@
         pollTimer = setInterval(fetchPendingRedemptions, 8000);
       });
     })();
-  </script>
 
-  <script src="{% static 'js/main.js' %}?v=2.1"></script>
-  {% block extra_js %}{% endblock %}
-
-  <!-- Backdrop for offcanvas sidebar on mobile -->
-  <div class="seller-sidebar-backdrop" id="sellerSidebarBackdrop"></div>
-
-  <!-- Mobile Bottom Navigation Bar for Merchants -->
-  <div class="mobile-bottom-nav seller-bottom-nav">
-    <a href="/seller/dashboard/" class="{% if request.path == '/seller/dashboard/' %}active{% endif %}">
-      <i class="bi bi-grid-fill"></i>
-      <span>Home</span>
-    </a>
-    <a href="/seller/offers/" class="{% if '/seller/offers/' in request.path %}active{% endif %}">
-      <i class="bi bi-tags-fill"></i>
-      <span>Offers</span>
-    </a>
-    <a href="/seller/qr/" class="seller-nav-qr-btn {% if '/seller/qr/' in request.path %}active{% endif %}" title="Counter QR Desk">
-      <i class="bi bi-qr-code-scan"></i>
-    </a>
-    <a href="/seller/redemptions/" class="{% if '/seller/redemptions/' in request.path %}active{% endif %}">
-      <i class="bi bi-check2-circle"></i>
-      <span>Redeem</span>
-    </a>
-    <a href="/seller/shop/" class="{% if '/seller/shop/' in request.path %}active{% endif %}">
-      <i class="bi bi-shop-window"></i>
-      <span>Shop</span>
-    </a>
-  </div>
-
-  <script>
     // Mobile Sidebar Drawer Toggle for Merchant Portal
     const sellerMobileBtn = document.getElementById('sellerMobileMenuBtn');
     const sellerSidebar = document.querySelector('.portal-sidebar');
@@ -873,6 +759,24 @@
     document.querySelectorAll('.portal-sidebar .portal-nav-item').forEach(link => {
       link.addEventListener('click', closeSellerSidebar);
     });
+
+    // Profile Dropdown Toggle
+    const sellerDropdownBtn = document.getElementById('sellerProfileDropdownBtn');
+    if (sellerDropdownBtn) {
+      sellerDropdownBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const menu = sellerDropdownBtn.nextElementSibling;
+        if (menu) menu.classList.toggle('show');
+      });
+      document.addEventListener('click', () => {
+        const menu = sellerDropdownBtn.nextElementSibling;
+        if (menu) menu.classList.remove('show');
+      });
+    }
   </script>
+
+  <script src="{% static 'js/main.js' %}?v=2.5"></script>
+  {% block extra_js %}{% endblock %}
+
 </body>
 </html>

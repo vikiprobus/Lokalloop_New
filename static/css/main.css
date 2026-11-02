@@ -1282,3 +1282,67 @@ body {
 
 
 
+
+
+/* -------------------------------------------------------------
+   12. Merchant / Seller Portal Mobile Responsive Optimizations
+   ------------------------------------------------------------- */
+@media (max-width: 768px) {
+  /* Prevent horizontal wobble in merchant portal */
+  .portal-layout,
+  .portal-main {
+    width: 100% !important;
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+  }
+
+  /* 2x2 KPI stat cards grid */
+  .portal-main .grid-4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 0.65rem !important;
+  }
+
+  /* Single column for promo packages, offers vs redemptions */
+  .portal-main .grid-3,
+  .portal-main .grid-2 {
+    grid-template-columns: 1fr !important;
+    gap: 0.85rem !important;
+  }
+
+  .portal-main .stat-card {
+    padding: 0.85rem 0.75rem !important;
+    border-radius: 14px !important;
+  }
+
+  .portal-main .stat-card .stat-val {
+    font-size: 1.35rem !important;
+  }
+
+  .portal-main .stat-card .stat-label {
+    font-size: 0.72rem !important;
+  }
+
+  /* Quick action buttons flex-wrap on mobile */
+  .portal-main .d-flex.gap-2 {
+    flex-wrap: wrap !important;
+  }
+
+  .portal-main .d-flex.gap-2 .btn {
+    flex: 1 1 auto !important;
+    text-align: center;
+    justify-content: center;
+  }
+
+  /* Responsive print/standee container */
+  .portal-main .qr-desk-left-col {
+    margin-bottom: 1rem !important;
+  }
+
+  /* Tables in merchant ledger */
+  .portal-main .table th,
+  .portal-main .table td {
+    padding: 0.65rem 0.75rem !important;
+    font-size: 0.8rem !important;
+    white-space: nowrap;
+  }
+}
