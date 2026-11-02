@@ -9,7 +9,7 @@ from apps.shops.models import Shop, ShopCategory, ShopImage
 from apps.offers.models import Offer, OfferType, OfferStatus
 from apps.redemptions.models import QRCode, OfferRedemption, RedemptionStatus
 from apps.wallets.models import SellerWallet, CreditPackage, WalletTransaction, TransactionType, CreditPurchase
-from apps.rewards.models import BuyerRewardAccount, RewardTransaction, RewardType
+from apps.rewards.models import BuyerRewardAccount, RewardTransaction, RewardType, BumperBillSubmission, BuyerRewardClaim, RewardCatalogItem
 from apps.notifications.models import Notification, NotificationType
 from apps.administration.models import AdminAction, SupportTicket, TicketCategory, TicketStatus
 from services.wallet_service import get_or_create_wallet
@@ -24,16 +24,21 @@ class Command(BaseCommand):
         self.stdout.write(self.style.NOTICE("Initializing LokalLoop demo data cleanup & reset..."))
 
         # 0. Clean old demo records safely
+        BumperBillSubmission.objects.all().delete()
+        BuyerRewardClaim.objects.all().delete()
+        RewardTransaction.objects.all().delete()
         OfferRedemption.objects.all().delete()
         QRCode.objects.all().delete()
         Offer.objects.all().delete()
+        ShopImage.objects.all().delete()
         Shop.objects.all().delete()
         SupportTicket.objects.all().delete()
         AdminAction.objects.all().delete()
         Notification.objects.all().delete()
-        RewardTransaction.objects.all().delete()
         WalletTransaction.objects.all().delete()
         CreditPurchase.objects.all().delete()
+        BuyerRewardAccount.objects.all().delete()
+        SellerWallet.objects.all().delete()
         
         # Clean demo users
         demo_emails = [
