@@ -38,15 +38,16 @@ SMS_GATEWAY_API_KEY = os.environ.get('SMS_GATEWAY_API_KEY', '')
 SMS_GATEWAY_SENDER_ID = os.environ.get('SMS_GATEWAY_SENDER_ID', 'LOKALP')
 SMS_GATEWAY_PROVIDER = os.environ.get('SMS_GATEWAY_PROVIDER', 'dummy')
 
-allowed_hosts_raw = os.environ.get('DJANGO_ALLOWED_HOSTS', '127.0.0.1,localhost,.trycloudflare.com')
+allowed_hosts_raw = os.environ.get('DJANGO_ALLOWED_HOSTS', '127.0.0.1,localhost,.trycloudflare.com,.onrender.com,.railway.app')
 ALLOWED_HOSTS = [host.strip() for host in allowed_hosts_raw.split(',') if host.strip()]
-if '.trycloudflare.com' not in ALLOWED_HOSTS:
-    ALLOWED_HOSTS.append('.trycloudflare.com')
-if 'testserver' not in ALLOWED_HOSTS:
-    ALLOWED_HOSTS.append('testserver')
+for h in ['.trycloudflare.com', '.onrender.com', '.railway.app', 'testserver']:
+    if h not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append(h)
 
 CSRF_TRUSTED_ORIGINS = [
     'https://*.trycloudflare.com',
+    'https://*.onrender.com',
+    'https://*.railway.app',
     'http://127.0.0.1:8000',
     'http://localhost:8000',
 ]
@@ -101,6 +102,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'config.middleware.RateLimitMiddleware',
     'config.middleware.ApiSecurityMiddleware',
     'config.middleware.SecurityHeadersMiddleware',
@@ -147,6 +149,15 @@ DATABASES = {
     }
 }
 
+database_url = os.environ.get('DATABASE_URL')
+if database_url:
+    import dj_database_url
+    DATABASES['default'] = dj_database_url.config(
+        default=database_url,
+        conn_max_age=600,
+        ssl_require=True if 'postgres' in database_url.lower() else False
+    )
+
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -178,6 +189,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
 # Media files
 MEDIA_URL = '/media/'
