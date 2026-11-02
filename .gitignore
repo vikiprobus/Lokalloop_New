@@ -28,7 +28,9 @@ wheels/
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
-media/
+media/bumper_bills/
+media/test/
+static/media/
 staticfiles/
 
 # Environment
