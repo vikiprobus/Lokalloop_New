@@ -214,34 +214,137 @@
 
   </div>
 
-  <!-- 7. Points Passbook Transactions Ledger -->
-  <div style="background: #ffffff; border-radius: 16px; border: 1px solid #f1f5f9; padding: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
+  
+  <!-- SECTION 3: Active & Past Bumper Submissions Status Report Table -->
+  {% if bumper_submissions %}
+    <div style="background: #ffffff; border-radius: 16px; border: 1px solid #f1f5f9; padding: 1rem; margin-bottom: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.85rem; border-bottom: 1px solid #f1f5f9; padding-bottom: 0.5rem;">
+        <div>
+          <h3 style="font-size: 1.05rem; font-weight: 800; color: #0f172a; margin: 0; font-family: 'Outfit', sans-serif;">
+            My High-Value Bill Submissions (Reports)
+          </h3>
+          <p style="font-size: 0.75rem; color: #64748b; margin: 0.15rem 0 0;">Track store counter verification and VIP voucher clearance</p>
+        </div>
+        <span style="font-size: 0.72rem; font-weight: 700; color: #ea580c; background: #fff7ed; padding: 0.2rem 0.6rem; border-radius: 9999px;">{{ bumper_submissions|length }} Submissions</span>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table" style="width: 100%; border-collapse: collapse; font-size: 0.82rem;">
+          <thead>
+            <tr style="border-bottom: 1px solid #e2e8f0; text-align: left; color: #64748b; font-size: 0.72rem; text-transform: uppercase;">
+              <th style="padding: 0.5rem 0.65rem;">Store</th>
+              <th style="padding: 0.5rem 0.65rem;">Bill Amount</th>
+              <th style="padding: 0.5rem 0.65rem;">Submitted On</th>
+              <th style="padding: 0.5rem 0.65rem;">Status</th>
+              <th style="padding: 0.5rem 0.65rem;">VIP Reward / Code</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for sub in bumper_submissions %}
+              <tr style="border-bottom: 1px dashed #f1f5f9;">
+                <td style="padding: 0.6rem 0.65rem;">
+                  <strong style="color: #0f172a;">{{ sub.shop.name }}</strong>
+                  <div style="font-size: 0.7rem; color: #94a3b8;">{{ sub.shop.locality }}</div>
+                </td>
+                <td style="padding: 0.6rem 0.65rem; font-weight: 700; color: #0f172a;">₹{{ sub.bill_amount|floatformat:2 }}</td>
+                <td style="padding: 0.6rem 0.65rem; color: #64748b; font-size: 0.75rem; white-space: nowrap;">{{ sub.submitted_at|date:"d M Y, h:i A" }}</td>
+                <td style="padding: 0.6rem 0.65rem;">
+                  {% if sub.status == 'APPROVED' %}
+                    <span style="background: #f0fdf4; color: #16a34a; font-weight: 800; font-size: 0.72rem; padding: 0.2rem 0.55rem; border-radius: 6px; border: 1px solid #bbf7d0;">Approved</span>
+                  {% elif sub.status == 'STORE_VERIFIED' %}
+                    <span style="background: #f0f9ff; color: #0284c7; font-weight: 800; font-size: 0.72rem; padding: 0.2rem 0.55rem; border-radius: 6px; border: 1px solid #bae6fd;">Store Verified</span>
+                  {% elif sub.status == 'REJECTED' %}
+                    <span style="background: #fef2f2; color: #dc2626; font-weight: 800; font-size: 0.72rem; padding: 0.2rem 0.55rem; border-radius: 6px; border: 1px solid #fecaca;">Declined</span>
+                  {% else %}
+                    <span style="background: #fffbeb; color: #d97706; font-weight: 800; font-size: 0.72rem; padding: 0.2rem 0.55rem; border-radius: 6px; border: 1px solid #fde68a;">Pending</span>
+                  {% endif %}
+                </td>
+                <td style="padding: 0.6rem 0.65rem;">
+                  {% if sub.status == 'APPROVED' %}
+                    <div style="font-size: 0.82rem; font-weight: 800; color: #16a34a;">
+                      +100 Pts &bull; VIP: <span style="font-family: monospace; color: #ffffff; background: #0f172a; padding: 0.15rem 0.45rem; border-radius: 4px;">{{ sub.voucher_code }}</span>
+                    </div>
+                    <div style="font-size: 0.72rem; color: #64748b;">{{ sub.voucher_details }}</div>
+                  {% elif sub.status == 'STORE_VERIFIED' %}
+                    <div style="font-size: 0.75rem; color: #0284c7; font-weight: 600;">
+                      Verified by store! Awaiting central platform clearance.
+                    </div>
+                  {% elif sub.status == 'REJECTED' %}
+                    <span style="font-size: 0.72rem; color: #ef4444;">
+                      Declined ({% if sub.rejection_stage == 'STORE' %}Store{% else %}Platform{% endif %}): {{ sub.rejection_reason|default:"Declined" }}
+                    </span>
+                  {% else %}
+                    <span style="font-size: 0.72rem; color: #94a3b8;">
+                      Waiting for merchant counter verification
+                    </span>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- SECTION 4: Points Passbook Audit Ledger Report -->
+  <div style="background: #ffffff; border-radius: 16px; border: 1px solid #f1f5f9; padding: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.02); margin-bottom: 2rem;">
     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.85rem; border-bottom: 1px solid #f1f5f9; padding-bottom: 0.5rem;">
-      <h3 style="font-size: 1rem; font-weight: 800; color: #0f172a; margin: 0; font-family: 'Outfit', sans-serif;">
-        Points Passbook Ledger
-      </h3>
-      <span style="font-size: 0.72rem; color: #64748b; font-weight: 700;">{{ transactions|length }} Entries</span>
+      <div>
+        <h3 style="font-size: 1.05rem; font-weight: 800; color: #0f172a; margin: 0; font-family: 'Outfit', sans-serif;">
+          Points Passbook Ledger (Audit Report)
+        </h3>
+        <p style="font-size: 0.75rem; color: #64748b; margin: 0.15rem 0 0;">Complete transaction audit trail of points earned, spent, and bumper rewards</p>
+      </div>
+      <span style="font-size: 0.72rem; font-weight: 700; color: #475569; background: #f1f5f9; padding: 0.2rem 0.6rem; border-radius: 9999px;">{{ transactions|length }} Entries</span>
     </div>
 
-    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-      {% for tx in transactions %}
-        <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px dashed #f1f5f9;">
-          <div>
-            <div style="font-size: 0.82rem; font-weight: 700; color: #0f172a;">{{ tx.notes }}</div>
-            <div style="font-size: 0.72rem; color: #94a3b8;">{{ tx.created_at|date:"d M Y, h:i A" }}</div>
-          </div>
-          <div style="text-align: right;">
-            <div style="font-weight: 800; font-size: 0.88rem; color: {% if tx.points > 0 %}#16a34a{% else %}#dc2626{% endif %};">
-              {% if tx.points > 0 %}+{{ tx.points }}{% else %}{{ tx.points }}{% endif %} Pts
-            </div>
-            <div style="font-size: 0.7rem; color: #64748b;">Bal: {{ tx.balance_after }} Pts</div>
-          </div>
-        </div>
-      {% empty %}
-        <div style="text-align: center; color: #94a3b8; font-size: 0.8rem; padding: 1.5rem 0;">
-          No points transactions yet. Scan an in-store offer to earn your first loyalty reward!
-        </div>
-      {% endfor %}
+    <div class="table-responsive">
+      <table class="table" style="width: 100%; border-collapse: collapse; font-size: 0.82rem;">
+        <thead>
+          <tr style="border-bottom: 1px solid #e2e8f0; text-align: left; color: #64748b; font-size: 0.72rem; text-transform: uppercase;">
+            <th style="padding: 0.5rem 0.65rem;">Date &amp; Time</th>
+            <th style="padding: 0.5rem 0.65rem;">Activity Description</th>
+            <th style="padding: 0.5rem 0.65rem;">Type</th>
+            <th style="padding: 0.5rem 0.65rem;">Points Delta</th>
+            <th style="padding: 0.5rem 0.65rem;">Balance After</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for tx in transactions %}
+            <tr style="border-bottom: 1px dashed #f1f5f9;">
+              <td style="padding: 0.6rem 0.65rem; color: #64748b; font-size: 0.75rem; white-space: nowrap;">
+                {{ tx.created_at|date:"d M Y, h:i A" }}
+              </td>
+              <td style="padding: 0.6rem 0.65rem;">
+                <div style="font-weight: 700; color: #0f172a;">{{ tx.notes }}</div>
+                {% if tx.redemption %}
+                  <div style="font-size: 0.7rem; color: #94a3b8;">
+                    Store: {{ tx.redemption.shop.name }} ({{ tx.redemption.shop.locality }})
+                  </div>
+                {% endif %}
+              </td>
+              <td style="padding: 0.6rem 0.65rem;">
+                <span style="font-size: 0.72rem; font-weight: 700; padding: 0.2rem 0.5rem; border-radius: 9999px; {% if tx.points > 0 %}background: #f0fdf4; color: #16a34a;{% else %}background: #f1f5f9; color: #64748b;{% endif %}">
+                  {{ tx.get_transaction_type_display }}
+                </span>
+              </td>
+              <td style="padding: 0.6rem 0.65rem; font-weight: 800; font-size: 0.88rem; color: {% if tx.points > 0 %}#16a34a{% else %}#dc2626{% endif %}; white-space: nowrap;">
+                {% if tx.points > 0 %}+{{ tx.points }}{% else %}{{ tx.points }}{% endif %} Pts
+              </td>
+              <td style="padding: 0.6rem 0.65rem; font-weight: 800; color: #0f172a; white-space: nowrap;">
+                {{ tx.balance_after }} Pts
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="5" style="text-align: center; color: #94a3b8; padding: 2rem 1rem;">
+                No points transactions yet. Scan an in-store offer to earn your first loyalty reward!
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
   </div>
 

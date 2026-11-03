@@ -363,12 +363,12 @@
     {% block content %}{% endblock %}
   </main>
 
-  <!-- Mobile Bottom Navigation Bar (5 Items with Floating Scan Button & Active Underlines) -->
+    <!-- Mobile Bottom Navigation Bar (6 Items with Activity & Floating Center Scan Button) -->
   <nav class="mobile-bottom-nav">
     
     <!-- 1. Home -->
     <a href="/buyer/dashboard/" class="bottom-nav-item {% if request.path == '/buyer/dashboard/' %}active{% endif %}">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="{% if request.path == '/buyer/dashboard/' %}#ea580c{% else %}none{% endif %}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="{% if request.path == '/buyer/dashboard/' %}#ea580c{% else %}none{% endif %}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
         <polyline points="9 22 9 12 15 12 15 22" stroke="{% if request.path == '/buyer/dashboard/' %}#ffffff{% else %}currentColor{% endif %}"/>
       </svg>
@@ -380,7 +380,7 @@
 
     <!-- 2. Explore -->
     <a href="/buyer/explore/" class="bottom-nav-item {% if '/buyer/explore/' in request.path %}active{% endif %}">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="10"/>
         <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" fill="{% if '/buyer/explore/' in request.path %}#ea580c{% else %}none{% endif %}"/>
       </svg>
@@ -393,7 +393,7 @@
     <!-- 3. Floating Orange Scan Button -->
     <a href="/buyer/scan/" class="bottom-scan-wrapper">
       <div class="bottom-scan-btn" aria-label="Scan billing counter QR">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
           <path d="M3 7V5a2 2 0 0 1 2-2h2"/>
           <path d="M17 3h2a2 2 0 0 1 2 2v2"/>
           <path d="M21 17v2a2 2 0 0 1-2 2h-2"/>
@@ -407,7 +407,7 @@
 
     <!-- 4. Rewards -->
     <a href="/buyer/rewards/" class="bottom-nav-item {% if '/buyer/rewards/' in request.path %}active{% endif %}">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <polyline points="20 12 20 22 4 22 4 12"/>
         <rect x="2" y="7" width="20" height="5"/>
         <line x1="12" y1="22" x2="12" y2="7"/>
@@ -420,9 +420,21 @@
       {% endif %}
     </a>
 
-    <!-- 5. Account -->
+    <!-- 5. Activity (Savings & Redemptions History) -->
+    <a href="/buyer/history/" class="bottom-nav-item {% if '/buyer/history/' in request.path %}active{% endif %}">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <polyline points="12 6 12 12 16 14"/>
+      </svg>
+      <span>Activity</span>
+      {% if '/buyer/history/' in request.path %}
+        <span class="bottom-nav-indicator"></span>
+      {% endif %}
+    </a>
+
+    <!-- 6. Account -->
     <a href="/buyer/account/" class="bottom-nav-item {% if '/buyer/account/' in request.path %}active{% endif %}">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
         <circle cx="12" cy="7" r="4"/>
       </svg>
@@ -433,7 +445,6 @@
     </a>
 
   </nav>
-
 
   <!-- Mobile Account Drawer Modal (BUG-3.2) -->
   <div id="mobileAccountBackdrop" style="display: none; position: fixed; inset: 0; background: rgba(15,23,42,0.6); z-index: 1050; backdrop-filter: blur(2px);" onclick="closeMobileAccountDrawer()"></div>

@@ -359,5 +359,78 @@
     {% endfor %}
   </div>
 
+
+  <!-- 6. Neighborhood stores (Verified local shops) -->
+  <div style="margin-bottom: 2rem;">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.85rem;">
+      <div>
+        <h3 style="font-size: 1.15rem; font-weight: 800; color: #0f172a; margin: 0; font-family: 'Outfit', sans-serif;">
+          Neighborhood stores
+        </h3>
+        <p style="font-size: 0.78rem; color: #64748b; margin: 0.15rem 0 0;">
+          Verified local boutiques, roasteries &amp; specialty shops
+        </p>
+      </div>
+      <a href="/buyer/explore/?type=shops" style="color: #2563eb; font-weight: 700; font-size: 0.78rem; text-decoration: none;">
+        <span>View all shops</span> &rarr;
+      </a>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 0.85rem;">
+      {% for shop in nearby_shops %}
+        {% include "components/shop_card.html" with shop=shop %}
+      {% empty %}
+        <div style="background: #ffffff; border-radius: 16px; padding: 2rem; text-align: center; color: #64748b; font-size: 0.85rem; grid-column: 1 / -1;">
+          No stores found in this area yet.
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- 7. Recent in-store redemptions (Activity Audit Report) -->
+  {% if recent_redemptions %}
+    <div style="background: #ffffff; border-radius: 16px; border: 1px solid #f1f5f9; padding: 1rem; margin-bottom: 2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.85rem; border-bottom: 1px solid #f1f5f9; padding-bottom: 0.5rem;">
+        <div>
+          <h3 style="font-size: 1.05rem; font-weight: 800; color: #0f172a; margin: 0; font-family: 'Outfit', sans-serif;">
+            Recent in-store redemptions
+          </h3>
+          <p style="font-size: 0.75rem; color: #64748b; margin: 0.1rem 0 0;">Past checkout activity and savings</p>
+        </div>
+        <a href="/buyer/history/" style="color: #ea580c; font-weight: 700; font-size: 0.75rem; text-decoration: none;">
+          Full Activity Ledger &rarr;
+        </a>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table" style="width: 100%; border-collapse: collapse; font-size: 0.82rem;">
+          <thead>
+            <tr style="border-bottom: 1px solid #e2e8f0; text-align: left; color: #64748b; font-size: 0.72rem; text-transform: uppercase;">
+              <th style="padding: 0.5rem 0.65rem;">Store</th>
+              <th style="padding: 0.5rem 0.65rem;">Offer</th>
+              <th style="padding: 0.5rem 0.65rem;">Discount saved</th>
+              <th style="padding: 0.5rem 0.65rem;">Points earned</th>
+              <th style="padding: 0.5rem 0.65rem;">Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in recent_redemptions %}
+              <tr style="border-bottom: 1px dashed #f1f5f9;">
+                <td style="padding: 0.6rem 0.65rem;">
+                  <strong style="color: #0f172a;">{{ item.shop.name }}</strong>
+                  <div style="font-size: 0.7rem; color: #94a3b8;">{{ item.shop.locality }}</div>
+                </td>
+                <td style="padding: 0.6rem 0.65rem; color: #334155;">{{ item.offer.title }}</td>
+                <td style="padding: 0.6rem 0.65rem; color: #16a34a; font-weight: 700;">₹{{ item.discount_given|floatformat:0 }}</td>
+                <td style="padding: 0.6rem 0.65rem; color: #ea580c; font-weight: 800;">+{{ item.reward_points_earned }} pts</td>
+                <td style="padding: 0.6rem 0.65rem; color: #64748b; font-size: 0.75rem; white-space: nowrap;">{{ item.redeemed_at|date:"d M Y, h:i A" }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  {% endif %}
+
 </div>
 {% endblock %}
