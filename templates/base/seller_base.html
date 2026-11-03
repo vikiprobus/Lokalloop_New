@@ -778,5 +778,72 @@
   <script src="{% static 'js/main.js' %}?v=2.5"></script>
   {% block extra_js %}{% endblock %}
 
+
+  <!-- Seller Sidebar Backdrop -->
+  <div class="seller-sidebar-backdrop" id="sellerSidebarBackdrop"></div>
+
+  <!-- Seller Mobile Bottom Navigation Bar -->
+  <nav class="seller-bottom-nav">
+    <a href="/seller/dashboard/" class="{% if request.path == '/seller/dashboard/' %}active{% endif %}">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="{% if request.path == '/seller/dashboard/' %}#ea580c{% else %}none{% endif %}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect width="7" height="9" x="3" y="3" rx="1"/>
+        <rect width="7" height="5" x="14" y="3" rx="1"/>
+        <rect width="7" height="9" x="14" y="12" rx="1"/>
+        <rect width="7" height="5" x="3" y="16" rx="1"/>
+      </svg>
+      <span>Home</span>
+    </a>
+
+    <a href="/seller/offers/" class="{% if '/seller/offers/' in request.path %}active{% endif %}">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2H2v10l9.29 9.29c.94.94 2.48.94 3.42 0l6.58-6.58c.94-.94.94-2.48 0-3.42L12 2Z"/>
+        <path d="M7 7h.01"/>
+      </svg>
+      <span>Offers</span>
+    </a>
+
+    <a href="/seller/qr/" class="seller-nav-qr-btn" aria-label="Counter QR Desk" title="Counter QR Standee">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+        <rect width="5" height="5" x="3" y="3" rx="1"/>
+        <rect width="5" height="5" x="16" y="3" rx="1"/>
+        <rect width="5" height="5" x="3" y="16" rx="1"/>
+        <path d="M21 16h-3a2 2 0 0 0-2 2v3"/>
+        <path d="M21 21v.01"/>
+        <path d="M12 7v3a2 2 0 0 1-2 2H7"/>
+        <path d="M3 12h.01"/>
+        <path d="M12 3h.01"/>
+        <path d="M12 16v.01"/>
+        <path d="M16 12h1"/>
+        <path d="M21 12v.01"/>
+        <path d="M12 21v-1"/>
+      </svg>
+    </a>
+
+    <a href="/seller/redemptions/" class="{% if '/seller/redemptions/' in request.path %}active{% endif %}">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+        <polyline points="22 4 12 14.01 9 11.01"/>
+      </svg>
+      <span>Redeem</span>
+    </a>
+
+    <a href="/seller/credits/" class="{% if '/seller/credits/' in request.path %}active{% endif %}">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/>
+        <path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/>
+        <path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/>
+      </svg>
+      <span>Credits</span>
+    </a>
+
+    <a href="/seller/shop/" class="{% if '/seller/shop/' in request.path %}active{% endif %}">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+        <polyline points="9 22 9 12 15 12 15 22"/>
+      </svg>
+      <span>Store</span>
+    </a>
+  </nav>
+
 </body>
 </html>

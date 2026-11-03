@@ -9,9 +9,9 @@
       {% if shop.distance_display %}
         {{ shop.distance_display }}
       {% elif shop.distance_km %}
-        ~ {{ shop.distance_km }} km
+        ~ {{ shop.distance_km|floatformat:1 }} km
       {% else %}
-        ~ 0.8 km
+        {{ shop.locality|default:shop.city }}
       {% endif %}
     </span>
 

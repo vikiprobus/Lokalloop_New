@@ -6,7 +6,7 @@
 {% block content %}
 {% if not user.seller_profile.is_verified %}
 <!-- Application Under Compliance Review Banner -->
-<div class="card card-padded" style="margin-bottom: 2rem; background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 60%, #1e293b 100%); color: #ffffff; border: 1px solid #f59e0b; border-left: 6px solid #f59e0b; border-radius: var(--radius-xl); box-shadow: 0 10px 25px -5px rgba(245, 158, 11, 0.15); position: relative; overflow: hidden;">
+<div class="card card-padded" style="margin-bottom: 1.5rem; background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 60%, #1e293b 100%); color: #ffffff; border: 1px solid #f59e0b; border-left: 6px solid #f59e0b; border-radius: 20px; box-shadow: 0 10px 25px -5px rgba(245, 158, 11, 0.15); position: relative; overflow: hidden;">
   <div style="position: absolute; top: -50px; right: -50px; width: 180px; height: 180px; background: radial-gradient(circle, rgba(245, 158, 11, 0.25) 0%, rgba(245, 158, 11, 0) 70%); border-radius: 50%; pointer-events: none;"></div>
 
   <div class="d-flex align-center justify-between flex-wrap gap-3" style="position: relative; z-index: 2;">
@@ -48,77 +48,100 @@
 </div>
 {% endif %}
 
-<!-- Quick KPI Cards Grid -->
-<div class="d-grid grid-4 gap-3" style="margin-bottom: 2rem;">
+<!-- Modern High-Definition 2x2 (Mobile) / 4-Col (Desktop) KPI Cards Grid -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
   
-  <div class="stat-card">
-    <div>
-      <span class="stat-label">Available promotional credits</span>
-      {% if user.seller_profile.is_verified %}
-        <div class="stat-val" style="color: var(--color-success);">{{ wallet.balance_credits }}</div>
-        <span style="font-size: 0.775rem; color: var(--text-muted);">
-          {% if wallet.balance_credits < 20 %}<strong class="text-danger">Low balance</strong>{% else %}Promotional balance active{% endif %}
-        </span>
-      {% else %}
-        <div class="stat-val" style="color: #f59e0b;">0 (Standby ⏳)</div>
-        <span style="font-size: 0.775rem; color: var(--text-muted);">100 Credits unlocked upon approval</span>
-      {% endif %}
+  <!-- 1. Available Credits -->
+  <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 18px; padding: 1.15rem 1.25rem; box-shadow: 0 4px 15px -3px rgba(0, 0, 0, 0.04); position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; min-height: 130px;">
+    <div style="position: absolute; right: -15px; top: -15px; width: 70px; height: 70px; background: rgba(16, 185, 129, 0.06); border-radius: 50%; pointer-events: none;"></div>
+    <div class="d-flex align-center justify-between" style="margin-bottom: 0.5rem;">
+      <span style="font-size: 0.75rem; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.04em;">Credits Balance</span>
+      <div style="width: 38px; height: 38px; border-radius: 12px; background: #ecfdf5; color: #059669; display: flex; align-items: center; justify-content: center; font-size: 1.15rem; flex-shrink: 0;">
+        <i class="bi bi-lightning-charge-fill"></i>
+      </div>
     </div>
-    <div class="stat-icon" style="background: var(--color-success-bg); color: var(--color-success);">
-      <i class="bi bi-lightning-charge-fill"></i>
+    <div>
+      <div style="font-size: 1.75rem; font-weight: 800; color: #059669; font-family: var(--font-display); line-height: 1.1;">
+        {% if user.seller_profile.is_verified %}{{ wallet.balance_credits }} <span style="font-size: 0.95rem; font-weight: 700;">Cr</span>{% else %}0 (Standby ⏳){% endif %}
+      </div>
+      <div style="font-size: 0.75rem; color: #94a3b8; margin-top: 0.35rem; font-weight: 600;">
+        {% if wallet.balance_credits < 20 %}<strong style="color: #ef4444;">Low balance</strong> &bull; <a href="/seller/credits/" style="color: #059669; text-decoration: underline;">Recharge</a>{% else %}Promotional balance active{% endif %}
+      </div>
     </div>
   </div>
 
-  <div class="stat-card">
-    <div>
-      <span class="stat-label">Total counter visits</span>
-      <div class="stat-val">{% if user.seller_profile.is_verified %}{{ total_redemptions_count }}{% else %}0{% endif %}</div>
-      <span style="font-size: 0.775rem; color: var(--text-muted);">{% if user.seller_profile.is_verified %}Verified store redemptions{% else %}Store not yet live{% endif %}</span>
+  <!-- 2. Total Counter Visits -->
+  <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 18px; padding: 1.15rem 1.25rem; box-shadow: 0 4px 15px -3px rgba(0, 0, 0, 0.04); position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; min-height: 130px;">
+    <div style="position: absolute; right: -15px; top: -15px; width: 70px; height: 70px; background: rgba(59, 130, 246, 0.06); border-radius: 50%; pointer-events: none;"></div>
+    <div class="d-flex align-center justify-between" style="margin-bottom: 0.5rem;">
+      <span style="font-size: 0.75rem; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.04em;">Counter Visits</span>
+      <div style="width: 38px; height: 38px; border-radius: 12px; background: #eff6ff; color: #2563eb; display: flex; align-items: center; justify-content: center; font-size: 1.15rem; flex-shrink: 0;">
+        <i class="bi bi-people-fill"></i>
+      </div>
     </div>
-    <div class="stat-icon" style="background: var(--brand-indigo-50); color: var(--brand-indigo-600);">
-      <i class="bi bi-people-fill"></i>
+    <div>
+      <div style="font-size: 1.75rem; font-weight: 800; color: #0f172a; font-family: var(--font-display); line-height: 1.1;">
+        {% if user.seller_profile.is_verified %}{{ total_redemptions_count }}{% else %}0{% endif %}
+      </div>
+      <div style="font-size: 0.75rem; color: #94a3b8; margin-top: 0.35rem; font-weight: 600;">
+        Verified store checkouts
+      </div>
     </div>
   </div>
 
-  <div class="stat-card">
-    <div>
-      <span class="stat-label">Active counter offers</span>
-      <div class="stat-val">{% if user.seller_profile.is_verified %}{{ active_offers_count }} / {{ total_offers_count }}{% else %}0 (Locked 🔒){% endif %}</div>
-      <span style="font-size: 0.775rem; color: var(--text-muted);">{% if user.seller_profile.is_verified %}Currently claimable{% else %}Unlocked upon verification{% endif %}</span>
+  <!-- 3. Active Offers -->
+  <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 18px; padding: 1.15rem 1.25rem; box-shadow: 0 4px 15px -3px rgba(0, 0, 0, 0.04); position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; min-height: 130px;">
+    <div style="position: absolute; right: -15px; top: -15px; width: 70px; height: 70px; background: rgba(249, 115, 22, 0.06); border-radius: 50%; pointer-events: none;"></div>
+    <div class="d-flex align-center justify-between" style="margin-bottom: 0.5rem;">
+      <span style="font-size: 0.75rem; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.04em;">Active Deals</span>
+      <div style="width: 38px; height: 38px; border-radius: 12px; background: #fff7ed; color: #ea580c; display: flex; align-items: center; justify-content: center; font-size: 1.15rem; flex-shrink: 0;">
+        <i class="bi bi-tags-fill"></i>
+      </div>
     </div>
-    <div class="stat-icon" style="background: var(--brand-saffron-50); color: var(--brand-saffron-600);">
-      <i class="bi bi-tags-fill"></i>
+    <div>
+      <div style="font-size: 1.75rem; font-weight: 800; color: #ea580c; font-family: var(--font-display); line-height: 1.1;">
+        {% if user.seller_profile.is_verified %}{{ active_offers_count }} <span style="font-size: 0.95rem; font-weight: 700; color: #94a3b8;">/ {{ total_offers_count }}</span>{% else %}0 (Locked 🔒){% endif %}
+      </div>
+      <div style="font-size: 0.75rem; color: #94a3b8; margin-top: 0.35rem; font-weight: 600;">
+        Live claimable campaigns
+      </div>
     </div>
   </div>
 
-  <div class="stat-card">
-    <div>
-      <span class="stat-label">Total discounts given</span>
-      <div class="stat-val text-saffron">₹{% if user.seller_profile.is_verified %}{{ total_discount_given|floatformat:0 }}{% else %}0{% endif %}</div>
-      <span style="font-size: 0.775rem; color: var(--text-muted);">{% if user.seller_profile.is_verified %}Customer savings delivered{% else %}Pending activation{% endif %}</span>
+  <!-- 4. Total Discounts Delivered -->
+  <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 18px; padding: 1.15rem 1.25rem; box-shadow: 0 4px 15px -3px rgba(0, 0, 0, 0.04); position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; min-height: 130px;">
+    <div style="position: absolute; right: -15px; top: -15px; width: 70px; height: 70px; background: rgba(217, 119, 6, 0.06); border-radius: 50%; pointer-events: none;"></div>
+    <div class="d-flex align-center justify-between" style="margin-bottom: 0.5rem;">
+      <span style="font-size: 0.75rem; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.04em;">Discounts Given</span>
+      <div style="width: 38px; height: 38px; border-radius: 12px; background: #fffbeb; color: #d97706; display: flex; align-items: center; justify-content: center; font-size: 1.15rem; flex-shrink: 0;">
+        <i class="bi bi-currency-rupee"></i>
+      </div>
     </div>
-    <div class="stat-icon" style="background: #fef3c7; color: #b45309;">
-      <i class="bi bi-currency-rupee"></i>
+    <div>
+      <div style="font-size: 1.75rem; font-weight: 800; color: #0f172a; font-family: var(--font-display); line-height: 1.1;">
+        ₹{% if user.seller_profile.is_verified %}{{ total_discount_given|floatformat:0 }}{% else %}0{% endif %}
+      </div>
+      <div style="font-size: 0.75rem; color: #94a3b8; margin-top: 0.35rem; font-weight: 600;">
+        Customer savings delivered
+      </div>
     </div>
   </div>
 
 </div>
 
 <!-- High-Contrast Modern Merchant Loyalty Tier Banner -->
-<div class="card card-padded" style="margin-bottom: 2rem; background: linear-gradient(135deg, #0b0f19 0%, #111827 50%, #1e1b4b 100%); color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.12); box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.35); position: relative; overflow: hidden; border-radius: var(--radius-xl);">
+<div class="card card-padded" style="margin-bottom: 1.5rem; background: linear-gradient(135deg, #0b0f19 0%, #111827 50%, #1e1b4b 100%); color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.12); box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.35); position: relative; overflow: hidden; border-radius: 20px;">
   
-  <!-- Subtle ambient glow accent -->
   <div style="position: absolute; top: -70px; right: -70px; width: 240px; height: 240px; background: radial-gradient(circle, rgba(245, 158, 11, 0.22) 0%, rgba(245, 158, 11, 0) 70%); border-radius: 50%; pointer-events: none;"></div>
   
-  <!-- Top Header Row -->
-  <div class="d-flex align-center justify-between flex-wrap gap-3" style="position: relative; z-index: 2; margin-bottom: 1.5rem;">
+  <div class="d-flex align-center justify-between flex-wrap gap-3" style="position: relative; z-index: 2; margin-bottom: 1.25rem;">
     <div>
       <div class="d-flex align-center gap-2" style="margin-bottom: 0.45rem;">
         <span style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; background: rgba(245, 158, 11, 0.16); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.35);">
           <i class="bi bi-award-fill"></i> Merchant Loyalty Rewards
         </span>
         <span style="font-size: 0.78rem; color: #94a3b8;">
-          <i class="bi bi-info-circle"></i> 1 Pt earned per approved counter redemption
+          <i class="bi bi-info-circle"></i> 1 Pt per verified counter redemption
         </span>
       </div>
       <h3 style="font-size: 1.35rem; font-weight: 800; color: #ffffff; margin: 0; font-family: var(--font-display); letter-spacing: -0.01em;">
@@ -126,7 +149,6 @@
       </h3>
     </div>
 
-    <!-- Dynamic Tier Badges -->
     <div>
       {% if wallet.loyalty_points >= 100 %}
         <span class="badge" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: #ffffff; padding: 0.55rem 1.15rem; font-size: 0.88rem; font-weight: 800; border-radius: 9999px; box-shadow: 0 4px 16px rgba(245, 158, 11, 0.4); display: inline-flex; align-items: center; gap: 0.5rem; border: 1px solid rgba(255, 255, 255, 0.25);">
@@ -145,141 +167,154 @@
   </div>
 
   <!-- Live Visual Progress Bar Container -->
-  <div style="position: relative; z-index: 2; background: rgba(15, 23, 42, 0.65); padding: 1.25rem; border-radius: var(--radius-lg); border: 1px solid rgba(255, 255, 255, 0.08);">
+  <div style="position: relative; z-index: 2; background: rgba(15, 23, 42, 0.65); padding: 1.15rem; border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.08);">
     
-    <!-- Progress Bar Track with 50 and 100 Milestones -->
-    <div style="position: relative; margin-bottom: 1.5rem; padding-top: 0.5rem;">
-      
-      <!-- Base Track Bar -->
-      <div style="height: 12px; background: rgba(255, 255, 255, 0.12); border-radius: 9999px; overflow: hidden; position: relative;">
-        <!-- Filled Active Gradient Bar -->
+    <div style="position: relative; margin-bottom: 1.25rem; padding-top: 0.5rem;">
+      <div style="height: 10px; background: rgba(255, 255, 255, 0.12); border-radius: 9999px; overflow: hidden; position: relative;">
         <div style="height: 100%; width: {{ wallet.loyalty_progress_percent }}%; background: linear-gradient(90deg, #3b82f6 0%, #f59e0b 50%, #10b981 100%); border-radius: 9999px; transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 0 12px rgba(245, 158, 11, 0.5);"></div>
       </div>
 
-      <!-- Milestone 50 Marker (50% position) -->
-      <div style="position: absolute; left: 50%; top: -2px; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; pointer-events: none;">
-        <div style="width: 20px; height: 20px; border-radius: 50%; background: {% if wallet.loyalty_points >= 50 %}#3b82f6{% else %}#1e293b{% endif %}; border: 2.5px solid #ffffff; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.4);">
+      <div style="position: absolute; left: 50%; top: -3px; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; pointer-events: none;">
+        <div style="width: 18px; height: 18px; border-radius: 50%; background: {% if wallet.loyalty_points >= 50 %}#3b82f6{% else %}#1e293b{% endif %}; border: 2.5px solid #ffffff; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.4);">
           {% if wallet.loyalty_points >= 50 %}
             <i class="bi bi-check" style="font-size: 0.75rem; color: #ffffff; font-weight: 900;"></i>
           {% else %}
-            <div style="width: 6px; height: 6px; border-radius: 50%; background: #64748b;"></div>
+            <div style="width: 5px; height: 5px; border-radius: 50%; background: #64748b;"></div>
           {% endif %}
         </div>
       </div>
 
-      <!-- Milestone 100 Marker (100% position) -->
-      <div style="position: absolute; right: 0; top: -2px; display: flex; flex-direction: column; align-items: center; pointer-events: none;">
-        <div style="width: 20px; height: 20px; border-radius: 50%; background: {% if wallet.loyalty_points >= 100 %}#10b981{% else %}#1e293b{% endif %}; border: 2.5px solid #ffffff; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.4);">
+      <div style="position: absolute; right: 0; top: -3px; display: flex; flex-direction: column; align-items: center; pointer-events: none;">
+        <div style="width: 18px; height: 18px; border-radius: 50%; background: {% if wallet.loyalty_points >= 100 %}#10b981{% else %}#1e293b{% endif %}; border: 2.5px solid #ffffff; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.4);">
           {% if wallet.loyalty_points >= 100 %}
             <i class="bi bi-check" style="font-size: 0.75rem; color: #ffffff; font-weight: 900;"></i>
           {% else %}
-            <div style="width: 6px; height: 6px; border-radius: 50%; background: #64748b;"></div>
+            <div style="width: 5px; height: 5px; border-radius: 50%; background: #64748b;"></div>
           {% endif %}
         </div>
       </div>
-
     </div>
 
-    <!-- Milestone Labels & Status Text -->
-    <div class="d-flex align-center justify-between flex-wrap gap-2" style="font-size: 0.8rem;">
+    <!-- Milestone Labels -->
+    <div class="d-flex align-center justify-between flex-wrap gap-2" style="font-size: 0.78rem;">
       <div style="color: #94a3b8;">
         <strong style="color: #ffffff;">0 Pts</strong> (Standard)
       </div>
 
       <div style="text-align: center; color: {% if wallet.loyalty_points >= 50 %}#60a5fa{% else %}#94a3b8{% endif %};">
         <strong style="color: {% if wallet.loyalty_points >= 50 %}#93c5fd{% else %}#cbd5e1{% endif %};">50 Pts Milestone</strong>
-        <span style="display: block; font-size: 0.74rem;">
+        <span style="display: block; font-size: 0.72rem;">
           {% if wallet.loyalty_points >= 50 %}
-            <span style="color: #34d399; font-weight: 700;"><i class="bi bi-check-circle-fill"></i> 1-Wk Featured Store Active</span>
+            <span style="color: #34d399; font-weight: 700;"><i class="bi bi-check-circle-fill"></i> Featured Store Active</span>
           {% else %}
-            Unlocks 1-Wk Featured Store
+            Unlocks Featured Store
           {% endif %}
         </span>
       </div>
 
       <div style="text-align: right; color: {% if wallet.loyalty_points >= 100 %}#34d399{% else %}#94a3b8{% endif %};">
         <strong style="color: {% if wallet.loyalty_points >= 100 %}#6ee7b7{% else %}#cbd5e1{% endif %};">100 Pts Milestone</strong>
-        <span style="display: block; font-size: 0.74rem;">
+        <span style="display: block; font-size: 0.72rem;">
           {% if wallet.loyalty_points >= 100 %}
-            <span style="color: #34d399; font-weight: 700;"><i class="bi bi-check-circle-fill"></i> 2-Wk Top Spotlight Active</span>
+            <span style="color: #34d399; font-weight: 700;"><i class="bi bi-check-circle-fill"></i> Top Spotlight Active</span>
           {% else %}
-            Unlocks 2-Wk Top Spotlight
+            Unlocks Top Spotlight
           {% endif %}
         </span>
       </div>
     </div>
 
-    <!-- Next Perk Dynamic Notification Bar -->
-    <div style="margin-top: 1rem; padding-top: 0.85rem; border-top: 1px dashed rgba(255, 255, 255, 0.12); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
-      <div style="font-size: 0.84rem; color: #cbd5e1;">
+    <div style="margin-top: 0.85rem; padding-top: 0.75rem; border-top: 1px dashed rgba(255, 255, 255, 0.12); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
+      <div style="font-size: 0.8rem; color: #cbd5e1;">
         {% if wallet.loyalty_points >= 100 %}
           <span style="color: #34d399; font-weight: 700;"><i class="bi bi-patch-check-fill"></i> Maximum Visibility Unlocked:</span>
-          Your store enjoys 2-week top ranked priority spotlight on Homepage &amp; Search!
+          Your store enjoys priority spotlight on Homepage &amp; Search!
         {% elif wallet.loyalty_points >= 50 %}
           <span style="color: #fbbf24; font-weight: 700;"><i class="bi bi-arrow-up-circle-fill"></i> Next Perk:</span>
-          Approve <strong style="color: #ffffff; font-variant-numeric: tabular-nums;">{{ wallet.points_to_next_perk }}</strong> more counter redemptions to unlock <strong style="color: #34d399;">2-Week Top Ranked Outlet Spotlight (100 Pts)</strong>!
+          Approve <strong style="color: #ffffff; font-variant-numeric: tabular-nums;">{{ wallet.points_to_next_perk }}</strong> more counter redemptions to unlock <strong style="color: #34d399;">Top Ranked Outlet Spotlight (100 Pts)</strong>!
         {% else %}
           <span style="color: #fbbf24; font-weight: 700;"><i class="bi bi-arrow-up-circle-fill"></i> Next Perk:</span>
-          Approve <strong style="color: #ffffff; font-variant-numeric: tabular-nums;">{{ wallet.points_to_next_perk }}</strong> more counter redemptions to unlock <strong style="color: #60a5fa;">1-Week Homepage Featured Store Badge (50 Pts)</strong>!
+          Approve <strong style="color: #ffffff; font-variant-numeric: tabular-nums;">{{ wallet.points_to_next_perk }}</strong> more counter redemptions to unlock <strong style="color: #60a5fa;">Homepage Featured Store Badge (50 Pts)</strong>!
         {% endif %}
       </div>
       <div style="font-size: 0.78rem; color: #94a3b8; font-variant-numeric: tabular-nums;">
-        Milestone Progress: <strong style="color: #fbbf24;">{{ wallet.loyalty_progress_percent }}%</strong>
+        Progress: <strong style="color: #fbbf24;">{{ wallet.loyalty_progress_percent }}%</strong>
       </div>
     </div>
 
   </div>
-
 </div>
 
-<!-- Quick Action Banner -->
-<div class="card card-padded" style="margin-bottom: 2rem; background: #ffffff; border-left: 4px solid var(--brand-saffron-500);">
-  <div class="d-flex align-center justify-between flex-wrap gap-2">
+<!-- Modern Store Quick Actions Grid -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.85rem; margin-bottom: 1.5rem;">
+  
+  <a href="/seller/qr/" style="text-decoration: none; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 1rem 1.15rem; display: flex; align-items: center; gap: 0.85rem; box-shadow: 0 2px 8px rgba(0,0,0,0.03); transition: all 0.2s ease;">
+    <div style="width: 44px; height: 44px; border-radius: 12px; background: #fff7ed; color: #ea580c; display: flex; align-items: center; justify-content: center; font-size: 1.35rem; flex-shrink: 0;">
+      <i class="bi bi-qr-code-scan"></i>
+    </div>
     <div>
-      <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--ink-950); font-family: var(--font-display);">
-        {{ primary_shop.name|default:"My Store" }} &bull; Counter Operations
-      </h3>
-      <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem;">
-        {{ primary_shop.locality }}, {{ primary_shop.city }} &bull; Status: <span class="badge badge-success">Live &amp; Discoverable</span>
-      </p>
+      <div style="font-weight: 700; font-size: 0.92rem; color: #0f172a;">Counter QR Standee</div>
+      <div style="font-size: 0.74rem; color: #64748b;">View &amp; Print Standee</div>
     </div>
-    <div class="d-flex gap-2">
-      <a href="/seller/offers/create/" class="btn btn-primary btn-sm">
-        <i class="bi bi-plus-circle"></i> Create new offer
-      </a>
-      <a href="/seller/qr/" class="btn btn-dark btn-sm">
-        <i class="bi bi-qr-code"></i> Counter QR standee
-      </a>
-      <a href="/seller/credits/" class="btn btn-secondary btn-sm">
-        <i class="bi bi-wallet2"></i> Top-up credits
-      </a>
+  </a>
+
+  <a href="/seller/offers/create/" style="text-decoration: none; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 1rem 1.15rem; display: flex; align-items: center; gap: 0.85rem; box-shadow: 0 2px 8px rgba(0,0,0,0.03); transition: all 0.2s ease;">
+    <div style="width: 44px; height: 44px; border-radius: 12px; background: #ecfdf5; color: #059669; display: flex; align-items: center; justify-content: center; font-size: 1.35rem; flex-shrink: 0;">
+      <i class="bi bi-plus-circle-fill"></i>
     </div>
-  </div>
+    <div>
+      <div style="font-weight: 700; font-size: 0.92rem; color: #0f172a;">Create New Offer</div>
+      <div style="font-size: 0.74rem; color: #64748b;">Launch Store Campaign</div>
+    </div>
+  </a>
+
+  <a href="/seller/bill-verifications/" style="text-decoration: none; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 1rem 1.15rem; display: flex; align-items: center; gap: 0.85rem; box-shadow: 0 2px 8px rgba(0,0,0,0.03); transition: all 0.2s ease;">
+    <div style="width: 44px; height: 44px; border-radius: 12px; background: #eff6ff; color: #2563eb; display: flex; align-items: center; justify-content: center; font-size: 1.35rem; flex-shrink: 0;">
+      <i class="bi bi-receipt-cutoff"></i>
+    </div>
+    <div>
+      <div style="font-weight: 700; font-size: 0.92rem; color: #0f172a;">Bumper Bills (₹10k+)</div>
+      <div style="font-size: 0.74rem; color: #64748b;">Review Shopper Invoices</div>
+    </div>
+  </a>
+
+  <a href="/seller/credits/" style="text-decoration: none; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 1rem 1.15rem; display: flex; align-items: center; gap: 0.85rem; box-shadow: 0 2px 8px rgba(0,0,0,0.03); transition: all 0.2s ease;">
+    <div style="width: 44px; height: 44px; border-radius: 12px; background: #fdf4ff; color: #a855f7; display: flex; align-items: center; justify-content: center; font-size: 1.35rem; flex-shrink: 0;">
+      <i class="bi bi-wallet2"></i>
+    </div>
+    <div>
+      <div style="font-weight: 700; font-size: 0.92rem; color: #0f172a;">Credit Wallet</div>
+      <div style="font-size: 0.74rem; color: #64748b;">Instant Recharge &amp; Ledger</div>
+    </div>
+  </a>
+
 </div>
 
-<div class="d-grid grid-2 gap-4">
+<!-- Split Grid: Active Offers & Live Counter Redemptions -->
+<div class="d-grid grid-2 gap-3">
   
   <!-- Live Active Offers -->
-  <div class="card card-padded">
+  <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 20px; padding: 1.35rem; box-shadow: 0 4px 15px -3px rgba(0, 0, 0, 0.04);">
     <div class="d-flex align-center justify-between" style="margin-bottom: 1rem;">
-      <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--ink-950); font-family: var(--font-display);">
-        Active offers
+      <h3 style="font-size: 1.1rem; font-weight: 800; color: #0f172a; font-family: var(--font-display); margin: 0;">
+        Active Store Offers
       </h3>
-      <a href="/seller/offers/" class="btn btn-outline btn-sm">Manage all</a>
+      <a href="/seller/offers/" class="btn btn-outline btn-sm" style="font-size: 0.78rem; padding: 0.3rem 0.75rem; border-radius: 8px;">Manage All</a>
     </div>
 
     <div style="display: flex; flex-direction: column; gap: 0.75rem;">
       {% for offer in active_offers %}
-        <div style="padding: 0.85rem 1rem; background: var(--bg-subtle); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: space-between;">
-          <div>
-            <div style="font-weight: 700; font-size: 0.95rem; color: var(--ink-950); font-family: var(--font-display);">{{ offer.title }}</div>
-            <div style="font-size: 0.775rem; color: var(--text-muted); margin-top: 0.15rem;">
-              {{ offer.discount_display }} &bull; Claimed: {{ offer.current_redemptions }}/{{ offer.max_redemptions }}
+        <div style="padding: 0.85rem 1rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;">
+          <div style="min-width: 0;">
+            <div style="font-weight: 700; font-size: 0.92rem; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ offer.title }}</div>
+            <div style="font-size: 0.75rem; color: #64748b; margin-top: 0.2rem; display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap;">
+              <span style="background: #fff7ed; color: #c2410c; padding: 0.15rem 0.45rem; border-radius: 4px; font-weight: 700;">{{ offer.discount_display }}</span>
+              <span>Claimed: {{ offer.current_redemptions }}/{{ offer.max_redemptions }}</span>
             </div>
           </div>
-          <div class="d-flex gap-1 align-center">
-            <span class="badge badge-success">Active</span>
-            <a href="/seller/qr/?offer={{ offer.id }}" class="btn btn-outline btn-sm" title="View Counter QR">
+          <div class="d-flex gap-1 align-center flex-shrink-0">
+            <span class="badge badge-success" style="font-size: 0.72rem;">Active</span>
+            <a href="/seller/qr/?offer={{ offer.id }}" class="btn btn-outline btn-sm" style="width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center; border-radius: 8px;" title="View Counter QR">
               <i class="bi bi-qr-code"></i>
             </a>
           </div>
@@ -291,37 +326,42 @@
   </div>
 
   <!-- Recent Redemptions Stream -->
-  <div class="card card-padded">
+  <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 20px; padding: 1.35rem; box-shadow: 0 4px 15px -3px rgba(0, 0, 0, 0.04);">
     <div class="d-flex align-center justify-between" style="margin-bottom: 1rem;">
-      <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--ink-950); font-family: var(--font-display);">
-        Live counter redemptions
+      <h3 style="font-size: 1.1rem; font-weight: 800; color: #0f172a; font-family: var(--font-display); margin: 0;">
+        Live Counter Redemptions
       </h3>
-      <a href="/seller/redemptions/" class="btn btn-outline btn-sm">Full ledger</a>
+      <a href="/seller/redemptions/" class="btn btn-outline btn-sm" style="font-size: 0.78rem; padding: 0.3rem 0.75rem; border-radius: 8px;">Full Ledger</a>
     </div>
 
     <div class="table-responsive">
-      <table class="table" style="font-size: 0.85rem;">
+      <table class="table" style="font-size: 0.85rem; width: 100%; border-collapse: collapse;">
         <thead>
-          <tr>
-            <th>Customer</th>
-            <th>Discount</th>
-            <th>Time</th>
+          <tr style="border-bottom: 1px solid #e2e8f0; color: #64748b; font-size: 0.75rem; text-transform: uppercase;">
+            <th style="padding: 0.6rem 0.5rem; text-align: left;">Customer</th>
+            <th style="padding: 0.6rem 0.5rem; text-align: left;">Discount</th>
+            <th style="padding: 0.6rem 0.5rem; text-align: right;">Time</th>
           </tr>
         </thead>
         <tbody>
           {% for r in recent_redemptions %}
-            <tr>
-              <td>
-                <strong>{{ r.buyer.buyer_profile.nickname|default:"Shopper" }}</strong>
-                <div style="font-size: 0.72rem; color: var(--text-muted); font-family: monospace;">{{ r.buyer.buyer_profile.public_unique_id|default:"-" }}</div>
-                <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.15rem;">{{ r.offer.title|truncatechars:24 }}</div>
+            <tr style="border-bottom: 1px solid #f1f5f9;">
+              <td style="padding: 0.65rem 0.5rem;">
+                <strong style="color: #0f172a; font-size: 0.88rem;">{{ r.buyer.buyer_profile.nickname|default:"Shopper" }}</strong>
+                <div style="font-size: 0.72rem; color: #64748b; font-family: monospace;">{{ r.buyer.buyer_profile.public_unique_id|default:"-" }}</div>
+                <div style="font-size: 0.75rem; color: #94a3b8; margin-top: 0.15rem;">{{ r.offer.title|truncatechars:22 }}</div>
               </td>
-              <td class="text-success fw-700">₹{{ r.discount_given|floatformat:0 }}</td>
-              <td class="text-muted">{{ r.redeemed_at|date:"h:i A" }}</td>
+              <td style="padding: 0.65rem 0.5rem; color: #059669; font-weight: 800; font-size: 0.95rem;">
+                ₹{{ r.discount_given|floatformat:0 }}
+              </td>
+              <td style="padding: 0.65rem 0.5rem; text-align: right; color: #94a3b8; font-size: 0.75rem;">
+                {{ r.redeemed_at|date:"h:i A" }}
+              </td>
             </tr>
           {% empty %}
             <tr>
-              <td colspan="3" class="text-center text-muted" style="padding: 2rem 0;">
+              <td colspan="3" class="text-center text-muted" style="padding: 2.5rem 0; color: #94a3b8;">
+                <i class="bi bi-clock-history" style="font-size: 1.5rem; display: block; margin-bottom: 0.5rem;"></i>
                 No redemptions recorded today.
               </td>
             </tr>

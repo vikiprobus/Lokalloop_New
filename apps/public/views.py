@@ -13,7 +13,7 @@ from apps.shops.models import Shop, ShopCategory
 from apps.offers.models import Offer, OfferStatus
 from apps.wallets.models import CreditPackage
 from services.location_service import (
-    annotate_shops_with_distance, calculate_distance, format_distance_display, safe_parse_coordinates
+    annotate_shops_with_distance, calculate_distance, format_distance_display, safe_parse_coordinates, get_city_coordinates
 )
 
 
@@ -144,10 +144,15 @@ def explore_view(request):
             Q(description__icontains=query)
         )
 
-    # Geo distance sorting if lat/lng available
+    # Geo distance sorting if lat/lng available (fallback to city coordinates)
+    if (lat_val is None or lng_val is None) and city and city != 'all':
+        c_lat, c_lng = get_city_coordinates(city)
+        if c_lat is not None and c_lng is not None:
+            lat_val, lng_val = c_lat, c_lng
+
     if lat_val is not None and lng_val is not None:
         try:
-            shops_list = annotate_shops_with_distance(shops, lat_val, lng_val)
+            shops_list = annotate_shops_with_distance(shops, lat_val, lng_val, max_km=None)
         except Exception:
             shops_list = list(shops)
     else:

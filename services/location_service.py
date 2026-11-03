@@ -2,6 +2,31 @@ import math
 from typing import Optional, Tuple
 from decimal import Decimal
 
+# Preset coordinates for major Indian metro trading hubs
+CITY_COORDINATES = {
+    'pune': (18.5204, 73.8567),
+    'bengaluru': (12.9716, 77.5946),
+    'bangalore': (12.9716, 77.5946),
+    'mumbai': (19.0760, 72.8777),
+    'delhi': (28.6139, 77.2090),
+    'new delhi': (28.6139, 77.2090),
+    'hyderabad': (17.3850, 78.4867),
+    'chennai': (13.0827, 80.2707),
+    'kolkata': (22.5726, 88.3639),
+    'ahmedabad': (23.0225, 72.5714),
+}
+
+
+def get_city_coordinates(city_name: str) -> Tuple[Optional[float], Optional[float]]:
+    """
+    Returns (lat, lng) tuple for standard Indian metropolitan cities as fallback when GPS is inactive.
+    """
+    if not city_name:
+        return None, None
+    clean = str(city_name).strip().lower()
+    return CITY_COORDINATES.get(clean, (None, None))
+
+
 
 def safe_parse_coordinates(lat: any, lon: any) -> Tuple[Optional[float], Optional[float]]:
     """
