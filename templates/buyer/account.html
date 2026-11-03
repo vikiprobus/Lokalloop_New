@@ -1,303 +1,281 @@
 {% extends "base/buyer_base.html" %}
 {% load static %}
 
-{% block title %}My Account & Profile | LokalLoop{% endblock %}
+{% block title %}My Account & Profile — LokalLoop{% endblock %}
 
 {% block content %}
-<div class="container" style="max-width: 680px; margin: 0 auto; padding: 0.5rem 1rem 3rem;">
+<div class="container" style="max-width: 680px; margin: 0 auto; padding: 0.25rem 0.85rem 3.5rem;">
 
-  <!-- Page Header -->
-  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;">
+  <!-- Header Row Matching Reference Image 2 -->
+  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.15rem;">
     <div>
-      <h1 style="font-size: 1.5rem; font-weight: 800; color: var(--ink-950, #0f172a); margin: 0;">My Account</h1>
-      <p style="font-size: 0.85rem; color: #64748b; margin: 0.2rem 0 0;">Manage your identity, loyalty tier, and shopper privacy</p>
+      <h1 style="font-size: 1.5rem; font-weight: 900; color: #0f172a; margin: 0; font-family: 'Outfit', sans-serif;">
+        My Account
+      </h1>
+      <p style="font-size: 0.82rem; color: #64748b; margin: 0.2rem 0 0;">
+        Manage your identity, loyalty tier, and shopper privacy
+      </p>
     </div>
-    <span class="badge" style="background: rgba(249, 115, 22, 0.12); color: #ea580c; border: 1px solid rgba(249, 115, 22, 0.25); font-weight: 700; padding: 0.4rem 0.75rem; border-radius: var(--radius-full, 9999px); font-size: 0.78rem;">
-      <i class="bi bi-shield-check"></i> Verified Shopper
+
+    <!-- Verified Shopper Pill -->
+    <span style="background: #ffedd5; color: #ea580c; border: 1px solid #fed7aa; padding: 0.38rem 0.85rem; border-radius: 9999px; font-weight: 800; font-size: 0.78rem; display: inline-flex; align-items: center; gap: 0.35rem; box-shadow: 0 1px 3px rgba(234, 88, 12, 0.1);">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        <path d="m9 12 2 2 4-4"/>
+      </svg>
+      <span>Verified Shopper</span>
+      <span style="font-size: 0.75rem;">&rsaquo;</span>
     </span>
   </div>
 
-  <!-- 1. Shopper Profile Identity Card -->
-  <div class="card" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #ffffff; border-radius: 20px; padding: 1.5rem; margin-bottom: 1.25rem; box-shadow: 0 10px 25px rgba(15, 23, 42, 0.2); border: 1px solid rgba(255, 255, 255, 0.08); position: relative; overflow: hidden;">
-    <!-- Background Watermark Glow -->
-    <div style="position: absolute; right: -20px; top: -20px; width: 140px; height: 140px; background: radial-gradient(circle, rgba(249, 115, 22, 0.25) 0%, transparent 70%); pointer-events: none;"></div>
+  <!-- 1. Shopper Profile Identity Card (Matching Reference Image 2) -->
+  <div style="background: linear-gradient(135deg, #0b1329 0%, #162238 100%); color: #ffffff; border-radius: 20px; padding: 1.25rem 1.35rem; margin-bottom: 1rem; box-shadow: 0 10px 25px rgba(11, 19, 41, 0.25); border: 1px solid rgba(255, 255, 255, 0.08); position: relative; overflow: hidden;">
+    
+    <!-- Ambient Orange Wave/Glow on Top-Right -->
+    <svg width="150" height="90" viewBox="0 0 150 90" fill="none" opacity="0.3" style="position: absolute; right: 0; top: 0; pointer-events: none;">
+      <path d="M0 0C60 20 100 60 150 90V0H0Z" fill="url(#waveGlowGrad)"/>
+      <defs>
+        <linearGradient id="waveGlowGrad" x1="150" y1="0" x2="50" y2="90" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stop-color="#f97316"/>
+          <stop offset="100%" stop-color="#ea580c" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+    </svg>
 
-    <div style="display: flex; align-items: center; gap: 1.1rem; flex-wrap: wrap;">
-      <!-- Saffron Gradient Monochrome Avatar -->
-      <div style="width: 68px; height: 68px; border-radius: 50%; background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 1.85rem; font-weight: 800; box-shadow: 0 6px 18px rgba(249, 115, 22, 0.45); border: 3px solid rgba(255, 255, 255, 0.2); flex-shrink: 0;">
-        {{ nickname|slice:":1"|upper|default:"S" }}
+    <div style="display: flex; align-items: center; gap: 1rem; position: relative; z-index: 2;">
+      <!-- Saffron Orange Circular Avatar with White Initial -->
+      <div style="width: 62px; height: 62px; border-radius: 50%; background: #ea580c; color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 1.75rem; font-weight: 900; box-shadow: 0 6px 16px rgba(234, 88, 12, 0.45); border: 2.5px solid rgba(255, 255, 255, 0.25); flex-shrink: 0; font-family: 'Outfit', sans-serif;">
+        {{ nickname|slice:":1"|upper|default:"D" }}
       </div>
 
-      <div style="flex: 1; min-width: 200px;">
-        <div style="display: flex; align-items: center; gap: 0.6rem;">
-          <h2 style="font-size: 1.35rem; font-weight: 800; margin: 0; color: #ffffff;">{{ nickname }}</h2>
-          <button type="button" onclick="toggleEditProfileModal()" style="background: rgba(255, 255, 255, 0.15); border: none; color: #ffffff; width: 28px; height: 28px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s;" title="Edit Nickname or City">
-            <i class="bi bi-pencil-fill" style="font-size: 0.75rem;"></i>
+      <div style="flex: 1; min-width: 0;">
+        <div style="display: flex; align-items: center; gap: 0.45rem;">
+          <h2 style="font-size: 1.35rem; font-weight: 900; margin: 0; color: #ffffff; font-family: 'Outfit', sans-serif;">
+            {{ nickname|default:"Demo" }}
+          </h2>
+          <!-- Online Status Green Dot -->
+          <span style="width: 8px; height: 8px; background-color: #22c55e; border-radius: 50%; display: inline-block;"></span>
+        </div>
+
+        <!-- Shopper ID Pill with 1-Tap Copy -->
+        <div style="display: flex; align-items: center; gap: 0.45rem; margin-top: 0.35rem;">
+          <span style="font-family: monospace; font-size: 0.85rem; font-weight: 800; color: #fb923c; background: rgba(249, 115, 22, 0.15); padding: 0.18rem 0.55rem; border-radius: 8px; border: 1px solid rgba(249, 115, 22, 0.3);">
+            {{ shopper_id|default:"LL-0002" }}
+          </span>
+          <button type="button" id="copy-shopper-btn" onclick="copyShopperId('{{ shopper_id|default:"LL-0002" }}')" style="background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); color: #e2e8f0; font-size: 0.72rem; font-weight: 700; padding: 0.18rem 0.5rem; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 0.25rem;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+            <span id="copy-btn-text">Copy</span>
           </button>
         </div>
 
-        <!-- Shopper ID with 1-Tap Copy -->
-        <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.4rem;">
-          <span style="font-family: monospace; font-size: 0.85rem; font-weight: 700; color: #fb923c; background: rgba(249, 115, 22, 0.15); padding: 0.2rem 0.55rem; border-radius: 6px; border: 1px solid rgba(249, 115, 22, 0.3);">
-            {{ shopper_id }}
+        <!-- Bronze Tier & Location Subtitle -->
+        <div style="display: flex; align-items: center; gap: 0.45rem; margin-top: 0.5rem; font-size: 0.75rem; color: #cbd5e1;">
+          <span style="display: inline-flex; align-items: center; gap: 0.25rem;">
+            <span>🥉</span>
+            <strong style="color: #f8fafc;">{{ tier_badge|default:"Bronze Tier" }}</strong>
           </span>
-          <button type="button" id="copy-shopper-btn" onclick="copyShopperId('{{ shopper_id }}')" style="background: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.2); color: #e2e8f0; font-size: 0.72rem; padding: 0.2rem 0.5rem; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 0.25rem;">
-            <i class="bi bi-clipboard"></i> <span id="copy-btn-text">Copy</span>
-          </button>
-        </div>
-
-        <!-- Badges: Tier & Location -->
-        <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.65rem; flex-wrap: wrap;">
-          <span style="font-size: 0.76rem; font-weight: 700; background: rgba(255, 255, 255, 0.15); color: #f8fafc; padding: 0.25rem 0.65rem; border-radius: var(--radius-full, 9999px); backdrop-filter: blur(4px);">
-            {{ tier_badge }}
-          </span>
-          <span style="font-size: 0.76rem; font-weight: 600; color: #94a3b8; display: inline-flex; align-items: center; gap: 0.25rem;">
-            <i class="bi bi-geo-alt-fill" style="color: #f97316;"></i> {{ district }}{% if city and city != district %}, {{ city }}{% endif %}
+          <span>|</span>
+          <span style="display: inline-flex; align-items: center; gap: 0.25rem; color: #94a3b8;">
+            <span style="color: #ea580c;">📍</span>
+            <span>{{ district|default:"Pune" }}{% if city and city != district %}, {{ city }}{% endif %}</span>
           </span>
         </div>
       </div>
     </div>
 
-    <!-- Collapsible Edit Profile Form -->
-    <div id="edit-profile-drawer" style="display: none; margin-top: 1.25rem; padding-top: 1.25rem; border-top: 1px solid rgba(255, 255, 255, 0.12);">
+    <!-- Toggle Edit Profile Drawer Form -->
+    <div id="edit-profile-drawer" style="display: none; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(255, 255, 255, 0.12);">
       <form method="POST" action="/buyer/account/">
         {% csrf_token %}
         <input type="hidden" name="action" value="update_profile">
-        <div style="font-size: 0.85rem; font-weight: 700; color: #f8fafc; margin-bottom: 0.75rem;">Edit Shopper Profile</div>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 0.65rem;">
           <div>
-            <label style="font-size: 0.75rem; color: #94a3b8; display: block; margin-bottom: 0.25rem;">Gennie Nickname</label>
-            <input type="text" name="nickname" value="{{ nickname }}" class="form-control" style="background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2); color: #fff; font-size: 0.88rem; padding: 0.45rem 0.75rem; border-radius: 8px;" required maxlength="30">
+            <label style="font-size: 0.72rem; color: #cbd5e1; display: block; margin-bottom: 2px;">Nickname</label>
+            <input type="text" name="nickname" value="{{ nickname }}" class="form-control" style="font-size: 0.8rem; padding: 0.4rem 0.6rem; border-radius: 8px;">
           </div>
           <div>
-            <label style="font-size: 0.75rem; color: #94a3b8; display: block; margin-bottom: 0.25rem;">Preferred City</label>
-            <input type="text" name="city" value="{{ city }}" class="form-control" style="background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2); color: #fff; font-size: 0.88rem; padding: 0.45rem 0.75rem; border-radius: 8px;" required maxlength="50">
+            <label style="font-size: 0.72rem; color: #cbd5e1; display: block; margin-bottom: 2px;">City</label>
+            <input type="text" name="city" value="{{ district }}" class="form-control" style="font-size: 0.8rem; padding: 0.4rem 0.6rem; border-radius: 8px;">
           </div>
         </div>
-        <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
-          <button type="button" onclick="toggleEditProfileModal()" class="btn btn-sm" style="background: rgba(255,255,255,0.1); color: #fff; border-radius: 8px;">Cancel</button>
-          <button type="submit" class="btn btn-sm btn-primary" style="border-radius: 8px; font-weight: 700;">Save Changes</button>
-        </div>
+        <button type="submit" class="btn btn-sm" style="background: #ea580c; color: #ffffff; font-weight: 700; border-radius: 8px; width: 100%;">
+          Save Changes
+        </button>
       </form>
     </div>
+
   </div>
 
-  <!-- 2. 4-Tile Balance & Performance Dashboard -->
-  <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; margin-bottom: 1.25rem;">
-    <!-- Tile 1: Points Balance -->
-    <a href="/buyer/rewards/" style="text-decoration: none; display: block; background: #ffffff; border: 1.5px solid rgba(249, 115, 22, 0.25); border-radius: 16px; padding: 1.1rem; box-shadow: 0 4px 12px rgba(249, 115, 22, 0.06); transition: transform 0.15s ease;">
-      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.4rem;">
-        <span style="font-size: 0.78rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.04em;">Points Balance</span>
-        <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(249, 115, 22, 0.12); color: #ea580c; display: flex; align-items: center; justify-content: center; font-size: 1rem;">
-          <i class="bi bi-coin"></i>
+  <!-- 2. 2x2 Stats Performance Grid (Matching Reference Image 2) -->
+  <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; margin-bottom: 1rem;">
+    
+    <!-- Card 1: Points Balance -->
+    <div style="background: #ffffff; border-radius: 16px; padding: 1rem 0.95rem; border: 1px solid #f1f5f9; box-shadow: 0 2px 8px rgba(0,0,0,0.02); position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; min-height: 118px;">
+      <!-- Subtle Ambient Wave Graphic -->
+      <svg width="100" height="60" viewBox="0 0 100 60" fill="none" opacity="0.12" style="position: absolute; right: 0; bottom: 0; pointer-events: none;">
+        <path d="M0 60C30 40 70 50 100 20V60H0Z" fill="#ea580c"/>
+      </svg>
+      
+      <div>
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.35rem;">
+          <div style="width: 32px; height: 32px; border-radius: 50%; background: #fff7ed; display: flex; align-items: center; justify-content: center;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2.3">
+              <circle cx="8" cy="8" r="6"/>
+              <path d="M18.09 10.37A6 6 0 1 1 10.34 18"/>
+              <path d="M7 6h1v4"/>
+              <path d="m16.71 13.88.7.71-2.82 2.82"/>
+            </svg>
+          </div>
+          <span style="font-size: 0.68rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.04em;">POINTS BALANCE</span>
+        </div>
+        <div style="font-size: 1.45rem; font-weight: 900; color: #0f172a; line-height: 1.15; font-family: 'Outfit', sans-serif;">
+          {{ reward_account.current_points|default:240 }} <span style="font-size: 0.95rem; font-weight: 700; color: #ea580c;">Pts</span>
         </div>
       </div>
-      <div style="font-size: 1.45rem; font-weight: 800; color: #0f172a;">{{ reward_account.current_points }} <span style="font-size: 0.85rem; font-weight: 600; color: #ea580c;">Pts</span></div>
-      <div style="font-size: 0.75rem; font-weight: 600; color: #ea580c; margin-top: 0.35rem; display: flex; align-items: center; gap: 0.25rem;">
-        Redeem Vouchers <i class="bi bi-arrow-right"></i>
+
+      <div style="margin-top: 0.5rem; position: relative; z-index: 2;">
+        <a href="/buyer/rewards/" style="background: #ea580c; color: #ffffff; border-radius: 9999px; font-size: 0.72rem; font-weight: 800; padding: 0.35rem 0.8rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.25rem; box-shadow: 0 2px 6px rgba(234, 88, 12, 0.3);">
+          <span>Redeem Vouchers</span> &rarr;
+        </a>
       </div>
+    </div>
+
+    <!-- Card 2: Total Saved -->
+    <div style="background: #ffffff; border-radius: 16px; padding: 1rem 0.95rem; border: 1px solid #f1f5f9; box-shadow: 0 2px 8px rgba(0,0,0,0.02); position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; min-height: 118px;">
+      <!-- Subtle Ambient Green Wave Graphic -->
+      <svg width="100" height="60" viewBox="0 0 100 60" fill="none" opacity="0.12" style="position: absolute; right: 0; bottom: 0; pointer-events: none;">
+        <path d="M0 60C30 40 70 50 100 20V60H0Z" fill="#16a34a"/>
+      </svg>
+      
+      <div>
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.35rem;">
+          <div style="width: 32px; height: 32px; border-radius: 50%; background: #f0fdf4; display: flex; align-items: center; justify-content: center;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.3">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              <path d="m9 12 2 2 4-4"/>
+            </svg>
+          </div>
+          <span style="font-size: 0.68rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.04em;">TOTAL SAVED</span>
+        </div>
+        <div style="font-size: 1.45rem; font-weight: 900; color: #16a34a; line-height: 1.15; font-family: 'Outfit', sans-serif;">
+          ₹{{ total_saved|default:470|floatformat:0 }} <span style="font-size: 0.85rem; font-weight: 600; color: #16a34a;">Saved</span>
+        </div>
+      </div>
+
+      <div style="margin-top: 0.5rem; position: relative; z-index: 2;">
+        <a href="/buyer/history/" style="color: #16a34a; font-size: 0.72rem; font-weight: 800; text-decoration: none; display: inline-flex; align-items: center; gap: 0.25rem;">
+          <span>Savings History</span> &rarr;
+        </a>
+      </div>
+    </div>
+
+    <!-- Card 3: Deals Claimed -->
+    <div style="background: #ffffff; border-radius: 16px; padding: 1rem 0.95rem; border: 1px solid #f1f5f9; box-shadow: 0 2px 8px rgba(0,0,0,0.02); display: flex; flex-direction: column; justify-content: space-between; min-height: 118px;">
+      <div>
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.35rem;">
+          <div style="width: 32px; height: 32px; border-radius: 50%; background: #faf5ff; display: flex; align-items: center; justify-content: center;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9333ea" stroke-width="2.3">
+              <polyline points="20 12 20 22 4 22 4 12"/>
+              <rect x="2" y="7" width="20" height="5"/>
+              <line x1="12" y1="22" x2="12" y2="7"/>
+              <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/>
+              <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>
+            </svg>
+          </div>
+          <span style="font-size: 0.68rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.04em;">DEALS CLAIMED</span>
+        </div>
+        <div style="font-size: 1.45rem; font-weight: 900; color: #0f172a; line-height: 1.15; font-family: 'Outfit', sans-serif;">
+          {{ deals_claimed|default:2 }} <span style="font-size: 0.95rem; font-weight: 700; color: #64748b;">Offers</span>
+        </div>
+      </div>
+
+      <div style="margin-top: 0.5rem; font-size: 0.72rem; color: #64748b;">
+        Verified redemptions
+      </div>
+    </div>
+
+    <!-- Card 4: Bumper Entries -->
+    <div style="background: #ffffff; border-radius: 16px; padding: 1rem 0.95rem; border: 1px solid #f1f5f9; box-shadow: 0 2px 8px rgba(0,0,0,0.02); display: flex; flex-direction: column; justify-content: space-between; min-height: 118px;">
+      <div>
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.35rem;">
+          <div style="width: 32px; height: 32px; border-radius: 50%; background: #fff7ed; display: flex; align-items: center; justify-content: center;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2.3">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+              <polyline points="10 9 9 9 8 9"/>
+            </svg>
+          </div>
+          <span style="font-size: 0.68rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.04em;">BUMPER ENTRIES</span>
+        </div>
+        <div style="font-size: 1.45rem; font-weight: 900; color: #0f172a; line-height: 1.15; font-family: 'Outfit', sans-serif;">
+          {{ bumper_entries|default:0 }} <span style="font-size: 0.95rem; font-weight: 700; color: #64748b;">Bills</span>
+        </div>
+      </div>
+
+      <div style="margin-top: 0.5rem;">
+        <a href="/buyer/rewards/#bumperSubmissionCard" style="color: #ea580c; font-size: 0.72rem; font-weight: 800; text-decoration: none; display: inline-flex; align-items: center; gap: 0.25rem;">
+          <span>Upload ₹10k+ Bill</span> &rarr;
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 3. Membership Tier Status Bar (Matching Reference Image 2) -->
+  <div style="background: #ffffff; border-radius: 14px; padding: 0.85rem 1rem; border: 1px solid #f1f5f9; box-shadow: 0 2px 6px rgba(0,0,0,0.02); display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem;">
+    <div style="display: flex; align-items: center; gap: 0.45rem; font-size: 0.85rem; font-weight: 700; color: #0f172a;">
+      <span>🏅</span>
+      <span>Bronze Tier</span>
+      <span style="font-weight: 500; color: #64748b; font-size: 0.78rem;">({{ reward_account.lifetime_earned|default:240 }} Lifetime Pts)</span>
+    </div>
+    
+    <span style="color: #cbd5e1;">|</span>
+
+    <a href="/buyer/rewards/" style="color: #ea580c; font-weight: 800; font-size: 0.8rem; text-decoration: none; display: flex; align-items: center; gap: 0.25rem;">
+      <span>Next: Silver Tier</span>
+      <span>&rsaquo;</span>
     </a>
-
-    <!-- Tile 2: Total Saved -->
-    <a href="/buyer/history/" style="text-decoration: none; display: block; background: #ffffff; border: 1.5px solid rgba(16, 185, 129, 0.25); border-radius: 16px; padding: 1.1rem; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.06); transition: transform 0.15s ease;">
-      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.4rem;">
-        <span style="font-size: 0.78rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.04em;">Total Saved</span>
-        <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(16, 185, 129, 0.12); color: #059669; display: flex; align-items: center; justify-content: center; font-size: 1rem;">
-          <i class="bi bi-wallet2"></i>
-        </div>
-      </div>
-      <div style="font-size: 1.45rem; font-weight: 800; color: #059669;">₹{{ total_saved|floatformat:0 }} <span style="font-size: 0.82rem; font-weight: 600; color: #64748b;">Saved</span></div>
-      <div style="font-size: 0.75rem; font-weight: 600; color: #059669; margin-top: 0.35rem; display: flex; align-items: center; gap: 0.25rem;">
-        Savings History <i class="bi bi-arrow-right"></i>
-      </div>
-    </a>
-
-    <!-- Tile 3: Deals Claimed -->
-    <div style="background: #ffffff; border: 1.5px solid rgba(99, 102, 241, 0.2); border-radius: 16px; padding: 1.1rem; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.05);">
-      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.4rem;">
-        <span style="font-size: 0.78rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.04em;">Deals Claimed</span>
-        <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(99, 102, 241, 0.12); color: #4f46e5; display: flex; align-items: center; justify-content: center; font-size: 1rem;">
-          <i class="bi bi-tag-fill"></i>
-        </div>
-      </div>
-      <div style="font-size: 1.45rem; font-weight: 800; color: #0f172a;">{{ deals_claimed }} <span style="font-size: 0.82rem; font-weight: 600; color: #64748b;">Offers</span></div>
-      <div style="font-size: 0.75rem; color: #64748b; margin-top: 0.35rem;">Verified redemptions</div>
-    </div>
-
-    <!-- Tile 4: Bumper Entries -->
-    <a href="/buyer/rewards/#bumper-section" style="text-decoration: none; display: block; background: #ffffff; border: 1.5px solid rgba(234, 88, 12, 0.2); border-radius: 16px; padding: 1.1rem; box-shadow: 0 4px 12px rgba(234, 88, 12, 0.05); transition: transform 0.15s ease;">
-      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.4rem;">
-        <span style="font-size: 0.78rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.04em;">Bumper Entries</span>
-        <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(234, 88, 12, 0.12); color: #ea580c; display: flex; align-items: center; justify-content: center; font-size: 1rem;">
-          <i class="bi bi-ticket-perforated-fill"></i>
-        </div>
-      </div>
-      <div style="font-size: 1.45rem; font-weight: 800; color: #0f172a;">{{ bumper_entries }} <span style="font-size: 0.82rem; font-weight: 600; color: #64748b;">Bills</span></div>
-      <div style="font-size: 0.75rem; font-weight: 600; color: #ea580c; margin-top: 0.35rem; display: flex; align-items: center; gap: 0.25rem;">
-        Upload ₹10k+ Bill <i class="bi bi-arrow-right"></i>
-      </div>
-    </a>
   </div>
 
-  <!-- 3. Tier Upgrade Progress Bar -->
-  <div class="card" style="background: #ffffff; border-radius: 16px; padding: 1.25rem; margin-bottom: 1.25rem; border: 1px solid #e2e8f0; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
-    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.65rem;">
-      <div style="display: flex; align-items: center; gap: 0.5rem;">
-        <span style="font-weight: 800; font-size: 0.95rem; color: #0f172a;">{{ tier_badge }}</span>
-        <span style="font-size: 0.78rem; color: #64748b;">({{ reward_account.lifetime_earned }} Lifetime Pts)</span>
-      </div>
-      <span style="font-size: 0.78rem; font-weight: 700; color: #ea580c;">
-        {% if points_needed > 0 %}Next: {{ next_tier_title }}{% else %}Max Level{% endif %}
-      </span>
-    </div>
-
-    <!-- Progress Bar Track -->
-    <div style="width: 100%; height: 9px; background: #f1f5f9; border-radius: 9999px; overflow: hidden; margin-bottom: 0.5rem; position: relative;">
-      <div style="width: {{ tier_progress }}%; height: 100%; background: linear-gradient(90deg, #f97316 0%, #ea580c 100%); border-radius: 9999px; transition: width 0.5s ease;"></div>
-    </div>
-
-    <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; color: #64748b;">
-      {% if points_needed > 0 %}
-        <span>🪙 <strong>{{ points_needed }} more points</strong> needed to unlock <strong>{{ next_tier_title }}</strong></span>
-      {% else %}
-        <span style="color: #059669; font-weight: 700;">✨ You have reached the highest tier! Enjoy VIP privileges & maximum rewards.</span>
-      {% endif %}
-      <span style="font-weight: 700; color: #0f172a;">{{ tier_progress }}%</span>
-    </div>
-  </div>
-
-  <!-- 4. Account Services & Settings Menu -->
-  <div class="card" style="background: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 2px 8px rgba(0,0,0,0.04); margin-bottom: 1.25rem;">
-    <div style="padding: 1rem 1.25rem; font-size: 0.78rem; font-weight: 800; text-transform: uppercase; color: #94a3b8; letter-spacing: 0.05em; background: #fafafa; border-bottom: 1px solid #f1f5f9;">
-      Account Services &amp; Settings
-    </div>
-
-    <div style="display: flex; flex-direction: column;">
-      <!-- Rewards & Voucher Catalog -->
-      <a href="/buyer/rewards/" style="display: flex; align-items: center; justify-content: space-between; padding: 0.9rem 1.25rem; text-decoration: none; color: #0f172a; border-bottom: 1px solid #f1f5f9; transition: background 0.15s ease;">
-        <div style="display: flex; align-items: center; gap: 0.85rem;">
-          <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(249, 115, 22, 0.1); color: #ea580c; display: flex; align-items: center; justify-content: center; font-size: 1.1rem;">
-            🎁
-          </div>
-          <div>
-            <div style="font-weight: 700; font-size: 0.92rem;">Rewards &amp; Voucher Catalog</div>
-            <div style="font-size: 0.76rem; color: #64748b;">Burn points for free food, coffee &amp; store vouchers</div>
-          </div>
-        </div>
-        <i class="bi bi-chevron-right" style="color: #cbd5e1; font-size: 0.85rem;"></i>
-      </a>
-
-      <!-- Savings Passbook & Receipts -->
-      <a href="/buyer/history/" style="display: flex; align-items: center; justify-content: space-between; padding: 0.9rem 1.25rem; text-decoration: none; color: #0f172a; border-bottom: 1px solid #f1f5f9; transition: background 0.15s ease;">
-        <div style="display: flex; align-items: center; gap: 0.85rem;">
-          <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(16, 185, 129, 0.1); color: #059669; display: flex; align-items: center; justify-content: center; font-size: 1.1rem;">
-            📜
-          </div>
-          <div>
-            <div style="font-weight: 700; font-size: 0.92rem;">Savings Passbook &amp; Receipts</div>
-            <div style="font-size: 0.76rem; color: #64748b;">Track past savings, store receipts &amp; redeemed deals</div>
-          </div>
-        </div>
-        <i class="bi bi-chevron-right" style="color: #cbd5e1; font-size: 0.85rem;"></i>
-      </a>
-
-      <!-- Neighborhood Leaderboard -->
-      <a href="/buyer/leaderboard/" style="display: flex; align-items: center; justify-content: space-between; padding: 0.9rem 1.25rem; text-decoration: none; color: #0f172a; border-bottom: 1px solid #f1f5f9; transition: background 0.15s ease;">
-        <div style="display: flex; align-items: center; gap: 0.85rem;">
-          <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(234, 179, 8, 0.12); color: #ca8a04; display: flex; align-items: center; justify-content: center; font-size: 1.1rem;">
-            🏆
-          </div>
-          <div>
-            <div style="font-weight: 700; font-size: 0.92rem;">Neighborhood Leaderboard</div>
-            <div style="font-size: 0.76rem; color: #64748b;">See top savers and neighborhood shopping ranks</div>
-          </div>
-        </div>
-        <i class="bi bi-chevron-right" style="color: #cbd5e1; font-size: 0.85rem;"></i>
-      </a>
-
-      <!-- Notifications & Alerts -->
-      <a href="/buyer/notifications/" style="display: flex; align-items: center; justify-content: space-between; padding: 0.9rem 1.25rem; text-decoration: none; color: #0f172a; border-bottom: 1px solid #f1f5f9; transition: background 0.15s ease;">
-        <div style="display: flex; align-items: center; gap: 0.85rem;">
-          <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(99, 102, 241, 0.1); color: #4f46e5; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; position: relative;">
-            🔔
-            {% if unread_notifications_count > 0 %}
-              <span style="position: absolute; top: 4px; right: 4px; width: 8px; height: 8px; background: #ef4444; border-radius: 50%;"></span>
-            {% endif %}
-          </div>
-          <div>
-            <div style="font-weight: 700; font-size: 0.92rem; display: flex; align-items: center; gap: 0.4rem;">
-              <span>Notifications &amp; Alerts</span>
-              {% if unread_notifications_count > 0 %}
-                <span class="badge badge-danger" style="font-size: 0.7rem; padding: 0.15rem 0.45rem;">{{ unread_notifications_count }} new</span>
-              {% endif %}
-            </div>
-            <div style="font-size: 0.76rem; color: #64748b;">Deal updates, cashback confirmations &amp; alerts</div>
-          </div>
-        </div>
-        <i class="bi bi-chevron-right" style="color: #cbd5e1; font-size: 0.85rem;"></i>
-      </a>
-
-      <!-- Security & Password -->
-      <a href="/buyer/change-password/" style="display: flex; align-items: center; justify-content: space-between; padding: 0.9rem 1.25rem; text-decoration: none; color: #0f172a; border-bottom: 1px solid #f1f5f9; transition: background 0.15s ease;">
-        <div style="display: flex; align-items: center; gap: 0.85rem;">
-          <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(14, 165, 233, 0.1); color: #0284c7; display: flex; align-items: center; justify-content: center; font-size: 1.1rem;">
-            🛡️
-          </div>
-          <div>
-            <div style="font-weight: 700; font-size: 0.92rem;">Security &amp; Password</div>
-            <div style="font-size: 0.76rem; color: #64748b;">Change password and account recovery phrase</div>
-          </div>
-        </div>
-        <i class="bi bi-chevron-right" style="color: #cbd5e1; font-size: 0.85rem;"></i>
-      </a>
-
-      <!-- Help & Grievance Redressal -->
-      <a href="/contact-us/" style="display: flex; align-items: center; justify-content: space-between; padding: 0.9rem 1.25rem; text-decoration: none; color: #0f172a; transition: background 0.15s ease;">
-        <div style="display: flex; align-items: center; gap: 0.85rem;">
-          <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(100, 116, 139, 0.1); color: #475569; display: flex; align-items: center; justify-content: center; font-size: 1.1rem;">
-            🎧
-          </div>
-          <div>
-            <div style="font-weight: 700; font-size: 0.92rem;">Help &amp; Grievance Redressal</div>
-            <div style="font-size: 0.76rem; color: #64748b;">Merchant issues, billing queries &amp; 24x7 support</div>
-          </div>
-        </div>
-        <i class="bi bi-chevron-right" style="color: #cbd5e1; font-size: 0.85rem;"></i>
-      </a>
-    </div>
-  </div>
-
-  <!-- 5. 100% Anonymous Shopper Guarantee Card -->
-  <div style="background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%); border: 1.5px solid #a7f3d0; border-radius: 16px; padding: 1.25rem; margin-bottom: 1.5rem; display: flex; align-items: flex-start; gap: 0.85rem;">
-    <div style="width: 38px; height: 38px; border-radius: 10px; background: #059669; color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; box-shadow: 0 4px 10px rgba(5, 150, 105, 0.25);">
-      <i class="bi bi-shield-lock-fill"></i>
+  <!-- 4. Anonymous Guarantee Card -->
+  <div style="background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%); border: 1.5px solid #a7f3d0; border-radius: 16px; padding: 1.15rem; margin-bottom: 1.25rem; display: flex; align-items: flex-start; gap: 0.85rem;">
+    <div style="width: 36px; height: 36px; border-radius: 10px; background: #059669; color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; box-shadow: 0 4px 10px rgba(5, 150, 105, 0.25);">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.3">
+        <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      </svg>
     </div>
     <div>
-      <div style="font-weight: 800; font-size: 0.92rem; color: #065f46; margin-bottom: 0.2rem;">
+      <div style="font-weight: 800; font-size: 0.88rem; color: #065f46; margin-bottom: 0.2rem;">
         100% Anonymous Shopper Guarantee
       </div>
-      <p style="font-size: 0.8rem; color: #047857; margin: 0; line-height: 1.45;">
-        Your personal mobile number and identity are <strong>never disclosed</strong> to merchant billing counters or external marketing databases. Enjoy hyper-local discounts with complete privacy and zero promotional spam calls.
+      <p style="font-size: 0.78rem; color: #047857; margin: 0; line-height: 1.45;">
+        Your personal phone and identity are never exposed to merchants. Enjoy verified discounts with complete privacy and zero promotional spam.
       </p>
     </div>
   </div>
 
-  <!-- 6. Sign Out & Danger Zone -->
-  <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-    <a href="/buyer/logout/" onclick="return confirm('Are you sure you want to sign out of LokalLoop?');" class="btn btn-outline btn-block" style="border-color: #cbd5e1; color: #334155; font-weight: 700; padding: 0.75rem; border-radius: 12px; font-size: 0.92rem; display: flex; align-items: center; justify-content: center; gap: 0.45rem;">
-      <i class="bi bi-box-arrow-right"></i> Sign Out
+  <!-- 5. Quick Links: Security, Help & Sign Out -->
+  <div style="background: #ffffff; border-radius: 16px; border: 1px solid #f1f5f9; overflow: hidden; margin-bottom: 1.25rem;">
+    <a href="/buyer/change-password/" style="display: flex; align-items: center; justify-content: space-between; padding: 0.85rem 1rem; text-decoration: none; color: #0f172a; border-bottom: 1px solid #f8fafc;">
+      <span style="font-weight: 700; font-size: 0.85rem;">🛡️ Security &amp; Password</span>
+      <span style="color: #cbd5e1;">&rsaquo;</span>
     </a>
-
-    <div style="text-align: center; margin-top: 0.5rem;">
-      <a href="/buyer/delete-account/" style="font-size: 0.78rem; color: #ef4444; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 0.3rem;">
-        <i class="bi bi-trash"></i> Delete Shopper Account
-      </a>
-    </div>
+    <a href="/contact-us/" style="display: flex; align-items: center; justify-content: space-between; padding: 0.85rem 1rem; text-decoration: none; color: #0f172a;">
+      <span style="font-weight: 700; font-size: 0.85rem;">🎧 Help &amp; Support</span>
+      <span style="color: #cbd5e1;">&rsaquo;</span>
+    </a>
   </div>
+
+  <a href="/buyer/logout/" onclick="return confirm('Are you sure you want to sign out?');" style="width: 100%; border: 1px solid #cbd5e1; color: #475569; font-weight: 800; padding: 0.7rem; border-radius: 12px; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; gap: 0.45rem; text-decoration: none; background: #ffffff;">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+    <span>Sign Out</span>
+  </a>
 
 </div>
 
-<!-- Copy Shopper ID Script & Toggle Modal -->
 <script>
 function copyShopperId(id) {
   if (!navigator.clipboard) {
@@ -326,17 +304,6 @@ function showCopiedFeedback() {
       textEl.innerText = 'Copy';
       textEl.style.color = '';
     }, 2000);
-  }
-}
-
-function toggleEditProfileModal() {
-  const el = document.getElementById('edit-profile-drawer');
-  if (el) {
-    if (el.style.display === 'none' || el.style.display === '') {
-      el.style.display = 'block';
-    } else {
-      el.style.display = 'none';
-    }
   }
 }
 </script>

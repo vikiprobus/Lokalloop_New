@@ -9,125 +9,297 @@
   
   <!-- Progressive Web App (PWA) & Web Clip Meta Tags -->
   <link rel="manifest" href="{% static 'manifest.json' %}">
-  <meta name="theme-color" content="#F97316">
+  <meta name="theme-color" content="#FFFFFF">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="LokalLoop">
   <link rel="apple-touch-icon" href="{% static 'images/icon-192.svg' %}">
 
-  <title>{% block title %}Buyer Experience — LokalLoop{% endblock %}</title>
+  <title>{% block title %}Customer Hub — LokalLoop{% endblock %}</title>
   
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="{% static 'css/design_tokens.css' %}?v=2.2">
-  <link rel="stylesheet" href="{% static 'css/main.css' %}?v=2.2">
+  <link rel="stylesheet" href="{% static 'css/design_tokens.css' %}?v=2.3">
+  <link rel="stylesheet" href="{% static 'css/main.css' %}?v=2.3">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   
   <style>
-    /* Buyer specific UI enhancements */
+    /* Buyer Mobile App Styling Matching Reference Designs */
+    html, body {
+      overflow-x: hidden !important;
+      max-width: 100vw;
+      background-color: #f8fafc;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: #0f172a;
+      -webkit-font-smoothing: antialiased;
+    }
+
     .buyer-header {
       background: #ffffff;
-      border-bottom: 1px solid var(--border-light);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
       position: sticky;
       top: 0;
-      z-index: 90;
+      z-index: 100;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+    }
+
+    .buyer-topbar-inner {
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: max(env(safe-area-inset-top, 0px), 0.2rem);
+    }
+
+    .buyer-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-decoration: none;
+    }
+
+    .buyer-brand-title {
+      font-size: 1.35rem;
+      font-weight: 900;
+      color: #0f172a;
+      letter-spacing: -0.02em;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    .buyer-brand-title span {
+      color: #f97316;
+    }
+
+    .city-picker-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      background: #f1f5f9;
+      padding: 0.32rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #1e293b;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.15s ease;
+    }
+    .city-picker-pill:hover {
+      background: #e2e8f0;
+    }
+
+    .points-badge-pill {
+      background: #fef3c7;
+      border: 1px solid #fde68a;
+      border-radius: 9999px;
+      padding: 0.22rem 0.8rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      line-height: 1.05;
+      box-shadow: 0 1px 2px rgba(245, 158, 11, 0.12);
+    }
+
+    .points-badge-val {
+      font-size: 0.95rem;
+      font-weight: 900;
+      color: #92400e;
+    }
+
+    .points-badge-lbl {
+      font-size: 0.62rem;
+      font-weight: 800;
+      color: #b45309;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .buyer-bell-btn {
+      position: relative;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #0f172a;
+      text-decoration: none;
+      border-radius: 50%;
+      transition: background 0.15s ease;
+    }
+
+    .buyer-bell-dot {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 8px;
+      height: 8px;
+      background-color: #ef4444;
+      border-radius: 50%;
+      border: 2px solid #ffffff;
+    }
+
+    /* Desktop Navigation */
+    .desktop-buyer-nav {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
     }
     .buyer-nav-link {
-      font-weight: 600;
-      font-size: 0.95rem;
-      color: var(--brand-navy-700);
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: #475569;
       display: flex;
       align-items: center;
       gap: 0.4rem;
-      padding: 0.5rem 0.75rem;
-      border-radius: var(--radius-sm);
-      transition: background 0.15s ease;
+      padding: 0.45rem 0.85rem;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: all 0.15s ease;
     }
     .buyer-nav-link:hover, .buyer-nav-link.active {
-      color: var(--brand-indigo-600);
-      background-color: var(--brand-indigo-50);
+      color: #ea580c;
+      background-color: #fff7ed;
     }
-    .points-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      background: linear-gradient(135deg, #fef3c7, #fde68a);
-      color: #92400e;
-      border: 1px solid #fcd34d;
-      font-weight: 700;
-      padding: 0.4rem 0.85rem;
-      border-radius: var(--radius-full);
-      font-size: 0.85rem;
-    }
-    .scan-btn-highlight {
-      background: linear-gradient(135deg, var(--brand-saffron-500), var(--brand-saffron-600));
-      color: #fff !important;
-      border-radius: var(--radius-full);
-      padding: 0.45rem 1rem;
-      box-shadow: 0 4px 10px rgba(249, 115, 22, 0.3);
-    }
-    .user-dropdown-container {
-      position: relative;
-    }
-    .user-dropdown-container .dropdown-menu {
-      display: none;
-      position: absolute;
-      top: 100%;
+
+    /* Mobile Bottom Navigation Bar (5 Items Exactly Matching Reference) */
+    .mobile-bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
       right: 0;
-      z-index: 1050;
+      height: calc(64px + env(safe-area-inset-bottom, 8px));
+      padding-bottom: env(safe-area-inset-bottom, 8px);
+      background: rgba(255, 255, 255, 0.98);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-top: 1px solid rgba(0, 0, 0, 0.07);
+      z-index: 1000;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
     }
-    .user-dropdown-container .dropdown-menu.show {
-      display: block !important;
+
+    .bottom-nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      color: #64748b;
+      font-size: 0.72rem;
+      font-weight: 700;
+      min-width: 56px;
+      position: relative;
+      gap: 2px;
+      transition: color 0.15s ease;
     }
-    .dropdown-item:hover {
-      background-color: var(--bg-subtle, #f8fafc);
+
+    .bottom-nav-item.active {
+      color: #ea580c;
     }
-  
-    /* Zero-Collision Status Bar & Notch Safe Area (BUG-Mobile) */
-    .buyer-header {
-      padding-top: max(env(safe-area-inset-top, 0px), 0px);
+
+    .bottom-nav-indicator {
+      width: 22px;
+      height: 3px;
+      background: #ea580c;
+      border-radius: 9999px;
+      margin-top: 2px;
     }
-    @media (max-width: 768px) {
-      .buyer-header .container {
-        height: auto !important;
-        min-height: 56px !important;
-        padding-top: 0.35rem !important;
-        padding-bottom: 0.35rem !important;
-      }
-      body.buyer-logged-in {
-        padding-bottom: calc(85px + env(safe-area-inset-bottom, 8px)) !important;
+
+    .bottom-scan-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-decoration: none;
+      margin-top: -22px;
+    }
+
+    .bottom-scan-btn {
+      width: 52px;
+      height: 52px;
+      border-radius: 17px;
+      background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 18px rgba(249, 115, 22, 0.45);
+      border: 3px solid #ffffff;
+      color: #ffffff;
+      transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .bottom-scan-btn:active {
+      transform: scale(0.94);
+    }
+
+    .bottom-scan-lbl {
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: #ea580c;
+      margin-top: 3px;
+    }
+
+    @media (min-width: 769px) {
+      .mobile-bottom-nav {
+        display: none !important;
       }
     }
 
+    @media (max-width: 768px) {
+      .desktop-buyer-nav {
+        display: none !important;
+      }
+      .desktop-user-profile {
+        display: none !important;
+      }
+    }
   </style>
   {% block extra_css %}{% endblock %}
 </head>
-<body class="buyer-logged-in">
+<body>
 
-  <!-- Buyer Top Bar -->
+  <!-- Top App Bar Matching Reference Photos -->
   <header class="buyer-header">
-    <div class="container d-flex align-center justify-between" style="height: 68px;">
+    <div class="container buyer-topbar-inner">
       
-      <!-- Brand & City Selector -->
-      <div class="d-flex align-center gap-3">
-        <a href="/buyer/dashboard/" class="d-flex align-center gap-2">
-          <div style="width: 34px; height: 34px; border-radius: 8px; background: linear-gradient(135deg, var(--brand-saffron-500), var(--brand-navy-900)); display: flex; align-items: center; justify-content: center; color: #fff;">
-            <i class="bi bi-geo-alt-fill"></i>
-          </div>
-          <span style="font-size: 1.25rem; font-weight: 800; color: var(--brand-navy-900);">Lokal<span style="color: var(--brand-saffron-500);">Loop</span></span>
+      <!-- Logo + City Selector -->
+      <div style="display: flex; align-items: center; gap: 0.65rem;">
+        <a href="/buyer/dashboard/" class="buyer-brand">
+          <!-- 3D Saffron Orange Shopping Bag Logo SVG -->
+          <svg width="32" height="32" viewBox="0 0 36 36" fill="none">
+            <defs>
+              <linearGradient id="bagMainGrad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#fb923c"/>
+                <stop offset="100%" stop-color="#ea580c"/>
+              </linearGradient>
+              <linearGradient id="bagHandleGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#9a3412"/>
+                <stop offset="100%" stop-color="#c2410c"/>
+              </linearGradient>
+            </defs>
+            <path d="M13 12V9C13 6.23858 15.2386 4 18 4C20.7614 4 23 6.23858 23 9V12" stroke="url(#bagHandleGrad)" stroke-width="2.6" stroke-linecap="round"/>
+            <rect x="6" y="11" width="24" height="21" rx="6" fill="url(#bagMainGrad)"/>
+            <path d="M10 16C10 16 13 19 18 19C23 19 26 16 26 16" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" opacity="0.4"/>
+            <circle cx="18" cy="22" r="2.5" stroke="#ffffff" stroke-width="1.5" opacity="0.45"/>
+          </svg>
+          <span class="buyer-brand-title">Lokal<span>Loop</span></span>
         </a>
 
-        <!-- Current City Badge / Selector -->
-        <div style="display: flex; align-items: center; gap: 0.35rem; background: var(--bg-subtle); padding: 0.35rem 0.75rem; border-radius: var(--radius-full); font-size: 0.825rem; font-weight: 600; color: var(--brand-navy-700);">
-          <i class="bi bi-geo" style="color: var(--brand-saffron-500);"></i>
-          <span>{{ user.buyer_profile.district|default:user.buyer_profile.preferred_city|default:user_profile.city|default:"Bengaluru, Karnataka" }}</span>
-        </div>
+        <!-- City Dropdown Pill -->
+        <a href="/buyer/explore/" class="city-picker-pill" title="Change City">
+          <span>{{ user.buyer_profile.district|default:user.buyer_profile.preferred_city|default:"Pune" }}</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m6 9 6 6 6-6"/>
+          </svg>
+        </a>
       </div>
 
-      <!-- Buyer Navigation Links (Desktop) -->
+      <!-- Desktop Links (Hidden on Mobile) -->
       <nav class="desktop-nav d-flex align-center gap-2">
         <a href="/buyer/dashboard/" class="buyer-nav-link {% if request.path == '/buyer/dashboard/' %}active{% endif %}">
           <i class="bi bi-house-door"></i> Home
@@ -135,81 +307,39 @@
         <a href="/buyer/explore/" class="buyer-nav-link {% if '/buyer/explore/' in request.path %}active{% endif %}">
           <i class="bi bi-compass"></i> Explore
         </a>
-        <a href="/buyer/scan/" class="buyer-nav-link scan-btn-highlight">
-          <i class="bi bi-qr-code-scan"></i> Scan & Redeem
+        <a href="/buyer/scan/" class="buyer-nav-link" style="color: #ea580c;">
+          <i class="bi bi-qr-code-scan"></i> Scan
         </a>
         <a href="/buyer/rewards/" class="buyer-nav-link {% if '/buyer/rewards/' in request.path %}active{% endif %}">
           <i class="bi bi-gift"></i> Rewards
         </a>
-        <a href="/buyer/leaderboard/" class="buyer-nav-link {% if '/buyer/leaderboard/' in request.path %}active{% endif %}">
-          <i class="bi bi-trophy"></i> Leaderboard
-        </a>
-        <a href="/buyer/history/" class="buyer-nav-link {% if '/buyer/history/' in request.path %}active{% endif %}">
-          <i class="bi bi-clock-history"></i> History
+        <a href="/buyer/account/" class="buyer-nav-link {% if '/buyer/account/' in request.path %}active{% endif %}">
+          <i class="bi bi-person"></i> Account
         </a>
       </nav>
 
-      <!-- Right Actions: Points, Notifications, Profile Dropdown -->
-      <div class="d-flex align-center gap-3">
-        <!-- Reward Points ticker -->
-        <a href="/buyer/rewards/" class="points-badge" title="Your available reward points balance">
-          <i class="bi bi-coin"></i>
-          <span>{{ user.reward_account.current_points|default:50 }} Pts</span>
+      <!-- Right Header Items: Points Pill + Bell Notification -->
+      <div style="display: flex; align-items: center; gap: 0.65rem;">
+        <!-- 240 Pts Badge -->
+        <a href="/buyer/rewards/" class="points-badge-pill" title="Your reward points balance">
+          <span class="points-badge-val">{{ user.reward_account.current_points|default:240 }}</span>
+          <span class="points-badge-lbl">Pts</span>
         </a>
 
-        <!-- Notifications Bell -->
-        <a href="/buyer/notifications/" style="position: relative; color: var(--brand-navy-700); font-size: 1.25rem; padding: 0.4rem;">
-          <i class="bi bi-bell"></i>
-          {% if unread_notifications_count > 0 %}
-            <span style="position: absolute; top: 2px; right: 2px; width: 8px; height: 8px; background-color: var(--color-danger); border-radius: 50%;"></span>
-          {% endif %}
+        <!-- Notification Bell with Red Dot -->
+        <a href="/buyer/notifications/" class="buyer-bell-btn" title="Notifications">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/>
+            <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>
+          </svg>
+          <span class="buyer-bell-dot"></span>
         </a>
 
-        <!-- User Profile Dropdown Menu -->
-        <div class="user-dropdown-container" style="padding-left: 0.5rem; border-left: 1px solid var(--border-light);">
-          <button type="button" class="dropdown-toggle" id="buyerProfileDropdownBtn" style="background: var(--bg-subtle, #f8fafc); border: 1px solid var(--border-light, #e2e8f0); padding: 0.35rem 0.65rem 0.35rem 0.4rem; border-radius: var(--radius-full, 9999px); display: inline-flex; align-items: center; gap: 0.5rem; cursor: pointer; transition: all 0.2s ease;">
-            <div style="width: 30px; height: 30px; border-radius: 50%; background: var(--brand-saffron-100, #ffedd5); color: var(--brand-saffron-700, #c2410c); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.85rem;">
-              <i class="bi bi-person-fill"></i>
-            </div>
-            <span style="font-weight: 700; font-size: 0.85rem; color: var(--brand-navy-900, #0f172a); max-width: 130px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-              {{ user.buyer_profile.nickname|default:"Shopper" }}
-            </span>
-            <i class="bi bi-chevron-down" style="font-size: 0.75rem; color: var(--text-muted, #64748b);"></i>
-          </button>
-
-          <div class="dropdown-menu" style="right: 0; left: auto; min-width: 240px; margin-top: 0.5rem; border-radius: 12px; box-shadow: var(--shadow-lg, 0 10px 25px rgba(0,0,0,0.12)); border: 1px solid var(--border-light, #e2e8f0); padding: 0.5rem; background: #ffffff;">
-            <div style="padding: 0.75rem 0.85rem; border-bottom: 1px solid var(--border-light, #e2e8f0); margin-bottom: 0.35rem;">
-              <div style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: #94a3b8; letter-spacing: 0.05em;">Customer Pass</div>
-              <div style="font-weight: 800; color: var(--ink-950, #0f172a); font-size: 0.95rem;">
-                {{ user.buyer_profile.nickname|default:"Shopper" }}
-              </div>
-              <div style="font-size: 0.78rem; color: var(--brand-saffron-600, #ea580c); font-family: monospace; font-weight: 700; margin-top: 0.15rem;">
-                {{ user.buyer_profile.public_unique_id|default:"" }}
-              </div>
-            </div>
-
-            <a href="/buyer/account/" class="dropdown-item" style="display: flex; align-items: center; gap: 0.55rem; padding: 0.65rem 0.85rem; border-radius: 8px; font-weight: 600; font-size: 0.85rem; color: #1e293b; text-decoration: none; transition: background 0.15s ease;">
-              <i class="bi bi-person-circle" style="color: var(--brand-saffron-600, #ea580c); font-size: 1rem;"></i>
-              <span>👤 My Account</span>
-            </a>
-
-            <a href="/buyer/change-password/" class="dropdown-item" style="display: flex; align-items: center; gap: 0.55rem; padding: 0.65rem 0.85rem; border-radius: 8px; font-weight: 600; font-size: 0.85rem; color: #1e293b; text-decoration: none; transition: background 0.15s ease;">
-              <i class="bi bi-shield-lock-fill" style="color: var(--brand-saffron-600, #ea580c); font-size: 1rem;"></i>
-              <span>🛡️ Security &amp; Password</span>
-            </a>
-
-            <a href="/contact-us/" class="dropdown-item" style="display: flex; align-items: center; gap: 0.55rem; padding: 0.65rem 0.85rem; border-radius: 8px; font-weight: 600; font-size: 0.85rem; color: #1e293b; text-decoration: none; transition: background 0.15s ease;">
-              <i class="bi bi-headset" style="color: var(--brand-navy-700, #0f172a); font-size: 1rem;"></i>
-              <span>🎧 Help &amp; Grievances</span>
-            </a>
-
-            <div style="border-top: 1px solid var(--border-light, #e2e8f0); margin: 0.35rem 0;"></div>
-
-            <a href="/buyer/logout/" class="dropdown-item" style="display: flex; align-items: center; gap: 0.55rem; padding: 0.65rem 0.85rem; border-radius: 8px; font-weight: 600; font-size: 0.85rem; color: #dc2626; text-decoration: none; transition: background 0.15s ease;">
-              <i class="bi bi-box-arrow-right" style="font-size: 1rem;"></i>
-              <span>🚪 Sign Out</span>
-            </a>
-          </div>
+        <!-- Desktop Profile Menu -->
+        <div class="desktop-user-profile" style="margin-left: 0.25rem;">
+          <a href="/buyer/account/" style="width: 34px; height: 34px; border-radius: 50%; background: #ea580c; color: #ffffff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.9rem; text-decoration: none;">
+            {{ user.buyer_profile.nickname|slice:":1"|upper|default:"S" }}
+          </a>
         </div>
       </div>
 
@@ -218,55 +348,65 @@
 
   <!-- Flash Messages -->
   {% if messages %}
-    <div class="container" style="margin-top: 1rem;">
+    <div class="container" style="margin-top: 0.75rem;">
       {% for message in messages %}
-        <div class="alert alert-{{ message.tags }}">
+        <div class="alert alert-{{ message.tags }}" style="border-radius: 12px; margin-bottom: 0.5rem;">
           <span>{{ message }}</span>
-          <button type="button" style="background: none; border: none; cursor: pointer; font-size: 1.1rem;" onclick="this.parentElement.remove();">&times;</button>
+          <button type="button" style="background: none; border: none; cursor: pointer; font-size: 1.1rem; float: right;" onclick="this.parentElement.remove();">&times;</button>
         </div>
       {% endfor %}
     </div>
   {% endif %}
 
-  <!-- Page Main -->
-  <main style="padding: 1.5rem 0 3rem;">
+  <!-- Page Content -->
+  <main style="padding: 0.85rem 0 5.5rem;">
     {% block content %}{% endblock %}
   </main>
 
-    <!-- Mobile Bottom Navigation Bar (Zero-CDN Inline High-Definition SVGs) -->
-  <div class="mobile-bottom-nav" style="position: fixed; bottom: 0; left: 0; right: 0; height: calc(62px + env(safe-area-inset-bottom, 8px)); padding-bottom: env(safe-area-inset-bottom, 8px); background: rgba(255, 255, 255, 0.96); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-top: 1px solid rgba(0, 0, 0, 0.08); z-index: 1000; display: flex; justify-content: space-around; align-items: center; box-shadow: 0 -4px 20px rgba(0,0,0,0.06);">
+  <!-- Mobile Bottom Navigation Bar (5 Items with Floating Scan Button & Active Underlines) -->
+  <nav class="mobile-bottom-nav">
+    
     <!-- 1. Home -->
-    <a href="/buyer/dashboard/" style="text-align: center; color: {% if request.path == '/buyer/dashboard/' %}var(--brand-indigo-600){% else %}var(--text-muted){% endif %}; font-size: 0.72rem; text-decoration: none; display: flex; flex-direction: column; align-items: center; gap: 0.2rem; min-width: 48px;">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <a href="/buyer/dashboard/" class="bottom-nav-item {% if request.path == '/buyer/dashboard/' %}active{% endif %}">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="{% if request.path == '/buyer/dashboard/' %}#ea580c{% else %}none{% endif %}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-        <polyline points="9 22 9 12 15 12 15 22"/>
+        <polyline points="9 22 9 12 15 12 15 22" stroke="{% if request.path == '/buyer/dashboard/' %}#ffffff{% else %}currentColor{% endif %}"/>
       </svg>
       <span>Home</span>
+      {% if request.path == '/buyer/dashboard/' %}
+        <span class="bottom-nav-indicator"></span>
+      {% endif %}
     </a>
 
     <!-- 2. Explore -->
-    <a href="/buyer/explore/" style="text-align: center; color: {% if '/buyer/explore/' in request.path %}var(--brand-indigo-600){% else %}var(--text-muted){% endif %}; font-size: 0.72rem; text-decoration: none; display: flex; flex-direction: column; align-items: center; gap: 0.2rem; min-width: 48px;">
+    <a href="/buyer/explore/" class="bottom-nav-item {% if '/buyer/explore/' in request.path %}active{% endif %}">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="10"/>
-        <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>
+        <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" fill="{% if '/buyer/explore/' in request.path %}#ea580c{% else %}none{% endif %}"/>
       </svg>
       <span>Explore</span>
+      {% if '/buyer/explore/' in request.path %}
+        <span class="bottom-nav-indicator"></span>
+      {% endif %}
     </a>
 
-    <!-- 3. Scan & Redeem (Floating High-Contrast Orange Circle) -->
-    <a href="/buyer/scan/" style="text-align: center; color: #ffffff !important; background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-top: -20px; box-shadow: 0 6px 16px rgba(249, 115, 22, 0.45); border: 3px solid #ffffff; flex-shrink: 0;" aria-label="Scan QR Code">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M3 7V5a2 2 0 0 1 2-2h2"/>
-        <path d="M17 3h2a2 2 0 0 1 2 2v2"/>
-        <path d="M21 17v2a2 2 0 0 1-2 2h-2"/>
-        <path d="M7 21H5a2 2 0 0 1-2-2v-2"/>
-        <rect x="7" y="7" width="10" height="10" rx="1.5"/>
-        <line x1="7" y1="12" x2="17" y2="12"/>
-      </svg>
+    <!-- 3. Floating Orange Scan Button -->
+    <a href="/buyer/scan/" class="bottom-scan-wrapper">
+      <div class="bottom-scan-btn" aria-label="Scan billing counter QR">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 7V5a2 2 0 0 1 2-2h2"/>
+          <path d="M17 3h2a2 2 0 0 1 2 2v2"/>
+          <path d="M21 17v2a2 2 0 0 1-2 2h-2"/>
+          <path d="M7 21H5a2 2 0 0 1-2-2v-2"/>
+          <rect x="7" y="7" width="10" height="10" rx="1.5"/>
+          <line x1="7" y1="12" x2="17" y2="12"/>
+        </svg>
+      </div>
+      <span class="bottom-scan-lbl">Scan</span>
     </a>
 
     <!-- 4. Rewards -->
-    <a href="/buyer/rewards/" style="text-align: center; color: {% if '/buyer/rewards/' in request.path %}var(--brand-indigo-600){% else %}var(--text-muted){% endif %}; font-size: 0.72rem; text-decoration: none; display: flex; flex-direction: column; align-items: center; gap: 0.2rem; min-width: 48px;">
+    <a href="/buyer/rewards/" class="bottom-nav-item {% if '/buyer/rewards/' in request.path %}active{% endif %}">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <polyline points="20 12 20 22 4 22 4 12"/>
         <rect x="2" y="7" width="20" height="5"/>
@@ -275,40 +415,39 @@
         <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>
       </svg>
       <span>Rewards</span>
+      {% if '/buyer/rewards/' in request.path %}
+        <span class="bottom-nav-indicator"></span>
+      {% endif %}
     </a>
 
-    <!-- 5. Activity -->
-    <a href="/buyer/history/" style="text-align: center; color: {% if '/buyer/history/' in request.path %}var(--brand-indigo-600){% else %}var(--text-muted){% endif %}; font-size: 0.72rem; text-decoration: none; display: flex; flex-direction: column; align-items: center; gap: 0.2rem; min-width: 48px;">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="10"/>
-        <polyline points="12 6 12 12 16 14"/>
-      </svg>
-      <span>Activity</span>
-    </a>
-
-    <!-- 6. Account -->
-    <a href="/buyer/account/" style="text-align: center; color: {% if '/buyer/account/' in request.path %}var(--brand-indigo-600){% else %}var(--text-muted){% endif %}; font-size: 0.72rem; text-decoration: none; display: flex; flex-direction: column; align-items: center; gap: 0.2rem; min-width: 48px;">
+    <!-- 5. Account -->
+    <a href="/buyer/account/" class="bottom-nav-item {% if '/buyer/account/' in request.path %}active{% endif %}">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
         <circle cx="12" cy="7" r="4"/>
       </svg>
       <span>Account</span>
+      {% if '/buyer/account/' in request.path %}
+        <span class="bottom-nav-indicator"></span>
+      {% endif %}
     </a>
-  </div>
+
+  </nav>
+
 
   <!-- Mobile Account Drawer Modal (BUG-3.2) -->
   <div id="mobileAccountBackdrop" style="display: none; position: fixed; inset: 0; background: rgba(15,23,42,0.6); z-index: 1050; backdrop-filter: blur(2px);" onclick="closeMobileAccountDrawer()"></div>
   <div id="mobileAccountDrawer" style="display: none; position: fixed; bottom: 0; left: 0; right: 0; background: #ffffff; border-radius: 20px 20px 0 0; z-index: 1060; padding: 1.5rem; box-shadow: 0 -8px 30px rgba(0,0,0,0.25); max-height: 80vh; overflow-y: auto;">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border-light, #e2e8f0);">
       <div style="display: flex; align-items: center; gap: 0.75rem;">
-        <div style="width: 42px; height: 42px; border-radius: 50%; background: var(--brand-saffron-100, #ffedd5); color: var(--brand-saffron-700, #c2410c); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.1rem;">
+        <div style="width: 42px; height: 42px; border-radius: 50%; background: #ffedd5; color: #ea580c; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.1rem;">
           <i class="bi bi-person-fill"></i>
         </div>
         <div>
-          <div style="font-weight: 800; color: var(--ink-950, #0f172a); font-size: 1.05rem;">
+          <div style="font-weight: 800; color: #0f172a; font-size: 1.05rem;">
             {{ user.buyer_profile.nickname|default:"Shopper" }}
           </div>
-          <div style="font-size: 0.8rem; color: var(--brand-saffron-600, #ea580c); font-family: monospace; font-weight: 700;">
+          <div style="font-size: 0.8rem; color: #ea580c; font-family: monospace; font-weight: 700;">
             {{ user.buyer_profile.public_unique_id|default:"" }}
           </div>
         </div>
@@ -319,25 +458,30 @@
     </div>
 
     <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.25rem;">
-      <a href="/buyer/rewards/" class="btn btn-outline" style="display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1rem; border-radius: 10px; text-decoration: none; font-weight: 700; color: #0f172a;">
-        <span style="display: flex; align-items: center; gap: 0.5rem;"><i class="bi bi-coin text-saffron"></i> Points Balance</span>
-        <span class="badge badge-saffron">{{ user.reward_account.current_points|default:50 }} Pts</span>
+      <a href="/buyer/account/" style="display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1rem; border-radius: 10px; text-decoration: none; font-weight: 700; color: #0f172a; background: #f8fafc;">
+        <span>👤 My Profile</span>
+        <span>&rsaquo;</span>
       </a>
 
-      <a href="/buyer/change-password/" class="btn btn-outline" style="display: flex; align-items: center; gap: 0.65rem; padding: 0.75rem 1rem; border-radius: 10px; text-decoration: none; font-weight: 600; color: #1e293b;">
-        <i class="bi bi-shield-lock-fill text-saffron"></i>
-        <span>Security &amp; Password</span>
+      <a href="/buyer/rewards/" style="display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1rem; border-radius: 10px; text-decoration: none; font-weight: 700; color: #0f172a; background: #f8fafc;">
+        <span>🎁 Points Balance</span>
+        <span style="color: #ea580c;">{{ user.reward_account.current_points|default:50 }} Pts</span>
       </a>
 
-      <a href="/contact-us/" class="btn btn-outline" style="display: flex; align-items: center; gap: 0.65rem; padding: 0.75rem 1rem; border-radius: 10px; text-decoration: none; font-weight: 600; color: #1e293b;">
-        <i class="bi bi-headset text-saffron"></i>
-        <span>Help &amp; Grievances</span>
+      <a href="/buyer/change-password/" style="display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1rem; border-radius: 10px; text-decoration: none; font-weight: 600; color: #1e293b; background: #f8fafc;">
+        <span>🛡️ Security &amp; Password</span>
+        <span>&rsaquo;</span>
+      </a>
+
+      <a href="/contact-us/" style="display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1rem; border-radius: 10px; text-decoration: none; font-weight: 600; color: #1e293b; background: #f8fafc;">
+        <span>🎧 Help &amp; Grievances</span>
+        <span>&rsaquo;</span>
       </a>
     </div>
 
-    <div style="padding-top: 0.5rem;">
-      <a href="/buyer/logout/" class="btn btn-block" style="background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; font-weight: 700; width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.75rem; border-radius: 10px;">
-        <i class="bi bi-box-arrow-right"></i> Sign Out
+    <div>
+      <a href="/buyer/logout/" style="background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; font-weight: 700; width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.75rem; border-radius: 10px; text-decoration: none;">
+        <span>Sign Out</span>
       </a>
     </div>
   </div>
@@ -352,27 +496,6 @@
       document.getElementById('mobileAccountDrawer').style.display = 'none';
     }
   </script>
-
-  <!-- Floating PWA Smart Mobile Install Banner -->
-  <div id="pwaInstallBanner" style="display: none; position: fixed; bottom: 5rem; left: 1rem; right: 1rem; max-width: 440px; margin: 0 auto; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #ffffff; padding: 1rem 1.25rem; border-radius: 16px; z-index: 999; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 12px 30px rgba(0,0,0,0.45); align-items: center; justify-content: space-between; gap: 0.75rem;">
-    <div style="display: flex; align-items: center; gap: 0.75rem;">
-      <div style="width: 44px; height: 44px; border-radius: 10px; background: linear-gradient(135deg, #f97316, #0f172a); display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 4px 10px rgba(249,115,22,0.35);">
-        <i class="bi bi-geo-alt-fill" style="color: #ffffff; font-size: 1.4rem;"></i>
-      </div>
-      <div>
-        <div style="font-weight: 800; font-size: 0.92rem; color: #ffffff; letter-spacing: -0.01em;">Install LokalLoop App</div>
-        <div style="font-size: 0.75rem; color: #94a3b8; line-height: 1.3;">Add to home screen for 1-tap QR scanning</div>
-      </div>
-    </div>
-    <div style="display: flex; align-items: center; gap: 0.4rem;">
-      <button type="button" onclick="promptPwaInstall()" class="btn btn-sm btn-primary" style="padding: 0.45rem 0.85rem; font-size: 0.8rem; font-weight: 700; white-space: nowrap;">
-        Install
-      </button>
-      <button type="button" onclick="dismissPwaBanner()" style="background: none; border: none; color: #94a3b8; font-size: 1.25rem; cursor: pointer; padding: 0.25rem; line-height: 1;" aria-label="Close">
-        &times;
-      </button>
-    </div>
-  </div>
 
   <script src="{% static 'js/main.js' %}?v=2.1"></script>
   <script src="{% static 'js/pwa.js' %}?v=1.0"></script>
