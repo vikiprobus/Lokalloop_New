@@ -109,5 +109,51 @@
     </div>
   {% endif %}
 
+
+  <!-- Interactive Geolocation GPS Handler -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const detectBtn = document.getElementById('detect-location-btn');
+      const latInput = document.getElementById('user-lat');
+      const lngInput = document.getElementById('user-lng');
+
+      // Check session cache for coordinates
+      if ((!latInput.value || !lngInput.value) && window.sessionStorage) {
+        const cachedLat = sessionStorage.getItem('user_lat');
+        const cachedLng = sessionStorage.getItem('user_lng');
+        if (cachedLat && cachedLng) {
+          latInput.value = cachedLat;
+          lngInput.value = cachedLng;
+        }
+      }
+
+      if (detectBtn) {
+        detectBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          if (!navigator.geolocation) {
+            alert("Geolocation is not supported by your browser.");
+            return;
+          }
+          detectBtn.innerHTML = '<span>Locating nearest... 📍</span>';
+          navigator.geolocation.getCurrentPosition(function(pos) {
+            const lat = pos.coords.latitude;
+            const lng = pos.coords.longitude;
+            latInput.value = lat;
+            lngInput.value = lng;
+            try {
+              sessionStorage.setItem('user_lat', lat);
+              sessionStorage.setItem('user_lng', lng);
+            } catch(err) {}
+            detectBtn.closest('form').submit();
+          }, function(err) {
+            detectBtn.innerHTML = '<span style="color: #ef4444;">GPS Unavailable ⚠️</span>';
+            setTimeout(() => {
+              detectBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> <span>Find Nearest Shops to Me</span>';
+            }, 3000);
+          }, { timeout: 8000, enableHighAccuracy: true });
+        });
+      }
+    });
+  </script>
 </div>
 {% endblock %}

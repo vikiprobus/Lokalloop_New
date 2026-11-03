@@ -99,6 +99,7 @@ def seller_dashboard_view(request):
         'total_discount_given': total_discount_given,
         'recent_redemptions': redemptions,
         'active_offers': active_offers[:4],
+        'primary_offer': active_offers.first() or offers.first(),
         'is_verified': is_verified,
     }
     return render(request, 'seller/dashboard.html', context)

@@ -34,6 +34,11 @@
         </span>
       {% endif %}
       <span>{{ offer.shop.locality }}, {{ offer.shop.city }}</span>
+      {% if offer.distance_display %}
+        <span style="display: inline-flex; align-items: center; gap: 0.25rem; color: #ea580c; font-weight: 700; background: #fff7ed; padding: 0.15rem 0.5rem; border-radius: 6px; font-size: 0.75rem;">
+          <i class="bi bi-geo-alt-fill"></i> {{ offer.distance_display }}
+        </span>
+      {% endif %}
     </div>
 
     <!-- Claimed Counter Indicator -->

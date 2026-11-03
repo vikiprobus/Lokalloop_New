@@ -4,6 +4,28 @@
 {% block page_title %}Store Performance &amp; Counter Overview{% endblock %}
 
 {% block content %}
+<!-- Merchant Store Header Banner (Matching Reference Screenshot 1) -->
+<div style="background: #111a2e; border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 1.15rem 1.25rem; margin-bottom: 1.25rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; box-shadow: 0 4px 20px rgba(0,0,0,0.25);">
+  <div style="display: flex; align-items: center; gap: 1rem; min-width: 0;">
+    <div style="width: 48px; height: 48px; border-radius: 14px; background: linear-gradient(135deg, #f97316, #ea580c); display: flex; align-items: center; justify-content: center; color: #ffffff; font-size: 1.35rem; flex-shrink: 0; box-shadow: 0 4px 12px rgba(234,88,12,0.35);">
+      {% if shop.category.icon %}<i class="bi {{ shop.category.icon }}"></i>{% else %}<i class="bi bi-shop"></i>{% endif %}
+    </div>
+    <div style="min-width: 0;">
+      <h2 style="font-size: 1.15rem; font-weight: 800; color: #ffffff; margin: 0; font-family: 'Outfit', sans-serif; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+        {{ shop.name|default:"Artisan Brew Coffee & Roasters" }}
+      </h2>
+      <div style="font-size: 0.78rem; color: #94a3b8; display: flex; align-items: center; gap: 0.35rem; margin-top: 0.2rem;">
+        <span style="color: #f97316;">📍</span>
+        <span>{{ shop.locality|default:"Indiranagar" }}, {{ shop.city|default:"Bengaluru" }}</span>
+      </div>
+    </div>
+  </div>
+  <a href="{% if shop.slug %}/shops/{{ shop.slug }}/{% else %}/seller/profile/{% endif %}" style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.45rem 1rem; border-radius: 9999px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: #f8fafc; font-size: 0.8rem; font-weight: 700; text-decoration: none; white-space: nowrap; transition: all 0.2s ease;">
+    <span>My Shop</span>
+    <span style="font-size: 0.95rem;">&rsaquo;</span>
+  </a>
+</div>
+
 {% if not user.seller_profile.is_verified %}
 <!-- Application Under Compliance Review Banner -->
 <div class="card card-padded" style="margin-bottom: 1.5rem; background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 60%, #1e293b 100%); color: #ffffff; border: 1px solid #f59e0b; border-left: 6px solid #f59e0b; border-radius: 20px; box-shadow: 0 10px 25px -5px rgba(245, 158, 11, 0.15); position: relative; overflow: hidden;">

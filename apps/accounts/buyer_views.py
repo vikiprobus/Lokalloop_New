@@ -14,7 +14,10 @@ from apps.rewards.models import (
     RewardCatalogItem, BuyerRewardClaim, BumperBillSubmission
 )
 from apps.notifications.models import Notification
-from services.location_service import annotate_shops_with_distance, safe_parse_coordinates, get_city_coordinates
+from services.location_service import (
+    annotate_shops_with_distance, safe_parse_coordinates, get_city_coordinates,
+    calculate_distance, format_distance_display
+)
 from services.redemption_service import process_redemption
 from services.reward_service import (
     get_or_create_reward_account, redeem_catalog_reward, submit_bumper_bill
@@ -47,7 +50,7 @@ def buyer_dashboard_view(request):
             nearby_shops = list(nearby_shops_qs)[:4]
     else:
         nearby_shops = list(nearby_shops_qs)[:4]
-    popular_offers = Offer.objects.filter(
+    popular_offers = list(Offer.objects.filter(
         status=OfferStatus.ACTIVE,
         shop__is_active=True,
         shop__is_approved=True,
@@ -55,7 +58,17 @@ def buyer_dashboard_view(request):
         start_date__lte=timezone.now(),
         end_date__gte=timezone.now(),
         current_redemptions__lt=F('max_redemptions')
-    ).select_related('shop', 'shop__category')[:4]
+    ).select_related('shop', 'shop__category')[:4])
+
+    if lat_val is not None and lng_val is not None:
+        for o in popular_offers:
+            try:
+                dist = calculate_distance(lat_val, lng_val, float(o.shop.latitude), float(o.shop.longitude))
+                o.distance_km = dist
+                o.distance_display = format_distance_display(dist)
+            except Exception:
+                o.distance_km = 9999.0
+                o.distance_display = ""
     categories = ShopCategory.objects.filter(is_active=True, parent__isnull=True)[:6]
     
     # Recent redemptions
@@ -80,7 +93,13 @@ def buyer_explore_view(request):
     """
     query = request.GET.get('q', '').strip()
     category_slug = request.GET.get('category', '').strip()
-    city = request.GET.get('city', 'Bengaluru').strip()
+    raw_city = request.GET.get('city')
+    if raw_city:
+        city = raw_city.strip()
+    else:
+        buyer_prof = getattr(request.user, 'buyer_profile', None)
+        city = (buyer_prof.preferred_city if buyer_prof and buyer_prof.preferred_city else getattr(getattr(request.user, 'profile', None), 'city', '')) or 'Pune'
+        city = city.strip()
     view_type = request.GET.get('type', 'offers')  # default to offers for buyers
     lat = request.GET.get('lat')
     lng = request.GET.get('lng')
@@ -111,7 +130,7 @@ def buyer_explore_view(request):
     else:
         shops_list = list(shops)
 
-    offers = Offer.objects.filter(
+    offers_qs = Offer.objects.filter(
         status=OfferStatus.ACTIVE,
         shop__is_active=True,
         shop__is_approved=True,
@@ -120,17 +139,29 @@ def buyer_explore_view(request):
         current_redemptions__lt=F('max_redemptions')
     ).select_related('shop', 'shop__category')
     if city and city != 'all' and not (lat and lng and request.GET.get('city') is None):
-        offers = offers.filter(shop__city__iexact=city)
+        offers_qs = offers_qs.filter(shop__city__iexact=city)
     if category_slug:
-        offers = offers.filter(Q(shop__category__slug=category_slug) | Q(shop__subcategory__slug=category_slug) | Q(shop__category__parent__slug=category_slug))
+        offers_qs = offers_qs.filter(Q(shop__category__slug=category_slug) | Q(shop__subcategory__slug=category_slug) | Q(shop__category__parent__slug=category_slug))
     if query:
-        offers = offers.filter(
+        offers_qs = offers_qs.filter(
             Q(title__icontains=query) | Q(shop__name__icontains=query) | Q(shop__locality__icontains=query)
         )
 
+    offers_list = list(offers_qs)
+    if lat_val is not None and lng_val is not None:
+        for offer in offers_list:
+            try:
+                dist = calculate_distance(lat_val, lng_val, float(offer.shop.latitude), float(offer.shop.longitude))
+                offer.distance_km = dist
+                offer.distance_display = format_distance_display(dist)
+            except Exception:
+                offer.distance_km = 9999.0
+                offer.distance_display = ""
+        offers_list.sort(key=lambda o: getattr(o, 'distance_km', 9999.0))
+
     context = {
         'shops': shops_list,
-        'offers': offers,
+        'offers': offers_list,
         'categories': categories,
         'current_category': category_slug,
         'current_city': city,

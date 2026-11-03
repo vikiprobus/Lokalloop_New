@@ -30,6 +30,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.cache import never_cache
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.db import transaction
@@ -197,6 +198,7 @@ def generate_shopper_id_api(request):
     return response
 
 
+@never_cache
 def buyer_register_view(request):
     if request.user.is_authenticated:
         return redirect('/buyer/dashboard/')
@@ -381,6 +383,7 @@ def buyer_set_nickname_view(request):
     return redirect('/buyer/dashboard/')
 
 
+@never_cache
 def buyer_recover_view(request):
     """
     Self-service Zero-Personal-Info Account Recovery:
@@ -501,6 +504,7 @@ def buyer_recover_view(request):
     return render(request, 'auth/buyer_recover.html', context)
 
 
+@never_cache
 def buyer_login_view(request):
     if request.user.is_authenticated:
         profile = getattr(request.user, 'profile', None)
@@ -627,6 +631,7 @@ def get_subcategories_api(request):
     return JsonResponse({'subcategories': list(subs)})
 
 
+@never_cache
 def seller_register_view(request):
     if request.user.is_authenticated:
         return redirect('/seller/dashboard/')
@@ -778,6 +783,7 @@ def seller_register_view(request):
     return render(request, 'auth/seller_register.html', context)
 
 
+@never_cache
 def seller_login_view(request):
     if request.user.is_authenticated:
         profile = getattr(request.user, 'profile', None)
@@ -863,6 +869,7 @@ def seller_login_view(request):
     return render(request, 'auth/seller_login.html', {'form': form, 'captcha': generate_captcha()})
 
 
+@never_cache
 def admin_login_view(request):
     if request.user.is_authenticated:
         profile = getattr(request.user, 'profile', None)
@@ -1076,6 +1083,7 @@ def seller_change_password_view(request):
     return render(request, 'seller/change_password.html', context)
 
 
+@never_cache
 def seller_recover_view(request):
     """
     Enterprise-Grade Password Recovery Engine for Merchants & Store Partners:
