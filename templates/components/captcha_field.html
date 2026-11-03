@@ -1,525 +1,569 @@
-{% if is_dark or request.path == '/admin-login/' %}
-<!-- ========================================== -->
-<!-- DARK THEME SLIDER CAPTCHA (ADMIN PORTAL)   -->
-<!-- ========================================== -->
-<div class="slider-captcha-wrapper slider-dark" style="margin-top: 1.25rem; margin-bottom: 1.25rem;">
-  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
-    <label class="form-label" style="color: #cbd5e1; font-weight: 700; font-size: 0.85rem; margin-bottom: 0; display: inline-flex; align-items: center; gap: 0.45rem;">
-      <i class="bi bi-shield-check" style="color: #ef4444; font-size: 1rem;"></i> CAPTCHA
-    </label>
-    <button type="button" class="slider-reset-btn-dark" onclick="resetSliderCaptcha(this, true)" title="Refresh challenge" style="background: none; border: none; color: #64748b; cursor: pointer; padding: 2px 4px; font-size: 0.85rem; transition: color 0.2s ease;">
-      <i class="bi bi-arrow-clockwise"></i>
-    </button>
-  </div>
-
-  <input type="hidden" name="captcha_token" id="id_captcha_token" value="{{ captcha.captcha_token }}">
-  <input type="hidden" name="captcha_answer" id="id_captcha_answer" value="">
-
-  <!-- Slider Track Component -->
-  <div class="slider-track-container dark-track" id="sliderTrackContainer">
-    <!-- Progress fill -->
-    <div class="slider-progress-bar dark-progress" id="sliderProgressBar"></div>
-    
-    <!-- Instructional / Status Text -->
-    <div class="slider-label-text dark-text" id="sliderLabelText">
-      <span class="slide-text-en">Slide to verify 👉</span>
-    </div>
-
-    <!-- Draggable Thumb / Handle -->
-    <div class="slider-handle dark-handle" id="sliderHandle" role="slider" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
-      <i class="bi bi-chevron-double-right" id="sliderHandleIcon"></i>
-    </div>
-  </div>
-
-  <!-- Dynamic Validation Error Alert -->
-  <div id="sliderClientError" class="text-danger" style="display: none; font-size: 0.8rem; margin-top: 0.45rem; font-weight: 600; color: #f87171;"></div>
-
-  {% if form.captcha_answer.errors %}
-    <div class="text-danger" style="font-size: 0.8rem; margin-top: 0.45rem; font-weight: 600; color: #f87171;">
-      {{ form.captcha_answer.errors.0 }}
-    </div>
-  {% elif captcha_error %}
-    <div class="text-danger" style="font-size: 0.8rem; margin-top: 0.45rem; font-weight: 600; color: #f87171;">
-      {{ captcha_error }}
-    </div>
-  {% endif %}
-</div>
-
-{% else %}
-<!-- ========================================== -->
-<!-- LIGHT THEME SLIDER CAPTCHA (BUYER / SELLER)-->
-<!-- ========================================== -->
-<div class="slider-captcha-wrapper slider-light" style="margin-top: 1.25rem; margin-bottom: 1.25rem;">
-  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
-    <label class="form-label" style="font-weight: 700; font-size: 0.85rem; margin-bottom: 0; display: inline-flex; align-items: center; gap: 0.45rem; color: var(--ink-950, #0f172a);">
-      <i class="bi bi-shield-check" style="color: var(--brand-saffron-600, #ea580c); font-size: 1rem;"></i> CAPTCHA
-    </label>
-    <button type="button" class="slider-reset-btn-light" onclick="resetSliderCaptcha(this, false)" title="Refresh challenge" style="background: none; border: none; color: #94a3b8; cursor: pointer; padding: 2px 4px; font-size: 0.85rem; transition: color 0.2s ease;">
-      <i class="bi bi-arrow-clockwise"></i>
-    </button>
-  </div>
-
-  <input type="hidden" name="captcha_token" id="id_captcha_token" value="{{ captcha.captcha_token }}">
-  <input type="hidden" name="captcha_answer" id="id_captcha_answer" value="">
-
-  <!-- Slider Track Component -->
-  <div class="slider-track-container light-track" id="sliderTrackContainer">
-    <!-- Progress fill -->
-    <div class="slider-progress-bar light-progress" id="sliderProgressBar"></div>
-    
-    <!-- Instructional / Status Text -->
-    <div class="slider-label-text light-text" id="sliderLabelText">
-      <span class="slide-text-en">Slide to verify 👉</span>
-    </div>
-
-    <!-- Draggable Thumb / Handle -->
-    <div class="slider-handle light-handle" id="sliderHandle" role="slider" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
-      <i class="bi bi-chevron-double-right" id="sliderHandleIcon"></i>
-    </div>
-  </div>
-
-  <!-- Dynamic Validation Error Alert -->
-  <div id="sliderClientError" class="text-danger" style="display: none; font-size: 0.8rem; margin-top: 0.45rem; font-weight: 600; color: #dc2626;"></div>
-
-  {% if form.captcha_answer.errors %}
-    <div class="text-danger" style="font-size: 0.8rem; margin-top: 0.45rem; font-weight: 600; color: #dc2626;">
-      {{ form.captcha_answer.errors.0 }}
-    </div>
-  {% elif captcha_error %}
-    <div class="text-danger" style="font-size: 0.8rem; margin-top: 0.45rem; font-weight: 600; color: #dc2626;">
-      {{ captcha_error }}
-    </div>
-  {% endif %}
-</div>
-{% endif %}
-
-<!-- ========================================== -->
-<!-- SLIDER CAPTCHA STYLING & KEYFRAMES         -->
-<!-- ========================================== -->
-<style>
-  .slider-track-container {
-    position: relative;
-    width: 100%;
-    height: 48px;
-    border-radius: 26px;
-    overflow: hidden;
-    user-select: none;
-    -webkit-user-select: none;
-    touch-action: none;
-    box-sizing: border-box;
-    display: flex;
-    align-items: center;
-  }
-
-  /* Light Track Styling */
-  .slider-track-container.light-track {
-    background: #f1f5f9;
-    border: 1.5px solid #cbd5e1;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
-  }
-
-  /* Dark Track Styling */
-  .slider-track-container.dark-track {
-    background: #0f172a;
-    border: 1.5px solid #334155;
-    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.5);
-  }
-
-  /* Progress Fill */
-  .slider-progress-bar {
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 0;
-    border-radius: 26px;
-    pointer-events: none;
-    z-index: 1;
-    transition: background 0.25s ease;
-  }
-
-  .slider-progress-bar.light-progress {
-    background: linear-gradient(90deg, rgba(249, 115, 22, 0.25) 0%, rgba(16, 185, 129, 0.65) 100%);
-  }
-
-  .slider-progress-bar.dark-progress {
-    background: linear-gradient(90deg, rgba(239, 68, 68, 0.25) 0%, rgba(16, 185, 129, 0.65) 100%);
-  }
-
-  .slider-progress-bar.verified {
-    background: linear-gradient(90deg, #10b981 0%, #059669 100%) !important;
-    width: 100% !important;
-  }
-
-  /* Slider Label Text */
-  .slider-label-text {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.4rem;
-    font-size: 0.88rem;
-    font-weight: 700;
-    pointer-events: none;
-    z-index: 2;
-    transition: opacity 0.2s ease, transform 0.2s ease;
-  }
-
-  .slider-label-text.light-text {
-    color: #475569;
-  }
-
-  .slider-label-text.dark-text {
-    color: #94a3b8;
-  }
-
-  .slider-label-text.verified {
-    color: #ffffff !important;
-    font-weight: 800;
-    letter-spacing: 0.03em;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
-  }
-
-  /* Slider Thumb Handle */
-  .slider-handle {
-    position: absolute;
-    top: 3px;
-    left: 3px;
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 3;
-    cursor: grab;
-    box-shadow: 0 2px 7px rgba(0, 0, 0, 0.18);
-    transition: background-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease, color 0.2s ease;
-    box-sizing: border-box;
-  }
-
-  .slider-handle.light-handle {
-    background: #ffffff;
-    color: #ea580c;
-    border: 1.5px solid #e2e8f0;
-  }
-
-  .slider-handle.dark-handle {
-    background: #1e293b;
-    color: #38bdf8;
-    border: 1.5px solid #475569;
-  }
-
-  .slider-handle.dragging {
-    cursor: grabbing;
-    transform: scale(1.06);
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.28);
-  }
-
-  .slider-handle.verified {
-    background: #10b981 !important;
-    color: #ffffff !important;
-    border: 1.5px solid #059669 !important;
-    cursor: default;
-    box-shadow: 0 0 12px rgba(16, 185, 129, 0.6);
-  }
-
-  .slider-shake {
-    animation: sliderShakeAnim 0.42s ease-in-out;
-  }
-
-  @keyframes sliderShakeAnim {
-    0%, 100% { transform: translateX(0); }
-    20%, 60% { transform: translateX(-8px); }
-    40%, 80% { transform: translateX(8px); }
-  }
-
-  .slider-spin {
-    animation: sliderSpinAnim 0.6s linear infinite;
-  }
-
-  @keyframes sliderSpinAnim {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-  }
-</style>
-
-<!-- ========================================== -->
-<!-- SLIDER CAPTCHA JAVASCRIPT CONTROLLER       -->
-<!-- ========================================== -->
-<script>
-  (function initSliderCaptcha() {
-    const track = document.getElementById('sliderTrackContainer');
-    const handle = document.getElementById('sliderHandle');
-    const progress = document.getElementById('sliderProgressBar');
-    const textLabel = document.getElementById('sliderLabelText');
-    const icon = document.getElementById('sliderHandleIcon');
-    const answerInput = document.getElementById('id_captcha_answer');
-    const tokenInput = document.getElementById('id_captcha_token');
-    const clientError = document.getElementById('sliderClientError');
-
-    if (!track || !handle) return;
-
-    let isDragging = false;
-    let isVerified = false;
-    let startX = 0;
-    let startTime = 0;
-    let trail = [];
-    let maxDistance = 0;
-
-    function calcMaxDistance() {
-      const trackW = track.clientWidth || 320;
-      const handleW = handle.offsetWidth || 42;
-      maxDistance = Math.max(trackW - handleW - 6, 80);
-    }
-    calcMaxDistance();
-    window.addEventListener('resize', calcMaxDistance);
-
-    function onDragStart(clientX) {
-      if (isVerified) return;
-      calcMaxDistance();
-      isDragging = true;
-      startX = clientX;
-      startTime = Date.now();
-      trail = [[0, 0, 0]];
-      handle.style.transition = 'none';
-      progress.style.transition = 'none';
-      handle.classList.add('dragging');
-      if (clientError) clientError.style.display = 'none';
-    }
-
-    function onDragMove(clientX, clientY) {
-      if (!isDragging || isVerified) return;
-      let deltaX = clientX - startX;
-      if (deltaX < 0) deltaX = 0;
-      if (deltaX > maxDistance) deltaX = maxDistance;
-
-      handle.style.left = (3 + deltaX) + 'px';
-      progress.style.width = (deltaX + handle.offsetWidth) + 'px';
-
-      const now = Date.now();
-      const last = trail[trail.length - 1];
-      if (!last || now - last[2] >= 16) {
-        trail.push([Math.round(deltaX), Math.round(clientY || 0), now - startTime]);
-      }
-
-      // Smoothly fade prompt text as handle moves right
-      const progressRatio = deltaX / maxDistance;
-      textLabel.style.opacity = Math.max(0.1, 1 - progressRatio * 1.5);
-    }
-
-    function onDragEnd() {
-      if (!isDragging || isVerified) return;
-      isDragging = false;
-      handle.classList.remove('dragging');
-
-      const currentLeft = parseFloat(handle.style.left || '3') - 3;
-      const completionRatio = currentLeft / maxDistance;
-
-      if (completionRatio >= 0.93) {
-        // Successful slide to 100%!
-        completeVerification();
-      } else {
-        // Rebound snap back to start
-        handle.style.transition = 'left 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)';
-        progress.style.transition = 'width 0.35s ease';
-        handle.style.left = '3px';
-        progress.style.width = '0px';
-        textLabel.style.opacity = '1';
-      }
-    }
-
-    function completeVerification() {
-      isVerified = true;
-      calcMaxDistance();
-
-      // Snap handle to the right edge
-      handle.style.transition = 'left 0.2s ease, background-color 0.2s ease';
-      progress.style.transition = 'all 0.2s ease';
-      handle.style.left = (3 + maxDistance) + 'px';
-      progress.style.width = '100%';
-      progress.classList.add('verified');
-      handle.classList.add('verified');
-
-      // Update icon and verified badge text
-      if (icon) icon.className = 'bi bi-check-lg';
-      if (textLabel) {
-        textLabel.innerHTML = '<span><i class="bi bi-shield-check"></i> Verified ✅</span>';
-        textLabel.classList.add('verified');
-        textLabel.style.opacity = '1';
-      }
-
-      // Haptic feedback on modern devices
-      if (navigator.vibrate) {
-        try { navigator.vibrate(35); } catch (e) {}
-      }
-
-      const totalDuration = Date.now() - startTime;
-      if (trail.length === 0) trail.push([0, 0, 0]);
-      trail.push([Math.round(maxDistance), 0, totalDuration]);
-
-      const payload = {
-        token: tokenInput ? tokenInput.value : '',
-        t: Math.max(totalDuration, 150),
-        m: Math.max(trail.length, 6),
-        trail: trail.slice(0, 35)
-      };
-
-      // Set fallback JSON in hidden input immediately
-      if (answerInput) {
-        answerInput.value = JSON.stringify(payload);
-      }
-
-      // Retrieve CSRF token from page for secure AJAX verification
-      const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
-
-      // Clear any previous error messages
-      if (clientError) clientError.style.display = 'none';
-
-      function unlockSubmitButton() {
-        const form = track.closest('form');
-        if (form) {
-          const submitBtn = form.querySelector('button[type="submit"]');
-          if (submitBtn) {
-            submitBtn.removeAttribute('disabled');
-          }
-        }
-      }
-
-      // BUG-2.4: Async verify with race-condition prevention. Submit button remains locked until verified signature arrives
-      fetch('/api/captcha/verify-slider/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Requested-With': 'XMLHttpRequest',
-          'X-CSRFToken': csrfToken
-        },
-        body: JSON.stringify(payload)
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.success && data.verified_token && answerInput) {
-          answerInput.value = data.verified_token;
-        }
-        unlockSubmitButton();
-      })
-      .catch(err => {
-        // Fallback assigned; unlock submit button
-        unlockSubmitButton();
-      });
-    }
-
-    // Attach desktop mouse events
-    handle.addEventListener('mousedown', function(e) {
-      e.preventDefault();
-      onDragStart(e.clientX);
-    });
-
-    document.addEventListener('mousemove', function(e) {
-      if (isDragging) onDragMove(e.clientX, e.clientY);
-    });
-
-    document.addEventListener('mouseup', function() {
-      if (isDragging) onDragEnd();
-    });
-
-    // Attach mobile touch events (BUG-2.5: Prevent touchmove vertical scroll cancellation during horizontal slider drag)
-    handle.addEventListener('touchstart', function(e) {
-      const touch = e.touches[0];
-      if (touch) onDragStart(touch.clientX);
-    }, { passive: false });
-
-    document.addEventListener('touchmove', function(e) {
-      if (!isDragging) return;
-      e.preventDefault();
-      const touch = e.touches[0];
-      if (touch) onDragMove(touch.clientX, touch.clientY);
-    }, { passive: false });
-
-    document.addEventListener('touchend', function() {
-      if (isDragging) onDragEnd();
-    });
-
-    document.addEventListener('touchcancel', function() {
-      if (isDragging) onDragEnd();
-    });
-
-    // Form submission interceptor: strictly blocks submit until slider is verified
-    const parentForm = track.closest('form');
-    if (parentForm) {
-      parentForm.addEventListener('submit', function(e) {
-        if (!isVerified) {
-          e.preventDefault();
-          e.stopPropagation();
-
-          // Shake track for feedback
-          track.classList.remove('slider-shake');
-          void track.offsetWidth; // Trigger DOM reflow
-          track.classList.add('slider-shake');
-
-          // Display informative error alert
-          if (clientError) {
-            clientError.textContent = "Please slide the verification bar to proceed.";
-            clientError.style.display = 'block';
-          }
-          return false;
-        }
-      });
-    }
-
-    // Expose reset handler to window
-    window.resetSliderCaptcha = function(btn, isDark) {
-      if (btn) {
-        const iconElem = btn.querySelector('i');
-        if (iconElem) iconElem.classList.add('slider-spin');
-        btn.disabled = true;
-      }
-
-      const url = isDark ? '/api/captcha/refresh/?dark=1' : '/api/captcha/refresh/';
-
-      fetch(url, {
-        headers: {
-          'Accept': 'application/json',
-          'X-Requested-With': 'XMLHttpRequest'
-        }
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          if (tokenInput) tokenInput.value = data.captcha_token;
-          if (answerInput) answerInput.value = '';
-
-          // Reset UI state
-          isVerified = false;
-          calcMaxDistance();
-          handle.style.transition = 'none';
-          progress.style.transition = 'none';
-          handle.style.left = '3px';
-          progress.style.width = '0px';
-          handle.classList.remove('verified', 'dragging');
-          progress.classList.remove('verified');
-
-          if (icon) icon.className = 'bi bi-chevron-double-right';
-          if (textLabel) {
-            textLabel.classList.remove('verified');
-            textLabel.style.opacity = '1';
-            textLabel.innerHTML = '<span class="slide-text-en">Slide to verify 👉</span>';
-          }
-
-          if (clientError) clientError.style.display = 'none';
-        }
-      })
-      .catch(err => {
-        console.error("Slider CAPTCHA refresh failed", err);
-      })
-      .finally(() => {
-        if (btn) {
-          const iconElem = btn.querySelector('i');
-          if (iconElem) iconElem.classList.remove('slider-spin');
-          btn.disabled = false;
-        }
-      });
-    };
-  })();
-</script>
+{% if is_dark or request.path == '/admin-login/' %}
+<!-- ========================================== -->
+<!-- DARK THEME SLIDER CAPTCHA (ADMIN PORTAL)   -->
+<!-- ========================================== -->
+<div class="slider-captcha-wrapper slider-dark" style="margin-top: 1.25rem; margin-bottom: 1.25rem;">
+  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
+    <label class="form-label" style="color: #cbd5e1; font-weight: 700; font-size: 0.85rem; margin-bottom: 0; display: inline-flex; align-items: center; gap: 0.45rem;">
+      <i class="bi bi-shield-check" style="color: #ef4444; font-size: 1rem;"></i> CAPTCHA
+    </label>
+    <button type="button" class="slider-reset-btn-dark" onclick="resetSliderCaptcha(this, true)" title="Refresh challenge" style="background: none; border: none; color: #64748b; cursor: pointer; padding: 2px 4px; font-size: 0.85rem; transition: color 0.2s ease;">
+      <i class="bi bi-arrow-clockwise"></i>
+    </button>
+  </div>
+
+  <input type="hidden" name="captcha_token" id="id_captcha_token" value="{{ captcha.captcha_token }}" autocomplete="off">
+  <input type="hidden" name="captcha_answer" id="id_captcha_answer" value="" autocomplete="off">
+
+  <!-- Slider Track Component -->
+  <div class="slider-track-container dark-track" id="sliderTrackContainer">
+    <!-- Progress fill -->
+    <div class="slider-progress-bar dark-progress" id="sliderProgressBar"></div>
+    
+    <!-- Instructional / Status Text -->
+    <div class="slider-label-text dark-text" id="sliderLabelText">
+      <span class="slide-text-en">Slide to verify 👉</span>
+    </div>
+
+    <!-- Draggable Thumb / Handle -->
+    <div class="slider-handle dark-handle" id="sliderHandle" role="slider" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
+      <i class="bi bi-chevron-double-right" id="sliderHandleIcon"></i>
+    </div>
+  </div>
+
+  <!-- Dynamic Validation Error Alert -->
+  <div id="sliderClientError" class="text-danger" style="display: none; font-size: 0.8rem; margin-top: 0.45rem; font-weight: 600; color: #f87171;"></div>
+
+  {% if form.captcha_answer.errors %}
+    <div class="text-danger" style="font-size: 0.8rem; margin-top: 0.45rem; font-weight: 600; color: #f87171;">
+      {{ form.captcha_answer.errors.0 }}
+    </div>
+  {% elif captcha_error %}
+    <div class="text-danger" style="font-size: 0.8rem; margin-top: 0.45rem; font-weight: 600; color: #f87171;">
+      {{ captcha_error }}
+    </div>
+  {% endif %}
+</div>
+
+{% else %}
+<!-- ========================================== -->
+<!-- LIGHT THEME SLIDER CAPTCHA (BUYER / SELLER)-->
+<!-- ========================================== -->
+<div class="slider-captcha-wrapper slider-light" style="margin-top: 1.25rem; margin-bottom: 1.25rem;">
+  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
+    <label class="form-label" style="font-weight: 700; font-size: 0.85rem; margin-bottom: 0; display: inline-flex; align-items: center; gap: 0.45rem; color: var(--ink-950, #0f172a);">
+      <i class="bi bi-shield-check" style="color: var(--brand-saffron-600, #ea580c); font-size: 1rem;"></i> CAPTCHA
+    </label>
+    <button type="button" class="slider-reset-btn-light" onclick="resetSliderCaptcha(this, false)" title="Refresh challenge" style="background: none; border: none; color: #94a3b8; cursor: pointer; padding: 2px 4px; font-size: 0.85rem; transition: color 0.2s ease;">
+      <i class="bi bi-arrow-clockwise"></i>
+    </button>
+  </div>
+
+  <input type="hidden" name="captcha_token" id="id_captcha_token" value="{{ captcha.captcha_token }}" autocomplete="off">
+  <input type="hidden" name="captcha_answer" id="id_captcha_answer" value="" autocomplete="off">
+
+  <!-- Slider Track Component -->
+  <div class="slider-track-container light-track" id="sliderTrackContainer">
+    <!-- Progress fill -->
+    <div class="slider-progress-bar light-progress" id="sliderProgressBar"></div>
+    
+    <!-- Instructional / Status Text -->
+    <div class="slider-label-text light-text" id="sliderLabelText">
+      <span class="slide-text-en">Slide to verify 👉</span>
+    </div>
+
+    <!-- Draggable Thumb / Handle -->
+    <div class="slider-handle light-handle" id="sliderHandle" role="slider" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
+      <i class="bi bi-chevron-double-right" id="sliderHandleIcon"></i>
+    </div>
+  </div>
+
+  <!-- Dynamic Validation Error Alert -->
+  <div id="sliderClientError" class="text-danger" style="display: none; font-size: 0.8rem; margin-top: 0.45rem; font-weight: 600; color: #dc2626;"></div>
+
+  {% if form.captcha_answer.errors %}
+    <div class="text-danger" style="font-size: 0.8rem; margin-top: 0.45rem; font-weight: 600; color: #dc2626;">
+      {{ form.captcha_answer.errors.0 }}
+    </div>
+  {% elif captcha_error %}
+    <div class="text-danger" style="font-size: 0.8rem; margin-top: 0.45rem; font-weight: 600; color: #dc2626;">
+      {{ captcha_error }}
+    </div>
+  {% endif %}
+</div>
+{% endif %}
+
+<!-- ========================================== -->
+<!-- SLIDER CAPTCHA STYLING & KEYFRAMES         -->
+<!-- ========================================== -->
+<style>
+  .slider-track-container {
+    position: relative;
+    width: 100%;
+    height: 48px;
+    border-radius: 26px;
+    overflow: hidden;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: none;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+  }
+
+  /* Light Track Styling */
+  .slider-track-container.light-track {
+    background: #f1f5f9;
+    border: 1.5px solid #cbd5e1;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+
+  /* Dark Track Styling */
+  .slider-track-container.dark-track {
+    background: #0f172a;
+    border: 1.5px solid #334155;
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.5);
+  }
+
+  /* Progress Fill */
+  .slider-progress-bar {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 0;
+    border-radius: 26px;
+    pointer-events: none;
+    z-index: 1;
+    transition: background 0.25s ease;
+  }
+
+  .slider-progress-bar.light-progress {
+    background: linear-gradient(90deg, rgba(249, 115, 22, 0.25) 0%, rgba(16, 185, 129, 0.65) 100%);
+  }
+
+  .slider-progress-bar.dark-progress {
+    background: linear-gradient(90deg, rgba(239, 68, 68, 0.25) 0%, rgba(16, 185, 129, 0.65) 100%);
+  }
+
+  .slider-progress-bar.verified {
+    background: linear-gradient(90deg, #10b981 0%, #059669 100%) !important;
+    width: 100% !important;
+  }
+
+  /* Slider Label Text */
+  .slider-label-text {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    font-size: 0.88rem;
+    font-weight: 700;
+    pointer-events: none;
+    z-index: 2;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+
+  .slider-label-text.light-text {
+    color: #475569;
+  }
+
+  .slider-label-text.dark-text {
+    color: #94a3b8;
+  }
+
+  .slider-label-text.verified {
+    color: #ffffff !important;
+    font-weight: 800;
+    letter-spacing: 0.03em;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  }
+
+  /* Slider Thumb Handle */
+  .slider-handle {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3;
+    cursor: grab;
+    box-shadow: 0 2px 7px rgba(0, 0, 0, 0.18);
+    transition: background-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease, color 0.2s ease;
+    box-sizing: border-box;
+  }
+
+  .slider-handle.light-handle {
+    background: #ffffff;
+    color: #ea580c;
+    border: 1.5px solid #e2e8f0;
+  }
+
+  .slider-handle.dark-handle {
+    background: #1e293b;
+    color: #38bdf8;
+    border: 1.5px solid #475569;
+  }
+
+  .slider-handle.dragging {
+    cursor: grabbing;
+    transform: scale(1.06);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.28);
+  }
+
+  .slider-handle.verified {
+    background: #10b981 !important;
+    color: #ffffff !important;
+    border: 1.5px solid #059669 !important;
+    cursor: default;
+    box-shadow: 0 0 12px rgba(16, 185, 129, 0.6);
+  }
+
+  .slider-shake {
+    animation: sliderShakeAnim 0.42s ease-in-out;
+  }
+
+  @keyframes sliderShakeAnim {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-8px); }
+    40%, 80% { transform: translateX(8px); }
+  }
+
+  .slider-spin {
+    animation: sliderSpinAnim 0.6s linear infinite;
+  }
+
+  @keyframes sliderSpinAnim {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+</style>
+
+<!-- ========================================== -->
+<!-- SLIDER CAPTCHA JAVASCRIPT CONTROLLER       -->
+<!-- ========================================== -->
+<script>
+  (function initSliderCaptcha() {
+    const track = document.getElementById('sliderTrackContainer');
+    const handle = document.getElementById('sliderHandle');
+    const progress = document.getElementById('sliderProgressBar');
+    const textLabel = document.getElementById('sliderLabelText');
+    const icon = document.getElementById('sliderHandleIcon');
+    const answerInput = document.getElementById('id_captcha_answer');
+    const tokenInput = document.getElementById('id_captcha_token');
+    const clientError = document.getElementById('sliderClientError');
+
+    if (!track || !handle) return;
+
+    let isDragging = false;
+    let isVerified = false;
+    let startX = 0;
+    let startTime = 0;
+    let trail = [];
+    let maxDistance = 0;
+
+    function calcMaxDistance() {
+      const trackW = track.clientWidth || 320;
+      const handleW = handle.offsetWidth || 42;
+      maxDistance = Math.max(trackW - handleW - 6, 80);
+    }
+    calcMaxDistance();
+    window.addEventListener('resize', calcMaxDistance);
+
+    function onDragStart(clientX) {
+      if (isVerified) return;
+      calcMaxDistance();
+      isDragging = true;
+      startX = clientX;
+      startTime = Date.now();
+      trail = [[0, 0, 0]];
+      handle.style.transition = 'none';
+      progress.style.transition = 'none';
+      handle.classList.add('dragging');
+      if (clientError) clientError.style.display = 'none';
+    }
+
+    function onDragMove(clientX, clientY) {
+      if (!isDragging || isVerified) return;
+      let deltaX = clientX - startX;
+      if (deltaX < 0) deltaX = 0;
+      if (deltaX > maxDistance) deltaX = maxDistance;
+
+      handle.style.left = (3 + deltaX) + 'px';
+      progress.style.width = (deltaX + handle.offsetWidth) + 'px';
+
+      const now = Date.now();
+      const last = trail[trail.length - 1];
+      if (!last || now - last[2] >= 16) {
+        trail.push([Math.round(deltaX), Math.round(clientY || 0), now - startTime]);
+      }
+
+      // Smoothly fade prompt text as handle moves right
+      const progressRatio = deltaX / maxDistance;
+      textLabel.style.opacity = Math.max(0.1, 1 - progressRatio * 1.5);
+    }
+
+    function onDragEnd() {
+      if (!isDragging || isVerified) return;
+      isDragging = false;
+      handle.classList.remove('dragging');
+
+      const currentLeft = parseFloat(handle.style.left || '3') - 3;
+      const completionRatio = currentLeft / maxDistance;
+
+      if (completionRatio >= 0.93) {
+        // Successful slide to 100%!
+        completeVerification();
+      } else {
+        // Rebound snap back to start
+        handle.style.transition = 'left 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)';
+        progress.style.transition = 'width 0.35s ease';
+        handle.style.left = '3px';
+        progress.style.width = '0px';
+        textLabel.style.opacity = '1';
+      }
+    }
+
+    function completeVerification() {
+      isVerified = true;
+      calcMaxDistance();
+
+      // Snap handle to the right edge
+      handle.style.transition = 'left 0.2s ease, background-color 0.2s ease';
+      progress.style.transition = 'all 0.2s ease';
+      handle.style.left = (3 + maxDistance) + 'px';
+      progress.style.width = '100%';
+      progress.classList.add('verified');
+      handle.classList.add('verified');
+
+      // Update icon and verified badge text
+      if (icon) icon.className = 'bi bi-check-lg';
+      if (textLabel) {
+        textLabel.innerHTML = '<span><i class="bi bi-shield-check"></i> Verified ✅</span>';
+        textLabel.classList.add('verified');
+        textLabel.style.opacity = '1';
+      }
+
+      // Haptic feedback on modern devices
+      if (navigator.vibrate) {
+        try { navigator.vibrate(35); } catch (e) {}
+      }
+
+      const totalDuration = Date.now() - startTime;
+      if (trail.length === 0) trail.push([0, 0, 0]);
+      trail.push([Math.round(maxDistance), 0, totalDuration]);
+
+      const payload = {
+        token: tokenInput ? tokenInput.value : '',
+        t: Math.max(totalDuration, 150),
+        m: Math.max(trail.length, 6),
+        trail: trail.slice(0, 35)
+      };
+
+      // Set fallback JSON in hidden input immediately
+      if (answerInput) {
+        answerInput.value = JSON.stringify(payload);
+      }
+
+      // Retrieve CSRF token from page for secure AJAX verification
+      const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
+
+      // Clear any previous error messages
+      if (clientError) clientError.style.display = 'none';
+
+      function unlockSubmitButton() {
+        const form = track.closest('form');
+        if (form) {
+          const submitBtn = form.querySelector('button[type="submit"]');
+          if (submitBtn) {
+            submitBtn.removeAttribute('disabled');
+          }
+        }
+      }
+
+      const isDarkTheme = track.classList.contains('dark-track');
+
+      fetch('/api/captcha/verify-slider/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest',
+          'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify(payload)
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.verified_token && answerInput) {
+          answerInput.value = data.verified_token;
+          unlockSubmitButton();
+        } else if (!data.success) {
+          if (clientError) {
+            clientError.textContent = data.error || "Verification challenge expired or used. Refreshing...";
+            clientError.style.display = 'block';
+          }
+          if (typeof window.resetSliderCaptcha === 'function') {
+            window.resetSliderCaptcha(null, isDarkTheme);
+          }
+        }
+      })
+      .catch(err => {
+        unlockSubmitButton();
+      });
+    }
+
+    // Attach desktop mouse events
+    handle.addEventListener('mousedown', function(e) {
+      e.preventDefault();
+      onDragStart(e.clientX);
+    });
+
+    document.addEventListener('mousemove', function(e) {
+      if (isDragging) onDragMove(e.clientX, e.clientY);
+    });
+
+    document.addEventListener('mouseup', function() {
+      if (isDragging) onDragEnd();
+    });
+
+    // Attach mobile touch events (BUG-2.5: Prevent touchmove vertical scroll cancellation during horizontal slider drag)
+    handle.addEventListener('touchstart', function(e) {
+      const touch = e.touches[0];
+      if (touch) onDragStart(touch.clientX);
+    }, { passive: false });
+
+    document.addEventListener('touchmove', function(e) {
+      if (!isDragging) return;
+      e.preventDefault();
+      const touch = e.touches[0];
+      if (touch) onDragMove(touch.clientX, touch.clientY);
+    }, { passive: false });
+
+    document.addEventListener('touchend', function() {
+      if (isDragging) onDragEnd();
+    });
+
+    document.addEventListener('touchcancel', function() {
+      if (isDragging) onDragEnd();
+    });
+
+    // Form submission interceptor: strictly blocks submit until slider is verified & prevents double-submits
+    const parentForm = track.closest('form');
+    let isSubmitting = false;
+    if (parentForm) {
+      parentForm.addEventListener('submit', function(e) {
+        if (!isVerified) {
+          e.preventDefault();
+          e.stopPropagation();
+
+          // Shake track for feedback
+          track.classList.remove('slider-shake');
+          void track.offsetWidth; // Trigger DOM reflow
+          track.classList.add('slider-shake');
+
+          // Display informative error alert
+          if (clientError) {
+            clientError.textContent = "Please slide the verification bar to proceed.";
+            clientError.style.display = 'block';
+          }
+          return false;
+        }
+
+        // Prevent rapid double-tap / double-click form submission (anti-replay race defense)
+        if (isSubmitting) {
+          e.preventDefault();
+          return false;
+        }
+        isSubmitting = true;
+
+        const submitBtn = parentForm.querySelector('button[type="submit"]');
+        if (submitBtn) {
+          submitBtn.classList.add('disabled');
+          setTimeout(() => {
+            if (submitBtn) submitBtn.disabled = true;
+          }, 60);
+        }
+      });
+    }
+
+    // Auto-refresh stale challenges on BFCache navigation (Back/Forward buttons)
+    window.addEventListener('pageshow', function(event) {
+      if (event.persisted) {
+        const isDarkTheme = track.classList.contains('dark-track');
+        if (typeof window.resetSliderCaptcha === 'function') {
+          window.resetSliderCaptcha(null, isDarkTheme);
+        }
+      }
+    });
+
+    {% if form.errors or captcha_error %}
+    // If form re-rendered with validation errors, ensure fresh challenge token on load
+    document.addEventListener('DOMContentLoaded', function() {
+      const isDarkTheme = track.classList.contains('dark-track');
+      if (typeof window.resetSliderCaptcha === 'function') {
+        window.resetSliderCaptcha(null, isDarkTheme);
+      }
+    });
+    {% endif %}
+
+    // Expose reset handler to window
+    window.resetSliderCaptcha = function(btn, isDark) {
+      if (btn) {
+        const iconElem = btn.querySelector('i');
+        if (iconElem) iconElem.classList.add('slider-spin');
+        btn.disabled = true;
+      }
+
+      const url = isDark ? '/api/captcha/refresh/?dark=1' : '/api/captcha/refresh/';
+
+      fetch(url, {
+        headers: {
+          'Accept': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          if (tokenInput) tokenInput.value = data.captcha_token;
+          if (answerInput) answerInput.value = '';
+
+          // Reset UI state
+          isVerified = false;
+          calcMaxDistance();
+          handle.style.transition = 'none';
+          progress.style.transition = 'none';
+          handle.style.left = '3px';
+          progress.style.width = '0px';
+          handle.classList.remove('verified', 'dragging');
+          progress.classList.remove('verified');
+
+          if (icon) icon.className = 'bi bi-chevron-double-right';
+          if (textLabel) {
+            textLabel.classList.remove('verified');
+            textLabel.style.opacity = '1';
+            textLabel.innerHTML = '<span class="slide-text-en">Slide to verify 👉</span>';
+          }
+
+          if (clientError) clientError.style.display = 'none';
+        }
+      })
+      .catch(err => {
+        console.error("Slider CAPTCHA refresh failed", err);
+      })
+      .finally(() => {
+        if (btn) {
+          const iconElem = btn.querySelector('i');
+          if (iconElem) iconElem.classList.remove('slider-spin');
+          btn.disabled = false;
+        }
+      });
+    };
+  })();
+</script>

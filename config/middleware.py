@@ -253,8 +253,14 @@ class ApiSecurityMiddleware(MiddlewareMixin):
             'application/json' in response.get('Content-Type', '').lower()
         )
 
-        if is_api:
-            # Enforce strict anti-caching on all API data
+        is_auth_page = any(path.startswith(p) for p in [
+            '/buyer/login/', '/buyer/register/', '/buyer/recover/',
+            '/seller/login/', '/seller/register/', '/seller/recover/',
+            '/admin-login/', '/contact-us/'
+        ])
+
+        if is_api or is_auth_page:
+            # Enforce strict anti-caching on all API data and dynamic forms with CAPTCHA/CSRF
             response['Cache-Control'] = 'no-store, no-cache, must-revalidate, private, max-age=0'
             response['Pragma'] = 'no-cache'
             response['Expires'] = '0'
