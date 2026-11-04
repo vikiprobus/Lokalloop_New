@@ -29,6 +29,13 @@
       width: 100%;
     }
     
+    .portal-content-body {
+      padding: 1.25rem 1.5rem;
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
+      overflow-x: hidden;
+    }
     .portal-main {
       flex: 1;
       display: flex;
@@ -219,6 +226,9 @@
     }
 
     @media (max-width: 768px) {
+      .portal-content-body {
+        padding: 0.85rem 0.65rem 4.5rem !important;
+      }
       body {
         padding-bottom: calc(78px + env(safe-area-inset-bottom, 8px)) !important;
       }
@@ -482,7 +492,7 @@
       {% endif %}
 
       <!-- Content Body -->
-      <div style="padding: 1.25rem 1.5rem; flex: 1;">
+      <div class="portal-content-body" style="flex: 1;">
         {% block content %}{% endblock %}
       </div>
 

@@ -3,21 +3,29 @@
 
 {% block title %}Manage Store Profile — {{ BRAND_NAME }} Business{% endblock %}
 {% block extra_css %}
-<!-- Leaflet.js Free & Open-Source Map CSS -->
-<link rel="stylesheet" href="{% static 'vendor/leaflet/leaflet.css' %}" />
+<!-- Leaflet.js Free & Open-Source Map CSS with CDN fallback -->
+<link rel="stylesheet" href="{% static 'vendor/leaflet/leaflet.css' %}" onerror="this.onerror=null;this.href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';" />
 <style>
   #merchantEditMap {
-    height: 260px;
+    height: 280px;
     width: 100%;
+    min-height: 280px;
     border-radius: 14px;
     border: 1.5px solid #cbd5e1;
     z-index: 1;
     margin-top: 0.5rem;
-    background: #f1f5f9;
+    background: #e2e8f0;
+    position: relative;
+    box-sizing: border-box;
   }
   .leaflet-container {
     font-family: inherit;
-    background: #f1f5f9 !important;
+    background: #e2e8f0 !important;
+    width: 100% !important;
+    height: 100% !important;
+  }
+  .leaflet-tile {
+    visibility: inherit !important;
   }
 </style>
 {% endblock %}
@@ -122,9 +130,14 @@
         <label class="form-label" style="font-weight: 700; margin-bottom: 0;">
           <i class="bi bi-geo-alt-fill text-danger"></i> Pin Store Counter Entrance on Map
         </label>
-        <button type="button" class="btn btn-sm btn-outline" onclick="detectGPSLocationProfile()" style="font-size: 0.75rem; padding: 0.25rem 0.65rem; font-weight: 700;">
-          <i class="bi bi-crosshair"></i> Use Current Location
-        </button>
+        <div style="display: flex; align-items: center; gap: 0.35rem; flex-wrap: wrap;">
+          <button type="button" class="btn btn-sm btn-outline" onclick="detectGPSLocationProfile()" style="font-size: 0.75rem; padding: 0.25rem 0.65rem; font-weight: 700;">
+            <i class="bi bi-crosshair"></i> Use Current Location
+          </button>
+          <button type="button" class="btn btn-sm btn-outline" onclick="refreshProfileMap()" style="font-size: 0.75rem; padding: 0.25rem 0.65rem; font-weight: 700;" title="Redraw map tiles">
+            <i class="bi bi-arrow-clockwise"></i> Redraw Map
+          </button>
+        </div>
       </div>
 
       <div id="merchantEditMap"></div>
@@ -456,95 +469,129 @@
   }
 </script>
 
-<!-- Free & Open-Source Leaflet.js Interactive Map Engine -->
-<script src="{% static 'vendor/leaflet/leaflet.js' %}"></script>
+<!-- Free & Open-Source Leaflet.js Interactive Map Engine with CDN Fallback -->
+<script src="{% static 'vendor/leaflet/leaflet.js' %}" onerror="this.onerror=null;this.src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';"></script>
 <script>
   let editMap = null;
   let editMarker = null;
+  let mapInitAttempts = 0;
 
   function initProfileMap() {
     const mapEl = document.getElementById('merchantEditMap');
-    if (!mapEl || typeof L === 'undefined') return;
-    if (editMap) {
-      editMap.invalidateSize();
+    if (!mapEl) return;
+    
+    if (typeof L === 'undefined') {
+      if (mapInitAttempts < 15) {
+        mapInitAttempts++;
+        setTimeout(initProfileMap, 150);
+      }
       return;
     }
 
-    // Configure static icon paths explicitly so Leaflet never fails to resolve marker assets
+    if (editMap) {
+      editMap.invalidateSize(true);
+      return;
+    }
+
+    // Configure static icon paths explicitly with unpkg fallback
     if (L.Icon && L.Icon.Default) {
       delete L.Icon.Default.prototype._getIconUrl;
       L.Icon.Default.mergeOptions({
-        iconRetinaUrl: '/static/vendor/leaflet/images/marker-icon-2x.png',
-        iconUrl: '/static/vendor/leaflet/images/marker-icon.png',
-        shadowUrl: '/static/vendor/leaflet/images/marker-shadow.png',
+        iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+        iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+        shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
       });
     }
 
     const latVal = parseFloat(document.getElementById('id_latitude').value) || 18.5204;
     const lngVal = parseFloat(document.getElementById('id_longitude').value) || 73.8567;
 
-    editMap = L.map('merchantEditMap', { 
-      scrollWheelZoom: false,
-      zoomControl: true,
-      fadeAnimation: true,
-    }).setView([latVal, lngVal], 16);
+    try {
+      editMap = L.map('merchantEditMap', { 
+        scrollWheelZoom: false,
+        zoomControl: true,
+        fadeAnimation: true,
+      }).setView([latVal, lngVal], 16);
 
-    // High-reliability CartoDB Voyager tiles with global CDN + OpenStreetMap fallback
-    const tileLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-      maxZoom: 19,
-      subdomains: 'abcd',
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>, &copy; CartoDB'
-    });
-    
-    tileLayer.on('tileerror', function() {
-      // Automatic fallback to standard OSM if carrier restricts Carto
-      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      // Primary: Google Maps Road tiles (ultra-fast, zero CORS/ISP restrictions in India)
+      const googleRoads = L.tileLayer('https://mt{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+        maxZoom: 20,
+        subdomains: ['0', '1', '2', '3'],
+        attribution: '&copy; Google Maps'
+      });
+
+      // Secondary fallback: CartoDB Voyager tiles
+      const cartoVoyager = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png', {
         maxZoom: 19,
-        attribution: '&copy; OpenStreetMap'
-      }).addTo(editMap);
-    });
-    tileLayer.addTo(editMap);
+        subdomains: 'abcd',
+        attribution: '&copy; CartoDB &copy; OpenStreetMap'
+      });
 
-    editMarker = L.marker([latVal, lngVal], { draggable: true }).addTo(editMap);
-    editMarker.bindTooltip("Drag pin to store entrance", { permanent: false, direction: 'top' });
+      googleRoads.on('tileerror', function() {
+        if (!editMap.hasLayer(cartoVoyager)) {
+          cartoVoyager.addTo(editMap);
+        }
+      });
+      googleRoads.addTo(editMap);
 
-    function onPosUpdate(lat, lng) {
-      const fLat = parseFloat(lat).toFixed(6);
-      const fLng = parseFloat(lng).toFixed(6);
-      document.getElementById('id_latitude').value = fLat;
-      document.getElementById('id_longitude').value = fLng;
-      const b = document.getElementById('coordBadge');
-      if (b) b.textContent = `${fLat}° N, ${fLng}° E`;
+      editMarker = L.marker([latVal, lngVal], { draggable: true }).addTo(editMap);
+      editMarker.bindTooltip("Drag pin to store entrance", { permanent: false, direction: 'top' });
+
+      function onPosUpdate(lat, lng) {
+        const fLat = parseFloat(lat).toFixed(6);
+        const fLng = parseFloat(lng).toFixed(6);
+        document.getElementById('id_latitude').value = fLat;
+        document.getElementById('id_longitude').value = fLng;
+        const b = document.getElementById('coordBadge');
+        if (b) b.textContent = `${fLat}° N, ${fLng}° E`;
+      }
+
+      editMarker.on('dragend', function(e) {
+        const pos = e.target.getLatLng();
+        onPosUpdate(pos.lat, pos.lng);
+      });
+
+      editMap.on('click', function(e) {
+        editMarker.setLatLng(e.latlng);
+        onPosUpdate(e.latlng.lat, e.latlng.lng);
+      });
+
+      // Multi-staged layout invalidation so tiles render sharply
+      editMap.whenReady(function() {
+        editMap.invalidateSize(true);
+      });
+      [100, 300, 600, 1200].forEach(delay => {
+        setTimeout(() => { if (editMap) editMap.invalidateSize(true); }, delay);
+      });
+
+      // Auto-refresh when scrolled into viewport
+      if ('IntersectionObserver' in window) {
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting && editMap) {
+              editMap.invalidateSize(true);
+            }
+          });
+        }, { threshold: 0.1 });
+        observer.observe(mapEl);
+      }
+
+      window.addEventListener('resize', () => { if (editMap) editMap.invalidateSize(true); });
+    } catch (err) {
+      console.warn("Leaflet init error:", err);
     }
+  }
 
-    editMarker.on('dragend', function(e) {
-      const pos = e.target.getLatLng();
-      onPosUpdate(pos.lat, pos.lng);
-    });
-
-    editMap.on('click', function(e) {
-      editMarker.setLatLng(e.latlng);
-      onPosUpdate(e.latlng.lat, e.latlng.lng);
-    });
-
-    // Invalidate size across multiple render intervals so tiles never render grey
-    [100, 300, 600, 1000].forEach(delay => {
-      setTimeout(() => { if (editMap) editMap.invalidateSize(); }, delay);
-    });
-
-    // Auto-refresh when scrolled into view
-    if ('IntersectionObserver' in window) {
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting && editMap) {
-            editMap.invalidateSize();
-          }
-        });
-      }, { threshold: 0.1 });
-      observer.observe(mapEl);
+  function refreshProfileMap() {
+    if (editMap) {
+      editMap.invalidateSize(true);
+      const latVal = parseFloat(document.getElementById('id_latitude').value) || 18.5204;
+      const lngVal = parseFloat(document.getElementById('id_longitude').value) || 73.8567;
+      editMap.setView([latVal, lngVal], 16);
+      if (editMarker) editMarker.setLatLng([latVal, lngVal]);
+    } else {
+      initProfileMap();
     }
-
-    window.addEventListener('resize', () => { if (editMap) editMap.invalidateSize(); });
   }
 
   function detectGPSLocationProfile() {
@@ -565,6 +612,7 @@
           document.getElementById('id_longitude').value = fLng;
           const b = document.getElementById('coordBadge');
           if (b) b.textContent = `${fLat}° N, ${fLng}° E`;
+          editMap.invalidateSize(true);
         }
       },
       function(err) {
@@ -574,9 +622,12 @@
     );
   }
 
-  document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(initProfileMap, 200);
-  });
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    setTimeout(initProfileMap, 100);
+  } else {
+    document.addEventListener('DOMContentLoaded', () => setTimeout(initProfileMap, 150));
+  }
+  window.addEventListener('load', () => setTimeout(initProfileMap, 200));
 </script>
 
 {% endblock %}
