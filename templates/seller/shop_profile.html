@@ -542,35 +542,36 @@
         fadeAnimation: true,
       }).setView([latVal, lngVal], 16);
 
-      // 1. Same-Origin High-Performance Local Tile Proxy (100% immune to CORS, ISP & network blocks)
-      const proxyTiles = L.tileLayer('/api/tiles/{z}/{x}/{y}/', {
-        maxZoom: 19,
-        attribution: '&copy; Google Maps &copy; OpenStreetMap'
-      });
-
-      // 2. Direct Google fallback if local proxy has any transient error
+      // 1. Direct Google Maps Road Tiles (instantaneous, high-speed, zero server load)
       const directGoogle = L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
-        maxZoom: 19,
+        maxZoom: 20,
         attribution: '&copy; Google Maps'
       });
 
-      // 3. CartoDB fallback
-      const cartoVoyager = L.tileLayer('https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png', {
+      // 2. CartoDB Voyager Fallback
+      const cartoVoyager = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png', {
+        subdomains: 'abcd',
         maxZoom: 19,
         attribution: '&copy; CartoDB &copy; OpenStreetMap'
       });
 
-      proxyTiles.on('tileerror', function() {
-        if (!editMap.hasLayer(directGoogle)) {
-          directGoogle.addTo(editMap);
-        }
+      // 3. Same-Origin Local Tile Proxy Fallback
+      const proxyTiles = L.tileLayer('/api/tiles/{z}/{x}/{y}/', {
+        maxZoom: 19,
+        attribution: '&copy; LokalLoop Maps'
       });
+
       directGoogle.on('tileerror', function() {
         if (!editMap.hasLayer(cartoVoyager)) {
           cartoVoyager.addTo(editMap);
         }
       });
-      proxyTiles.addTo(editMap);
+      cartoVoyager.on('tileerror', function() {
+        if (!editMap.hasLayer(proxyTiles)) {
+          proxyTiles.addTo(editMap);
+        }
+      });
+      directGoogle.addTo(editMap);
 
       const pinIcon = createStorePinIcon();
       editMarker = L.marker([latVal, lngVal], { 

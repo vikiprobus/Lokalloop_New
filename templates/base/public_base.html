@@ -85,28 +85,26 @@
 
     .mobile-menu-drawer {
       display: none;
-      flex-direction: column;
-      position: absolute;
-      top: 72px;
+      position: fixed;
+      top: 0;
       left: 0;
       right: 0;
+      bottom: 0;
+      width: 100vw;
       width: 100%;
+      height: 100vh;
+      height: 100dvh;
       background: #0b0f19;
-      border-bottom: 2px solid #f97316;
-      padding: 1.25rem 1rem 1.75rem;
-      gap: 0.65rem;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.85);
-      z-index: 99999;
-      max-height: calc(100vh - 80px);
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-      animation: mobileDrawerSlide 0.2s ease-out forwards;
+      z-index: 1000000;
+      flex-direction: column;
       box-sizing: border-box;
+      overflow: hidden;
+      animation: mobileDrawerFade 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .mobile-menu-drawer.show {
       display: flex !important;
     }
-    @keyframes mobileDrawerSlide {
+    @keyframes mobileDrawerFade {
       from {
         opacity: 0;
         transform: translateY(-8px);
@@ -115,6 +113,73 @@
         opacity: 1;
         transform: translateY(0);
       }
+    }
+    .mobile-drawer-header {
+      height: 64px;
+      padding: 0 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      background: #0b0f19;
+      flex-shrink: 0;
+    }
+    .mobile-drawer-close-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .mobile-drawer-close-btn:active {
+      transform: scale(0.92);
+      background: rgba(255, 255, 255, 0.2);
+    }
+    .mobile-drawer-body {
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 1rem 1.25rem 3.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+      box-sizing: border-box;
+    }
+    .mobile-nav-link-card {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 0.75rem 1rem;
+      color: #ffffff;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.92rem;
+      transition: background 0.15s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .mobile-nav-link-card:active {
+      background: rgba(255, 255, 255, 0.12);
+      transform: scale(0.99);
+    }
+    .mobile-nav-icon-badge {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.15rem;
+      flex-shrink: 0;
     }
   </style>
   {% block extra_css %}{% endblock %}
@@ -199,70 +264,109 @@
 
     </div>
 
-    <!-- Mobile Menu Drawer (Toggles on mobile) -->
-    <div class="mobile-menu-drawer" id="mobileMenuDrawer" style="background: #0b0f19; border-bottom: 1px solid rgba(255,255,255,0.12);">
+  </header>
+
+  <!-- Full-Screen Native-App Style Mobile Navigation Overlay -->
+  <div class="mobile-menu-drawer" id="mobileMenuDrawer" role="dialog" aria-modal="true" aria-label="Mobile Navigation">
+    
+    <!-- Dedicated Drawer Top Bar with Brand & Crisp Close (✕) Button -->
+    <div class="mobile-drawer-header">
+      <a href="/" onclick="closePublicMobileNav()" style="display: flex; align-items: center; gap: 0.6rem; text-decoration: none;">
+        <div style="width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1.15rem; box-shadow: 0 4px 12px rgba(249,115,22,0.35);">
+          <i class="bi bi-geo-alt-fill"></i>
+        </div>
+        <div>
+          <span style="font-size: 1.25rem; font-weight: 800; color: #ffffff; letter-spacing: -0.02em;">Lokal<span style="color: #f97316;">Loop</span></span>
+          <span style="display: block; font-size: 0.62rem; color: #94a3b8; font-weight: 500; line-height: 1;">Local Shops. Bigger Dreams.</span>
+        </div>
+      </a>
+      <button type="button" class="mobile-drawer-close-btn" onclick="closePublicMobileNav()" aria-label="Close navigation menu" title="Close">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Scrollable Drawer Body -->
+    <div class="mobile-drawer-body">
       
       <!-- City Quick Switcher -->
-      <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.35rem; padding: 0.4rem 0.5rem 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.08);">
-        <span style="font-size: 0.75rem; color: #94a3b8; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0.65rem 0.85rem; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px;">
+        <span style="font-size: 0.75rem; color: #94a3b8; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; gap: 0.35rem;">
           <i class="bi bi-geo-alt-fill" style="color: #f97316;"></i> Select City:
         </span>
         <div style="display: flex; gap: 0.35rem;">
-          <a href="/explore/?city=Pune" style="padding: 0.25rem 0.65rem; border-radius: 9999px; background: rgba(255,255,255,0.08); color: #fff; font-size: 0.75rem; font-weight: 600; text-decoration: none; border: 1px solid rgba(255,255,255,0.12);">Pune</a>
-          <a href="/explore/?city=Bengaluru" style="padding: 0.25rem 0.65rem; border-radius: 9999px; background: rgba(255,255,255,0.08); color: #fff; font-size: 0.75rem; font-weight: 600; text-decoration: none; border: 1px solid rgba(255,255,255,0.12);">Bengaluru</a>
-          <a href="/explore/?city=Mumbai" style="padding: 0.25rem 0.65rem; border-radius: 9999px; background: rgba(255,255,255,0.08); color: #fff; font-size: 0.75rem; font-weight: 600; text-decoration: none; border: 1px solid rgba(255,255,255,0.12);">Mumbai</a>
+          <a href="/explore/?city=Pune" onclick="closePublicMobileNav()" style="padding: 0.25rem 0.65rem; border-radius: 9999px; background: rgba(255,255,255,0.08); color: #fff; font-size: 0.75rem; font-weight: 600; text-decoration: none; border: 1px solid rgba(255,255,255,0.12);">Pune</a>
+          <a href="/explore/?city=Bengaluru" onclick="closePublicMobileNav()" style="padding: 0.25rem 0.65rem; border-radius: 9999px; background: rgba(255,255,255,0.08); color: #fff; font-size: 0.75rem; font-weight: 600; text-decoration: none; border: 1px solid rgba(255,255,255,0.12);">Bengaluru</a>
+          <a href="/explore/?city=Mumbai" onclick="closePublicMobileNav()" style="padding: 0.25rem 0.65rem; border-radius: 9999px; background: rgba(255,255,255,0.08); color: #fff; font-size: 0.75rem; font-weight: 600; text-decoration: none; border: 1px solid rgba(255,255,255,0.12);">Mumbai</a>
         </div>
       </div>
 
       <!-- Navigation Links -->
-      <a href="/" class="btn btn-block text-left" style="justify-content: flex-start; color: #fff; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); font-weight: 600; font-size: 0.9rem; padding: 0.65rem 1rem; border-radius: 10px;">
-        <i class="bi bi-house-door" style="color: #f97316; margin-right: 0.5rem;"></i> Home
+      <a href="/" class="mobile-nav-link-card" onclick="closePublicMobileNav()">
+        <span class="mobile-nav-icon-badge" style="background: rgba(249,115,22,0.15); color: #f97316;">
+          <i class="bi bi-house-door"></i>
+        </span>
+        <span>Home</span>
       </a>
-      <a href="/explore/?type=shops" class="btn btn-block text-left" style="justify-content: flex-start; color: #fff; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); font-weight: 600; font-size: 0.9rem; padding: 0.65rem 1rem; border-radius: 10px;">
-        <i class="bi bi-shop" style="color: #38bdf8; margin-right: 0.5rem;"></i> Explore Local Shops
+      <a href="/explore/?type=shops" class="mobile-nav-link-card" onclick="closePublicMobileNav()">
+        <span class="mobile-nav-icon-badge" style="background: rgba(56,189,248,0.15); color: #38bdf8;">
+          <i class="bi bi-shop"></i>
+        </span>
+        <span>Explore Local Shops</span>
       </a>
-      <a href="/explore/?type=offers" class="btn btn-block text-left" style="justify-content: flex-start; color: #fff; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); font-weight: 600; font-size: 0.9rem; padding: 0.65rem 1rem; border-radius: 10px;">
-        <i class="bi bi-tag-fill" style="color: #f59e0b; margin-right: 0.5rem;"></i> In-Store Counter Deals
+      <a href="/explore/?type=offers" class="mobile-nav-link-card" onclick="closePublicMobileNav()">
+        <span class="mobile-nav-icon-badge" style="background: rgba(245,158,11,0.15); color: #f59e0b;">
+          <i class="bi bi-tag-fill"></i>
+        </span>
+        <span>In-Store Counter Deals</span>
       </a>
-      <a href="/#how-it-works" class="btn btn-block text-left" style="justify-content: flex-start; color: #fff; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); font-weight: 600; font-size: 0.9rem; padding: 0.65rem 1rem; border-radius: 10px;">
-        <i class="bi bi-compass-fill" style="color: #10b981; margin-right: 0.5rem;"></i> How It Works (1-Min Guide)
+      <a href="/#how-it-works" class="mobile-nav-link-card" onclick="closePublicMobileNav()">
+        <span class="mobile-nav-icon-badge" style="background: rgba(16,185,129,0.15); color: #10b981;">
+          <i class="bi bi-compass-fill"></i>
+        </span>
+        <span>How It Works (1-Min Guide)</span>
       </a>
-      <a href="/for-sellers/" class="btn btn-block text-left" style="justify-content: flex-start; color: #fff; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); font-weight: 600; font-size: 0.9rem; padding: 0.65rem 1rem; border-radius: 10px;">
-        <i class="bi bi-briefcase-fill" style="color: #a855f7; margin-right: 0.5rem;"></i> For Merchants &amp; Retailers
+      <a href="/for-sellers/" class="mobile-nav-link-card" onclick="closePublicMobileNav()">
+        <span class="mobile-nav-icon-badge" style="background: rgba(168,85,247,0.15); color: #a855f7;">
+          <i class="bi bi-briefcase-fill"></i>
+        </span>
+        <span>For Merchants &amp; Retailers</span>
       </a>
-      <a href="/contact-us/" class="btn btn-block text-left" style="justify-content: flex-start; color: #fff; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); font-weight: 600; font-size: 0.9rem; padding: 0.65rem 1rem; border-radius: 10px;">
-        <i class="bi bi-headset" style="color: #06b6d4; margin-right: 0.5rem;"></i> Contact Us &amp; Support
+      <a href="/contact-us/" class="mobile-nav-link-card" onclick="closePublicMobileNav()">
+        <span class="mobile-nav-icon-badge" style="background: rgba(6,182,212,0.15); color: #06b6d4;">
+          <i class="bi bi-headset"></i>
+        </span>
+        <span>Contact Us &amp; Support</span>
       </a>
 
-      <!-- Auth Section -->
-      <div style="border-top: 1px solid rgba(255,255,255,0.1); margin-top: 0.35rem; padding-top: 0.85rem; display: flex; flex-direction: column; gap: 0.5rem;">
+      <!-- Auth Action Section -->
+      <div style="border-top: 1px solid rgba(255,255,255,0.1); margin-top: 0.5rem; padding-top: 1rem; display: flex; flex-direction: column; gap: 0.65rem;">
         {% if user.is_authenticated %}
           {% if is_buyer %}
-            <a href="/buyer/dashboard/" class="btn btn-primary btn-block" style="border-radius: 10px; font-weight: 700; padding: 0.75rem;"><i class="bi bi-compass"></i> Open My Shopper App</a>
+            <a href="/buyer/dashboard/" onclick="closePublicMobileNav()" class="btn btn-primary btn-block" style="border-radius: 12px; font-weight: 700; padding: 0.85rem;"><i class="bi bi-compass"></i> Open My Shopper App</a>
           {% elif is_seller %}
-            <a href="/seller/dashboard/" class="btn btn-block" style="background: rgba(255,255,255,0.1); color: #fff; border-radius: 10px; font-weight: 700; padding: 0.75rem;"><i class="bi bi-shop"></i> Open Merchant Portal</a>
+            <a href="/seller/dashboard/" onclick="closePublicMobileNav()" class="btn btn-block" style="background: rgba(255,255,255,0.1); color: #fff; border-radius: 12px; font-weight: 700; padding: 0.85rem;"><i class="bi bi-shop"></i> Open Merchant Portal</a>
           {% elif is_admin %}
-            <a href="/admin-portal/dashboard/" class="btn btn-block" style="background: rgba(255,255,255,0.1); color: #fff; border-radius: 10px; font-weight: 700; padding: 0.75rem;"><i class="bi bi-shield-check"></i> Open Admin Portal</a>
+            <a href="/admin-portal/dashboard/" onclick="closePublicMobileNav()" class="btn btn-block" style="background: rgba(255,255,255,0.1); color: #fff; border-radius: 12px; font-weight: 700; padding: 0.85rem;"><i class="bi bi-shield-check"></i> Open Admin Portal</a>
           {% endif %}
         {% else %}
-          <a href="/buyer/register/" class="btn btn-primary btn-block" style="background: #f97316; border-color: #f97316; color: #fff; border-radius: 10px; font-weight: 800; padding: 0.75rem; text-align: center; text-decoration: none; box-shadow: 0 4px 12px rgba(249,115,22,0.35);">
+          <a href="/buyer/register/" onclick="closePublicMobileNav()" class="btn btn-primary btn-block" style="background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); border: none; color: #fff; border-radius: 12px; font-weight: 800; font-size: 0.95rem; padding: 0.85rem; text-align: center; text-decoration: none; box-shadow: 0 4px 16px rgba(249,115,22,0.4);">
             ⚡ Join Free — Get Instant Deals
           </a>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top: 0.2rem;">
-            <a href="/buyer/login/" class="btn btn-block" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18); color: #fff; border-radius: 10px; font-weight: 600; font-size: 0.82rem; padding: 0.6rem; text-align: center; text-decoration: none;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; margin-top: 0.25rem;">
+            <a href="/buyer/login/" onclick="closePublicMobileNav()" class="btn btn-block" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18); color: #fff; border-radius: 12px; font-weight: 600; font-size: 0.85rem; padding: 0.7rem 0.5rem; text-align: center; text-decoration: none;">
               Shopper Login
             </a>
-            <a href="/seller/login/" class="btn btn-block" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18); color: #fff; border-radius: 10px; font-weight: 600; font-size: 0.82rem; padding: 0.6rem; text-align: center; text-decoration: none;">
+            <a href="/seller/login/" onclick="closePublicMobileNav()" class="btn btn-block" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18); color: #fff; border-radius: 12px; font-weight: 600; font-size: 0.85rem; padding: 0.7rem 0.5rem; text-align: center; text-decoration: none;">
               <i class="bi bi-shop"></i> Merchant Login
             </a>
           </div>
         {% endif %}
       </div>
     </div>
-  </header>
-
-  <!-- Backdrop overlay when mobile menu is open -->
-  <div id="mobileMenuBackdrop" onclick="closePublicMobileNav()" style="display: none; position: fixed; inset: 0; top: 72px; background: rgba(0,0,0,0.65); backdrop-filter: blur(4px); z-index: 99998;"></div>
+  </div>
 
   <script>
     function togglePublicMobileNav(e) {
@@ -271,7 +375,6 @@
         if (e.stopPropagation) e.stopPropagation();
       }
       var drawer = document.getElementById('mobileMenuDrawer');
-      var backdrop = document.getElementById('mobileMenuBackdrop');
       var toggle = document.getElementById('mobileNavToggle');
       var lines = document.getElementById('navToggleIconLines');
       var close = document.getElementById('navToggleIconClose');
@@ -283,7 +386,7 @@
       } else {
         drawer.classList.add('show');
         drawer.style.setProperty('display', 'flex', 'important');
-        if (backdrop) backdrop.style.setProperty('display', 'block', 'important');
+        document.body.style.overflow = 'hidden';
         if (toggle) toggle.setAttribute('aria-expanded', 'true');
         if (lines) lines.style.display = 'none';
         if (close) close.style.display = 'block';
@@ -293,7 +396,6 @@
 
     function closePublicMobileNav() {
       var drawer = document.getElementById('mobileMenuDrawer');
-      var backdrop = document.getElementById('mobileMenuBackdrop');
       var toggle = document.getElementById('mobileNavToggle');
       var lines = document.getElementById('navToggleIconLines');
       var close = document.getElementById('navToggleIconClose');
@@ -301,7 +403,7 @@
         drawer.classList.remove('show');
         drawer.style.setProperty('display', 'none', 'important');
       }
-      if (backdrop) backdrop.style.setProperty('display', 'none', 'important');
+      document.body.style.overflow = '';
       if (toggle) toggle.setAttribute('aria-expanded', 'false');
       if (lines) lines.style.display = 'block';
       if (close) close.style.display = 'none';

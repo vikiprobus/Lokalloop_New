@@ -846,13 +846,14 @@ def map_tile_proxy_view(request, z, x, y):
         response['Cache-Control'] = 'public, max-age=86400'
         return response
 
-    # Multi-provider upstream cascade: ESRI ArcGIS World Street Map (high reliability, no key), OSM, CartoDB, Google Maps
+    # Multi-provider upstream cascade: Google Maps (ultra fast, high availability in India), CartoDB, ArcGIS, OSM
     candidate_urls = [
-        f"https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",
-        f"https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-        f"https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png",
         f"https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
         f"https://mt0.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
+        f"https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png",
+        f"https://b.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png",
+        f"https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",
+        f"https://tile.openstreetmap.org/{z}/{x}/{y}.png",
     ]
 
     for tile_url in candidate_urls:
