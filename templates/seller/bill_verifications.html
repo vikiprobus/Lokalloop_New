@@ -18,7 +18,7 @@
   </div>
 
   <!-- Metric Overview Cards -->
-  <div class="d-grid grid-4 gap-3" style="margin-bottom: 1.75rem;">
+  <div class="bumper-metrics-grid">
     <div class="card card-padded" style="background: #ffffff; border: 1px solid var(--border-light); border-radius: 14px;">
       <span class="stat-label">Awaiting Your Verification</span>
       <div style="font-size: 2rem; font-weight: 900; color: #f59e0b; margin: 0.25rem 0 0.15rem;">{{ pending_count }}</div>
@@ -44,18 +44,57 @@
     </div>
   </div>
 
-  <!-- Filter Navigation Tabs -->
-  <div class="d-flex align-center gap-2" style="margin-bottom: 1.25rem;">
-    <a href="{% url 'seller_bill_verifications' %}" class="btn btn-sm {% if not status_filter %}btn-primary{% else %}btn-outline{% endif %}" style="font-weight: 700;">
+  <style>
+    .bumper-metrics-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+    @media (min-width: 992px) {
+      .bumper-metrics-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1rem;
+      }
+    }
+    .bumper-tabs-scroller {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1.25rem;
+      overflow-x: auto;
+      white-space: nowrap;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      padding-bottom: 6px;
+    }
+    .bumper-tabs-scroller::-webkit-scrollbar {
+      display: none;
+    }
+    .bumper-tab-pill {
+      font-weight: 700;
+      border-radius: 9999px;
+      padding: 0.45rem 1.05rem;
+      flex-shrink: 0;
+      white-space: nowrap;
+      font-size: 0.8rem;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+  </style>
+
+  <!-- Filter Navigation Tabs (Smooth Horizontal Scroll on Mobile) -->
+  <div class="bumper-tabs-scroller">
+    <a href="{% url 'seller_bill_verifications' %}" class="bumper-tab-pill {% if not status_filter %}btn-primary{% else %}btn-outline{% endif %}">
       All Submissions ({{ submissions|length }})
     </a>
-    <a href="{% url 'seller_bill_verifications' %}?status=PENDING_STORE" class="btn btn-sm {% if status_filter == 'PENDING_STORE' or status_filter == 'PENDING' %}btn-primary{% else %}btn-outline{% endif %}" style="font-weight: 700;">
+    <a href="{% url 'seller_bill_verifications' %}?status=PENDING_STORE" class="bumper-tab-pill {% if status_filter == 'PENDING_STORE' or status_filter == 'PENDING' %}btn-primary{% else %}btn-outline{% endif %}">
       Awaiting Verification ({{ pending_count }})
     </a>
-    <a href="{% url 'seller_bill_verifications' %}?status=STORE_VERIFIED" class="btn btn-sm {% if status_filter == 'STORE_VERIFIED' %}btn-primary{% else %}btn-outline{% endif %}" style="font-weight: 700;">
+    <a href="{% url 'seller_bill_verifications' %}?status=STORE_VERIFIED" class="bumper-tab-pill {% if status_filter == 'STORE_VERIFIED' %}btn-primary{% else %}btn-outline{% endif %}">
       Sent to Admin ({{ store_verified_count }})
     </a>
-    <a href="{% url 'seller_bill_verifications' %}?status=APPROVED" class="btn btn-sm {% if status_filter == 'APPROVED' %}btn-primary{% else %}btn-outline{% endif %}" style="font-weight: 700;">
+    <a href="{% url 'seller_bill_verifications' %}?status=APPROVED" class="bumper-tab-pill {% if status_filter == 'APPROVED' %}btn-primary{% else %}btn-outline{% endif %}">
       Approved ({{ approved_count }})
     </a>
   </div>
@@ -167,7 +206,7 @@
             </tr>
           {% empty %}
             <tr>
-              <td colspan="7" class="text-center text-muted" style="padding: 2.5rem 1rem;">
+              <td colspan="7" class="text-center text-muted" style="padding: 2.5rem 1rem; text-align: center; color: #64748b; font-size: 0.85rem;">
                 No high-value purchase submissions found for your store outlets.
               </td>
             </tr>

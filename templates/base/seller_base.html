@@ -389,7 +389,7 @@
               <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
               <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
             </svg>
-            <span style="position: absolute; top: -2px; right: -2px; width: 16px; height: 16px; border-radius: 50%; background: #ef4444; color: #ffffff; font-size: 0.62rem; font-weight: 800; display: flex; align-items: center; justify-content: center; border: 2px solid #070c18;">{% if unread_notifications_count %}{{ unread_notifications_count }}{% else %}2{% endif %}</span>
+            {% if unread_notifications_count and unread_notifications_count > 0 %}<span style="position: absolute; top: -2px; right: -2px; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 9999px; background: #ef4444; color: #ffffff; font-size: 0.62rem; font-weight: 800; display: flex; align-items: center; justify-content: center; border: 2px solid #070c18;">{{ unread_notifications_count }}</span>{% endif %}
           </a>
 
           <!-- Shop Avatar with Online Status Indicator -->

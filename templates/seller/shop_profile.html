@@ -7,12 +7,17 @@
 <link rel="stylesheet" href="{% static 'vendor/leaflet/leaflet.css' %}" />
 <style>
   #merchantEditMap {
-    height: 240px;
+    height: 260px;
     width: 100%;
-    border-radius: 10px;
+    border-radius: 14px;
     border: 1.5px solid #cbd5e1;
     z-index: 1;
     margin-top: 0.5rem;
+    background: #f1f5f9;
+  }
+  .leaflet-container {
+    font-family: inherit;
+    background: #f1f5f9 !important;
   }
 </style>
 {% endblock %}
@@ -460,15 +465,45 @@
   function initProfileMap() {
     const mapEl = document.getElementById('merchantEditMap');
     if (!mapEl || typeof L === 'undefined') return;
+    if (editMap) {
+      editMap.invalidateSize();
+      return;
+    }
+
+    // Configure static icon paths explicitly so Leaflet never fails to resolve marker assets
+    if (L.Icon && L.Icon.Default) {
+      delete L.Icon.Default.prototype._getIconUrl;
+      L.Icon.Default.mergeOptions({
+        iconRetinaUrl: '/static/vendor/leaflet/images/marker-icon-2x.png',
+        iconUrl: '/static/vendor/leaflet/images/marker-icon.png',
+        shadowUrl: '/static/vendor/leaflet/images/marker-shadow.png',
+      });
+    }
 
     const latVal = parseFloat(document.getElementById('id_latitude').value) || 18.5204;
     const lngVal = parseFloat(document.getElementById('id_longitude').value) || 73.8567;
 
-    editMap = L.map('merchantEditMap', { scrollWheelZoom: false }).setView([latVal, lngVal], 15);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    editMap = L.map('merchantEditMap', { 
+      scrollWheelZoom: false,
+      zoomControl: true,
+      fadeAnimation: true,
+    }).setView([latVal, lngVal], 16);
+
+    // High-reliability CartoDB Voyager tiles with global CDN + OpenStreetMap fallback
+    const tileLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
       maxZoom: 19,
-      attribution: '© OpenStreetMap contributors'
-    }).addTo(editMap);
+      subdomains: 'abcd',
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>, &copy; CartoDB'
+    });
+    
+    tileLayer.on('tileerror', function() {
+      // Automatic fallback to standard OSM if carrier restricts Carto
+      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; OpenStreetMap'
+      }).addTo(editMap);
+    });
+    tileLayer.addTo(editMap);
 
     editMarker = L.marker([latVal, lngVal], { draggable: true }).addTo(editMap);
     editMarker.bindTooltip("Drag pin to store entrance", { permanent: false, direction: 'top' });
@@ -491,6 +526,25 @@
       editMarker.setLatLng(e.latlng);
       onPosUpdate(e.latlng.lat, e.latlng.lng);
     });
+
+    // Invalidate size across multiple render intervals so tiles never render grey
+    [100, 300, 600, 1000].forEach(delay => {
+      setTimeout(() => { if (editMap) editMap.invalidateSize(); }, delay);
+    });
+
+    // Auto-refresh when scrolled into view
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting && editMap) {
+            editMap.invalidateSize();
+          }
+        });
+      }, { threshold: 0.1 });
+      observer.observe(mapEl);
+    }
+
+    window.addEventListener('resize', () => { if (editMap) editMap.invalidateSize(); });
   }
 
   function detectGPSLocationProfile() {

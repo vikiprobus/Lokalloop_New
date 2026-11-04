@@ -5,6 +5,44 @@
 
 {% block extra_css %}
 <style>
+  .qr-page-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  @media (min-width: 992px) {
+    .qr-page-grid {
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 2rem;
+      align-items: start;
+    }
+    .qr-desk-left-col {
+      order: 1;
+    }
+    .qr-standee-container {
+      order: 2;
+    }
+  }
+  @media (max-width: 991px) {
+    .qr-standee-container {
+      order: 1;
+    }
+    .qr-desk-left-col {
+      order: 2;
+    }
+  }
+  .qr-standee-card {
+    width: 100%;
+    max-width: 440px;
+    margin: 0 auto;
+    border-radius: 20px;
+    overflow: hidden;
+    background: #ffffff;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+    border: 1px solid #e2e8f0;
+    box-sizing: border-box;
+  }
   @media print {
     @page {
       margin: 0.5cm;
@@ -18,7 +56,7 @@
       width: 100% !important;
       height: auto !important;
     }
-    .portal-sidebar, .portal-topbar, header, footer, .btn, .no-print, nav, .mobile-bottom-nav, .qr-desk-left-col {
+    .portal-sidebar, .portal-topbar, header, footer, .btn, .no-print, nav, .mobile-bottom-nav, .seller-bottom-nav, .qr-desk-left-col, .merchant-pills-bar {
       display: none !important;
     }
     .portal-layout, .portal-main, main, .container {
@@ -28,7 +66,7 @@
       width: 100% !important;
       max-width: 100% !important;
     }
-    .d-grid {
+    .qr-page-grid {
       display: block !important;
     }
     .qr-standee-container {
@@ -40,25 +78,20 @@
     #printable-standee {
       display: block !important;
       position: static !important;
-      margin: 1.5rem auto !important;
+      margin: 1rem auto !important;
       transform: none !important;
       width: 100% !important;
-      max-width: 480px !important;
+      max-width: 460px !important;
       border: 2px solid #0f172a !important;
       box-shadow: none !important;
       page-break-inside: avoid !important;
-    }
-  }
-  @media (max-width: 900px) {
-    .qr-standee-container {
-      grid-column: span 1 !important;
     }
   }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="d-grid grid-3 gap-4">
+<div class="qr-page-grid">
   
   <!-- Left Side: Standee Type Selector & Instructions -->
   <div class="no-print qr-desk-left-col">
@@ -129,7 +162,7 @@
   </div>
 
   <!-- Right Side: The Official Printable Standee Poster (2 cols) -->
-  <div class="qr-standee-container" style="grid-column: span 2;">
+  <div class="qr-standee-container">
     
     {% if qr_mode == 'store' and store_qr_data_uri %}
       <!-- ================= STORE-WIDE QR STANDEE ================= -->
