@@ -685,7 +685,7 @@ img {
   background: none;
   border: none;
   font-size: 1.5rem;
-  color: var(--ink-950);
+  color: #ffffff;
   cursor: pointer;
   padding: 0.25rem 0.5rem;
 }
@@ -703,6 +703,17 @@ img {
   display: flex !important;
 }
 
+@media (max-width: 991px) {
+  .desktop-nav {
+    display: none !important;
+  }
+  .mobile-nav-toggle {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
 @media (max-width: 768px) {
   .mobile-bottom-nav {
     display: flex;
@@ -712,14 +723,6 @@ img {
   }
   body.buyer-logged-in {
     padding-bottom: calc(85px + env(safe-area-inset-bottom, 8px)) !important;
-  }
-  .mobile-nav-toggle {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .desktop-nav {
-    display: none !important;
   }
 }
 

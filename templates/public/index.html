@@ -3,6 +3,64 @@
 
 {% block title %}LokalLoop — Discover Local. Save More. Shop Nearby.{% endblock %}
 
+{% block extra_css %}
+<style>
+  /* Public Mobile Polish & Ergonomics */
+  @media (max-width: 768px) {
+    .hero-dark-wrapper {
+      padding: 2.25rem 0 2rem !important;
+    }
+    .hero-dark-wrapper .d-grid.grid-2 {
+      grid-template-columns: 1fr !important;
+      gap: 1.75rem !important;
+    }
+    .hero-showcase-container {
+      max-width: 100% !important;
+    }
+    .hero-showcase-container img {
+      height: 250px !important;
+    }
+    .hero-floating-badge {
+      top: 10px !important;
+      right: 10px !important;
+      padding: 0.5rem 0.85rem !important;
+    }
+    .hero-floating-badge > div:last-child > div:last-child {
+      font-size: 0.82rem !important;
+    }
+    section {
+      padding-top: 2.5rem !important;
+      padding-bottom: 2.5rem !important;
+    }
+    .cat-card-modern {
+      padding: 0.85rem 0.75rem !important;
+    }
+    .steps-grid {
+      grid-template-columns: 1fr !important;
+      gap: 0.85rem !important;
+    }
+    .merchant-cta-banner {
+      padding: 1.75rem 1.25rem !important;
+    }
+    .merchant-cta-banner .d-grid.grid-2 {
+      grid-template-columns: 1fr !important;
+      gap: 1.5rem !important;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .d-grid.grid-4 {
+      grid-template-columns: 1fr 1fr !important;
+      gap: 0.65rem !important;
+    }
+    .d-grid.grid-3 {
+      grid-template-columns: 1fr !important;
+      gap: 1rem !important;
+    }
+  }
+</style>
+{% endblock %}
+
 {% block content %}
 <!-- Modern Dark Ambient Hero Section -->
 <section class="hero-dark-wrapper" style="padding: 4.5rem 0 4rem;">

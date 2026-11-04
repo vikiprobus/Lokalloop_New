@@ -46,6 +46,66 @@
     header {
       padding-top: max(env(safe-area-inset-top, 0px), 0px);
     }
+    /* Mobile Hamburger Menu & Public Navigation Overrides */
+    .mobile-nav-toggle {
+      display: none;
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      align-items: center;
+      justify-content: center;
+      color: #ffffff !important;
+      cursor: pointer;
+      padding: 0;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+      -webkit-tap-highlight-color: transparent;
+      flex-shrink: 0;
+    }
+    .mobile-nav-toggle:hover, .mobile-nav-toggle:focus {
+      background: rgba(255, 255, 255, 0.14);
+      border-color: rgba(255, 255, 255, 0.3);
+      outline: none;
+    }
+    .mobile-nav-toggle:active {
+      transform: scale(0.95);
+      background: rgba(255, 255, 255, 0.2);
+    }
+    
+    @media (max-width: 991px) {
+      .desktop-nav {
+        display: none !important;
+      }
+      .mobile-nav-toggle {
+        display: inline-flex !important;
+      }
+    }
+
+    .mobile-menu-drawer {
+      display: none;
+      flex-direction: column;
+      background: #0b0f19;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 1.25rem 1rem 1.75rem;
+      gap: 0.65rem;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+      animation: mobileDrawerSlide 0.22s ease-out forwards;
+    }
+    .mobile-menu-drawer.show {
+      display: flex !important;
+    }
+    @keyframes mobileDrawerSlide {
+      from {
+        opacity: 0;
+        transform: translateY(-8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
   </style>
   {% block extra_css %}{% endblock %}
 </head>
@@ -111,45 +171,116 @@
           {% endif %}
         </div>
 
-        <!-- Mobile Hamburger Menu Button -->
-        <button type="button" class="mobile-nav-toggle" id="mobileNavToggle" aria-label="Toggle Navigation Menu" style="color: #ffffff;">
-          <i class="bi bi-list"></i>
+        <!-- Mobile Hamburger Menu Button (High-Contrast 3-Line Inline SVG) -->
+        <button type="button" class="mobile-nav-toggle" id="mobileNavToggle" aria-label="Toggle Navigation Menu" aria-expanded="false" title="Menu">
+          <svg id="navToggleIconLines" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+          <svg id="navToggleIconClose" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
         </button>
       </div>
 
     </div>
 
     <!-- Mobile Menu Drawer (Toggles on mobile) -->
-    <div class="mobile-menu-drawer" id="mobileMenuDrawer" style="background: #0b0f19; border-bottom: 1px solid rgba(255,255,255,0.1);">
-      <a href="/explore/" class="btn btn-outline btn-block text-left" style="justify-content: flex-start; color: #fff; background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1);">
-        <i class="bi bi-compass"></i> Explore Shops
+    <div class="mobile-menu-drawer" id="mobileMenuDrawer" style="background: #0b0f19; border-bottom: 1px solid rgba(255,255,255,0.12);">
+      
+      <!-- City Quick Switcher -->
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.35rem; padding: 0.4rem 0.5rem 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.08);">
+        <span style="font-size: 0.75rem; color: #94a3b8; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">
+          <i class="bi bi-geo-alt-fill" style="color: #f97316;"></i> Select City:
+        </span>
+        <div style="display: flex; gap: 0.35rem;">
+          <a href="/explore/?city=Pune" style="padding: 0.25rem 0.65rem; border-radius: 9999px; background: rgba(255,255,255,0.08); color: #fff; font-size: 0.75rem; font-weight: 600; text-decoration: none; border: 1px solid rgba(255,255,255,0.12);">Pune</a>
+          <a href="/explore/?city=Bengaluru" style="padding: 0.25rem 0.65rem; border-radius: 9999px; background: rgba(255,255,255,0.08); color: #fff; font-size: 0.75rem; font-weight: 600; text-decoration: none; border: 1px solid rgba(255,255,255,0.12);">Bengaluru</a>
+          <a href="/explore/?city=Mumbai" style="padding: 0.25rem 0.65rem; border-radius: 9999px; background: rgba(255,255,255,0.08); color: #fff; font-size: 0.75rem; font-weight: 600; text-decoration: none; border: 1px solid rgba(255,255,255,0.12);">Mumbai</a>
+        </div>
+      </div>
+
+      <!-- Navigation Links -->
+      <a href="/" class="btn btn-block text-left" style="justify-content: flex-start; color: #fff; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); font-weight: 600; font-size: 0.9rem; padding: 0.65rem 1rem; border-radius: 10px;">
+        <i class="bi bi-house-door" style="color: #f97316; margin-right: 0.5rem;"></i> Home
       </a>
-      <a href="/explore/?type=offers" class="btn btn-outline btn-block text-left" style="justify-content: flex-start; color: #fff; background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1);">
-        <i class="bi bi-tag-fill text-saffron"></i> Hot Offers
+      <a href="/explore/?type=shops" class="btn btn-block text-left" style="justify-content: flex-start; color: #fff; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); font-weight: 600; font-size: 0.9rem; padding: 0.65rem 1rem; border-radius: 10px;">
+        <i class="bi bi-shop" style="color: #38bdf8; margin-right: 0.5rem;"></i> Explore Local Shops
       </a>
-      <a href="/for-sellers/" class="btn btn-outline btn-block text-left" style="justify-content: flex-start; color: #fff; background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1);">
-        <i class="bi bi-shop"></i> For Businesses &amp; Retailers
+      <a href="/explore/?type=offers" class="btn btn-block text-left" style="justify-content: flex-start; color: #fff; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); font-weight: 600; font-size: 0.9rem; padding: 0.65rem 1rem; border-radius: 10px;">
+        <i class="bi bi-tag-fill" style="color: #f59e0b; margin-right: 0.5rem;"></i> In-Store Counter Deals
       </a>
-      <a href="/contact-us/" class="btn btn-outline btn-block text-left" style="justify-content: flex-start; color: #fff; background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1);">
-        <i class="bi bi-headset"></i> Contact Us &amp; Grievances
+      <a href="/#how-it-works" class="btn btn-block text-left" style="justify-content: flex-start; color: #fff; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); font-weight: 600; font-size: 0.9rem; padding: 0.65rem 1rem; border-radius: 10px;">
+        <i class="bi bi-compass-fill" style="color: #10b981; margin-right: 0.5rem;"></i> How It Works (1-Min Guide)
       </a>
-      <div style="border-top: 1px solid rgba(255,255,255,0.1); margin: 0.5rem 0; padding-top: 0.75rem; display: flex; flex-direction: column; gap: 0.5rem;">
+      <a href="/for-sellers/" class="btn btn-block text-left" style="justify-content: flex-start; color: #fff; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); font-weight: 600; font-size: 0.9rem; padding: 0.65rem 1rem; border-radius: 10px;">
+        <i class="bi bi-briefcase-fill" style="color: #a855f7; margin-right: 0.5rem;"></i> For Merchants &amp; Retailers
+      </a>
+      <a href="/contact-us/" class="btn btn-block text-left" style="justify-content: flex-start; color: #fff; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); font-weight: 600; font-size: 0.9rem; padding: 0.65rem 1rem; border-radius: 10px;">
+        <i class="bi bi-headset" style="color: #06b6d4; margin-right: 0.5rem;"></i> Contact Us &amp; Support
+      </a>
+
+      <!-- Auth Section -->
+      <div style="border-top: 1px solid rgba(255,255,255,0.1); margin-top: 0.35rem; padding-top: 0.85rem; display: flex; flex-direction: column; gap: 0.5rem;">
         {% if user.is_authenticated %}
           {% if is_buyer %}
-            <a href="/buyer/dashboard/" class="btn btn-primary btn-block"><i class="bi bi-compass"></i> Open Buyer Dashboard</a>
+            <a href="/buyer/dashboard/" class="btn btn-primary btn-block" style="border-radius: 10px; font-weight: 700; padding: 0.75rem;"><i class="bi bi-compass"></i> Open My Shopper App</a>
           {% elif is_seller %}
-            <a href="/seller/dashboard/" class="btn btn-block" style="background: rgba(255,255,255,0.1); color: #fff;"><i class="bi bi-shop"></i> Open Merchant Portal</a>
+            <a href="/seller/dashboard/" class="btn btn-block" style="background: rgba(255,255,255,0.1); color: #fff; border-radius: 10px; font-weight: 700; padding: 0.75rem;"><i class="bi bi-shop"></i> Open Merchant Portal</a>
           {% elif is_admin %}
-            <a href="/admin-portal/dashboard/" class="btn btn-block" style="background: rgba(255,255,255,0.1); color: #fff;"><i class="bi bi-shield-check"></i> Open Admin Portal</a>
+            <a href="/admin-portal/dashboard/" class="btn btn-block" style="background: rgba(255,255,255,0.1); color: #fff; border-radius: 10px; font-weight: 700; padding: 0.75rem;"><i class="bi bi-shield-check"></i> Open Admin Portal</a>
           {% endif %}
         {% else %}
-          <a href="/buyer/login/" class="btn btn-block" style="background: rgba(255,255,255,0.1); color: #fff;">Buyer Login</a>
-          <a href="/seller/login/" class="btn btn-block" style="background: rgba(255,255,255,0.1); color: #fff;"><i class="bi bi-shop"></i> Merchant Login</a>
-          <a href="/buyer/register/" class="btn btn-primary btn-block">Get Started Free</a>
+          <a href="/buyer/register/" class="btn btn-primary btn-block" style="background: #f97316; border-color: #f97316; color: #fff; border-radius: 10px; font-weight: 800; padding: 0.75rem; text-align: center; text-decoration: none; box-shadow: 0 4px 12px rgba(249,115,22,0.35);">
+            ⚡ Join Free — Get Instant Deals
+          </a>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top: 0.2rem;">
+            <a href="/buyer/login/" class="btn btn-block" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18); color: #fff; border-radius: 10px; font-weight: 600; font-size: 0.82rem; padding: 0.6rem; text-align: center; text-decoration: none;">
+              Shopper Login
+            </a>
+            <a href="/seller/login/" class="btn btn-block" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18); color: #fff; border-radius: 10px; font-weight: 600; font-size: 0.82rem; padding: 0.6rem; text-align: center; text-decoration: none;">
+              <i class="bi bi-shop"></i> Merchant Login
+            </a>
+          </div>
         {% endif %}
       </div>
     </div>
   </header>
+
+  <script>
+    (function() {
+      var toggle = document.getElementById('mobileNavToggle');
+      var drawer = document.getElementById('mobileMenuDrawer');
+      var lines = document.getElementById('navToggleIconLines');
+      var close = document.getElementById('navToggleIconClose');
+      if (toggle && drawer) {
+        toggle.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          var isOpen = drawer.classList.toggle('show');
+          toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+          if (lines && close) {
+            lines.style.display = isOpen ? 'none' : 'block';
+            close.style.display = isOpen ? 'block' : 'none';
+          }
+        });
+        document.addEventListener('click', function(e) {
+          if (!drawer.contains(e.target) && !toggle.contains(e.target)) {
+            if (drawer.classList.contains('show')) {
+              drawer.classList.remove('show');
+              toggle.setAttribute('aria-expanded', 'false');
+              if (lines && close) {
+                lines.style.display = 'block';
+                close.style.display = 'none';
+              }
+            }
+          }
+        });
+      }
+    })();
+  </script>
 
   <!-- Flash Messages -->
   {% if messages %}

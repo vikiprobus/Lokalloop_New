@@ -2,6 +2,29 @@
 
 {% block title %}Explore Local Shops & In-Store Deals — LokalLoop{% endblock %}
 
+{% block extra_css %}
+<style>
+  @media (max-width: 640px) {
+    .container {
+      padding-left: 0.75rem !important;
+      padding-right: 0.75rem !important;
+    }
+    .explore-filter-form > div {
+      min-width: 100% !important;
+      width: 100% !important;
+    }
+    .explore-filter-form button, .explore-filter-form a.btn {
+      width: 100% !important;
+      justify-content: center !important;
+    }
+    .d-grid.grid-3 {
+      grid-template-columns: 1fr !important;
+      gap: 1rem !important;
+    }
+  }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container" style="padding-top: 2rem; padding-bottom: 4rem;">
 
