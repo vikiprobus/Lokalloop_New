@@ -85,6 +85,7 @@ urlpatterns = [
     # 4. Seller Portal
     path('seller/dashboard/', seller_views.seller_dashboard_view, name='seller_dashboard'),
     path('seller/shop/', seller_views.seller_shop_view, name='seller_shop'),
+    path('seller/profile/', seller_views.seller_shop_view, name='seller_profile'),
     path('seller/offers/', seller_views.seller_offers_list_view, name='seller_offers'),
     path('seller/offers/create/', seller_views.seller_offer_create_view, name='seller_offer_create'),
     path('seller/offers/new/', seller_views.seller_offer_create_view, name='seller_offer_new'),

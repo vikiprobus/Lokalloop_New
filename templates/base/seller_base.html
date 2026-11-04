@@ -394,7 +394,7 @@
 
           <!-- Shop Avatar with Online Status Indicator -->
           <div class="user-dropdown-container">
-            <button type="button" class="dropdown-toggle" id="sellerProfileDropdownBtn" style="background: none; border: none; padding: 0; cursor: pointer; display: flex; align-items: center; position: relative;">
+            <button type="button" id="sellerProfileDropdownBtn" style="background: none; border: none; padding: 0; cursor: pointer; display: flex; align-items: center; position: relative;">
               <div style="width: 34px; height: 34px; border-radius: 50%; border: 2px solid rgba(255, 255, 255, 0.15); overflow: hidden; background: #141c2e; display: flex; align-items: center; justify-content: center;">
                 {% if user.seller_profile.logo_image_url %}
                   <img src="{{ user.seller_profile.logo_image_url }}" alt="Logo" style="width: 100%; height: 100%; object-fit: cover;">
@@ -405,7 +405,7 @@
               <span style="position: absolute; bottom: 0; right: 0; width: 10px; height: 10px; border-radius: 50%; background: #10b981; border: 2px solid #070c18;" title="Online"></span>
             </button>
 
-            <div class="dropdown-menu" style="right: 0; left: auto; min-width: 240px; margin-top: 0.5rem; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); padding: 0.5rem; background: #111827; color: #ffffff;">
+            <div class="dropdown-menu" style="right: 0; left: auto; min-width: 240px; margin-top: 0.5rem; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.15); padding: 0.5rem; background: #111827; color: #ffffff; z-index: 99999 !important;">
               <div style="padding: 0.75rem 0.85rem; border-bottom: 1px solid rgba(255,255,255,0.08); margin-bottom: 0.35rem;">
                 <div style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: #94a3b8; letter-spacing: 0.05em;">LokalLoop PRO</div>
                 <div style="font-weight: 800; color: #ffffff; font-size: 0.95rem;">
@@ -820,17 +820,26 @@
       link.addEventListener('click', closeSellerSidebar);
     });
 
-    // Profile Dropdown Toggle
+    // Profile Dropdown Toggle (Robust Single Handler)
     const sellerDropdownBtn = document.getElementById('sellerProfileDropdownBtn');
     if (sellerDropdownBtn) {
-      sellerDropdownBtn.addEventListener('click', (e) => {
+      sellerDropdownBtn.addEventListener('click', function(e) {
+        e.preventDefault();
         e.stopPropagation();
-        const menu = sellerDropdownBtn.nextElementSibling;
-        if (menu) menu.classList.toggle('show');
+        const container = this.closest('.user-dropdown-container');
+        const menu = container ? container.querySelector('.dropdown-menu') : null;
+        if (menu) {
+          const isOpen = menu.classList.contains('show');
+          document.querySelectorAll('.dropdown-menu.show').forEach(m => m.classList.remove('show'));
+          if (!isOpen) {
+            menu.classList.add('show');
+          }
+        }
       });
-      document.addEventListener('click', () => {
-        const menu = sellerDropdownBtn.nextElementSibling;
-        if (menu) menu.classList.remove('show');
+      document.addEventListener('click', function(e) {
+        if (!e.target.closest('.user-dropdown-container')) {
+          document.querySelectorAll('.dropdown-menu.show').forEach(m => m.classList.remove('show'));
+        }
       });
     }
   </script>
@@ -871,11 +880,11 @@
     </button>
 
     <a href="/seller/shop/" class="{% if '/seller/shop/' in request.path %}active{% endif %}">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="3"/>
-        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="{% if '/seller/shop/' in request.path %}#ea580c{% else %}none{% endif %}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+        <circle cx="12" cy="7" r="4"/>
       </svg>
-      <span>Settings</span>
+      <span>Profile</span>
     </a>
 
     <a href="/contact-us/?role=merchant" class="{% if '/contact-us/' in request.path %}active{% endif %}">
