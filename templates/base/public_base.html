@@ -86,12 +86,22 @@
     .mobile-menu-drawer {
       display: none;
       flex-direction: column;
+      position: absolute;
+      top: 72px;
+      left: 0;
+      right: 0;
+      width: 100%;
       background: #0b0f19;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+      border-bottom: 2px solid #f97316;
       padding: 1.25rem 1rem 1.75rem;
       gap: 0.65rem;
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
-      animation: mobileDrawerSlide 0.22s ease-out forwards;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.85);
+      z-index: 99999;
+      max-height: calc(100vh - 80px);
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      animation: mobileDrawerSlide 0.2s ease-out forwards;
+      box-sizing: border-box;
     }
     .mobile-menu-drawer.show {
       display: flex !important;
@@ -172,16 +182,18 @@
         </div>
 
         <!-- Mobile Hamburger Menu Button (High-Contrast 3-Line Inline SVG) -->
-        <button type="button" class="mobile-nav-toggle" id="mobileNavToggle" onclick="togglePublicMobileNav(event)" aria-label="Toggle Navigation Menu" aria-expanded="false" title="Menu" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
-          <svg id="navToggleIconLines" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="pointer-events: none; display: block;">
-            <line x1="3" y1="6" x2="21" y2="6"></line>
-            <line x1="3" y1="12" x2="21" y2="12"></line>
-            <line x1="3" y1="18" x2="21" y2="18"></line>
-          </svg>
-          <svg id="navToggleIconClose" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="pointer-events: none; display: none;">
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
+        <button type="button" class="mobile-nav-toggle" id="mobileNavToggle" onclick="togglePublicMobileNav(event)" aria-label="Toggle Navigation Menu" aria-expanded="false" title="Menu" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent; position: relative; z-index: 100000;">
+          <span style="pointer-events: none; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;">
+            <svg id="navToggleIconLines" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display: block;">
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+            <svg id="navToggleIconClose" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </span>
         </button>
       </div>
 
@@ -249,6 +261,9 @@
     </div>
   </header>
 
+  <!-- Backdrop overlay when mobile menu is open -->
+  <div id="mobileMenuBackdrop" onclick="closePublicMobileNav()" style="display: none; position: fixed; inset: 0; top: 72px; background: rgba(0,0,0,0.65); backdrop-filter: blur(4px); z-index: 99998;"></div>
+
   <script>
     function togglePublicMobileNav(e) {
       if (e) {
@@ -256,21 +271,19 @@
         if (e.stopPropagation) e.stopPropagation();
       }
       var drawer = document.getElementById('mobileMenuDrawer');
+      var backdrop = document.getElementById('mobileMenuBackdrop');
       var toggle = document.getElementById('mobileNavToggle');
       var lines = document.getElementById('navToggleIconLines');
       var close = document.getElementById('navToggleIconClose');
       if (!drawer) return false;
 
-      var isCurrentlyOpen = drawer.classList.contains('show') || drawer.style.display === 'flex';
-      if (isCurrentlyOpen) {
-        drawer.classList.remove('show');
-        drawer.style.display = 'none';
-        if (toggle) toggle.setAttribute('aria-expanded', 'false');
-        if (lines) lines.style.display = 'block';
-        if (close) close.style.display = 'none';
+      var isOpen = drawer.classList.contains('show') || drawer.style.display === 'flex';
+      if (isOpen) {
+        closePublicMobileNav();
       } else {
         drawer.classList.add('show');
-        drawer.style.display = 'flex';
+        drawer.style.setProperty('display', 'flex', 'important');
+        if (backdrop) backdrop.style.setProperty('display', 'block', 'important');
         if (toggle) toggle.setAttribute('aria-expanded', 'true');
         if (lines) lines.style.display = 'none';
         if (close) close.style.display = 'block';
@@ -278,22 +291,21 @@
       return false;
     }
 
-    document.addEventListener('click', function(e) {
+    function closePublicMobileNav() {
       var drawer = document.getElementById('mobileMenuDrawer');
+      var backdrop = document.getElementById('mobileMenuBackdrop');
       var toggle = document.getElementById('mobileNavToggle');
-      if (!drawer || !toggle) return;
-      if (drawer.classList.contains('show') || drawer.style.display === 'flex') {
-        if (!drawer.contains(e.target) && !toggle.contains(e.target) && e.target !== toggle) {
-          drawer.classList.remove('show');
-          drawer.style.display = 'none';
-          toggle.setAttribute('aria-expanded', 'false');
-          var lines = document.getElementById('navToggleIconLines');
-          var close = document.getElementById('navToggleIconClose');
-          if (lines) lines.style.display = 'block';
-          if (close) close.style.display = 'none';
-        }
+      var lines = document.getElementById('navToggleIconLines');
+      var close = document.getElementById('navToggleIconClose');
+      if (drawer) {
+        drawer.classList.remove('show');
+        drawer.style.setProperty('display', 'none', 'important');
       }
-    });
+      if (backdrop) backdrop.style.setProperty('display', 'none', 'important');
+      if (toggle) toggle.setAttribute('aria-expanded', 'false');
+      if (lines) lines.style.display = 'block';
+      if (close) close.style.display = 'none';
+    }
   </script>
 
   <!-- Flash Messages -->
