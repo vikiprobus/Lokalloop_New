@@ -168,10 +168,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (lngInp && !lngInp.value) lngInp.value = savedLng;
   }
 
-  // 5. Mobile Navbar Drawer Toggle
+  // 5. Mobile Navbar Drawer Toggle (guard against duplicate bindings)
   const mobileToggle = document.getElementById('mobileNavToggle');
   const mobileDrawer = document.getElementById('mobileMenuDrawer');
-  if (mobileToggle && mobileDrawer) {
+  if (mobileToggle && mobileDrawer && !mobileToggle.hasAttribute('onclick')) {
     mobileToggle.addEventListener('click', (e) => {
       e.stopPropagation();
       mobileDrawer.classList.toggle('show');

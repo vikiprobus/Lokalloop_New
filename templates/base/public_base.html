@@ -172,13 +172,13 @@
         </div>
 
         <!-- Mobile Hamburger Menu Button (High-Contrast 3-Line Inline SVG) -->
-        <button type="button" class="mobile-nav-toggle" id="mobileNavToggle" aria-label="Toggle Navigation Menu" aria-expanded="false" title="Menu">
-          <svg id="navToggleIconLines" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <button type="button" class="mobile-nav-toggle" id="mobileNavToggle" onclick="togglePublicMobileNav(event)" aria-label="Toggle Navigation Menu" aria-expanded="false" title="Menu" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
+          <svg id="navToggleIconLines" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="pointer-events: none; display: block;">
             <line x1="3" y1="6" x2="21" y2="6"></line>
             <line x1="3" y1="12" x2="21" y2="12"></line>
             <line x1="3" y1="18" x2="21" y2="18"></line>
           </svg>
-          <svg id="navToggleIconClose" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+          <svg id="navToggleIconClose" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="pointer-events: none; display: none;">
             <line x1="18" y1="6" x2="6" y2="18"></line>
             <line x1="6" y1="6" x2="18" y2="18"></line>
           </svg>
@@ -250,36 +250,50 @@
   </header>
 
   <script>
-    (function() {
-      var toggle = document.getElementById('mobileNavToggle');
+    function togglePublicMobileNav(e) {
+      if (e) {
+        if (e.preventDefault) e.preventDefault();
+        if (e.stopPropagation) e.stopPropagation();
+      }
       var drawer = document.getElementById('mobileMenuDrawer');
+      var toggle = document.getElementById('mobileNavToggle');
       var lines = document.getElementById('navToggleIconLines');
       var close = document.getElementById('navToggleIconClose');
-      if (toggle && drawer) {
-        toggle.addEventListener('click', function(e) {
-          e.preventDefault();
-          e.stopPropagation();
-          var isOpen = drawer.classList.toggle('show');
-          toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-          if (lines && close) {
-            lines.style.display = isOpen ? 'none' : 'block';
-            close.style.display = isOpen ? 'block' : 'none';
-          }
-        });
-        document.addEventListener('click', function(e) {
-          if (!drawer.contains(e.target) && !toggle.contains(e.target)) {
-            if (drawer.classList.contains('show')) {
-              drawer.classList.remove('show');
-              toggle.setAttribute('aria-expanded', 'false');
-              if (lines && close) {
-                lines.style.display = 'block';
-                close.style.display = 'none';
-              }
-            }
-          }
-        });
+      if (!drawer) return false;
+
+      var isCurrentlyOpen = drawer.classList.contains('show') || drawer.style.display === 'flex';
+      if (isCurrentlyOpen) {
+        drawer.classList.remove('show');
+        drawer.style.display = 'none';
+        if (toggle) toggle.setAttribute('aria-expanded', 'false');
+        if (lines) lines.style.display = 'block';
+        if (close) close.style.display = 'none';
+      } else {
+        drawer.classList.add('show');
+        drawer.style.display = 'flex';
+        if (toggle) toggle.setAttribute('aria-expanded', 'true');
+        if (lines) lines.style.display = 'none';
+        if (close) close.style.display = 'block';
       }
-    })();
+      return false;
+    }
+
+    document.addEventListener('click', function(e) {
+      var drawer = document.getElementById('mobileMenuDrawer');
+      var toggle = document.getElementById('mobileNavToggle');
+      if (!drawer || !toggle) return;
+      if (drawer.classList.contains('show') || drawer.style.display === 'flex') {
+        if (!drawer.contains(e.target) && !toggle.contains(e.target) && e.target !== toggle) {
+          drawer.classList.remove('show');
+          drawer.style.display = 'none';
+          toggle.setAttribute('aria-expanded', 'false');
+          var lines = document.getElementById('navToggleIconLines');
+          var close = document.getElementById('navToggleIconClose');
+          if (lines) lines.style.display = 'block';
+          if (close) close.style.display = 'none';
+        }
+      }
+    });
   </script>
 
   <!-- Flash Messages -->
