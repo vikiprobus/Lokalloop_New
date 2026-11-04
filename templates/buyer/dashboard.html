@@ -3,8 +3,69 @@
 
 {% block title %}Customer Hub — {{ BRAND_NAME }}{% endblock %}
 
+{% block extra_css %}
+<style>
+  .buyer-offers-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.85rem;
+  }
+  @media (min-width: 580px) {
+    .buyer-offers-grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+  }
+  @media (min-width: 992px) {
+    .buyer-offers-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .buyer-shops-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.85rem;
+  }
+  @media (min-width: 580px) {
+    .buyer-shops-grid {
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .gennie-bag-illustration {
+      width: 72px !important;
+      height: 72px !important;
+    }
+    .gennie-bag-illustration svg {
+      width: 72px !important;
+      height: 72px !important;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .redemption-desktop-table {
+      display: none !important;
+    }
+    .redemption-mobile-stream {
+      display: flex !important;
+    }
+  }
+  @media (min-width: 769px) {
+    .redemption-desktop-table {
+      display: block !important;
+    }
+    .redemption-mobile-stream {
+      display: none !important;
+    }
+  }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container" style="max-width: 680px; margin: 0 auto; padding: 0.25rem 0.85rem 3rem;">
+<div class="container" style="max-width: 740px; margin: 0 auto; padding: 0.25rem 0.5rem 2.5rem; width: 100%; box-sizing: border-box;">
   
   <!-- 1. Gennie Personalized Greeting Banner (Matching Reference Image 1) -->
   <div style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 40%, #ec4899 75%, #f97316 100%); color: #ffffff; border-radius: 20px; margin-bottom: 1rem; padding: 1.25rem 1.25rem 0.95rem; box-shadow: 0 10px 25px -5px rgba(124, 58, 237, 0.35); position: relative; overflow: hidden;">
@@ -34,7 +95,7 @@
       </div>
 
       <!-- 3D Shopping Bag Illustration with Floating % Badge & Leaves -->
-      <div style="width: 110px; height: 110px; position: relative; flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
+      <div class="gennie-bag-illustration" style="width: 100px; height: 100px; position: relative; flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
         <!-- Base Shadow -->
         <div style="position: absolute; bottom: 8px; width: 75px; height: 16px; background: rgba(0, 0, 0, 0.22); border-radius: 50%; filter: blur(3px);"></div>
         
@@ -159,7 +220,7 @@
           <path d="M7 21H5a2 2 0 0 1-2-2v-2"/>
           <rect x="7" y="7" width="10" height="10" rx="1.5"/>
         </svg>
-        <span>Scan billing counter QR</span>
+        <span>Scan Counter QR</span>
       </a>
 
       <!-- Discover Deals -->
@@ -169,7 +230,7 @@
           <rect x="2" y="7" width="20" height="5"/>
           <line x1="12" y1="22" x2="12" y2="7"/>
         </svg>
-        <span>Discover nearby deals</span>
+        <span>Explore Deals</span>
       </a>
     </div>
 
@@ -198,7 +259,7 @@
     </div>
 
     <!-- 2x3 Grid of 6 Categories -->
-    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.65rem;">
+    <div class="buyer-category-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.65rem;">
       
       <!-- Food & Cafes -->
       <a href="/buyer/explore/?category=food-dining" style="background: #ffffff; border: 1px solid #f1f5f9; border-radius: 14px; padding: 0.75rem 0.85rem; display: flex; align-items: center; gap: 0.65rem; text-decoration: none; box-shadow: 0 2px 6px rgba(0,0,0,0.02);">
@@ -290,7 +351,7 @@
   </div>
 
   <!-- 4. Active In-Store Deals Banner (Matching Reference Image 1) -->
-  <div style="background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%); border: 1px solid #fed7aa; border-radius: 18px; padding: 0.85rem 1rem; margin-bottom: 1rem; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;">
+  <div style="background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%); border: 1px solid #fed7aa; border-radius: 18px; padding: 0.85rem 1rem; margin-bottom: 1rem; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: space-between; gap: 0.65rem; flex-wrap: wrap;">
     
     <!-- City Monument Line Silhouette -->
     <svg width="120" height="60" viewBox="0 0 140 80" fill="none" opacity="0.18" style="position: absolute; right: 10px; bottom: 0; pointer-events: none;">
@@ -320,7 +381,7 @@
   </div>
 
   <!-- 5. Active In-Store Offers Horizontal Scroll / Cards (Matching Reference Image 1) -->
-  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 2rem;">
+  <div class="buyer-offers-grid" style="margin-bottom: 2rem;">
     {% for offer in popular_offers %}
       <div style="background: #ffffff; border-radius: 16px; border: 1px solid #f1f5f9; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.03); display: flex; flex-direction: column;">
         <div style="position: relative; height: 140px; width: 100%; overflow: hidden; background: #f8fafc;">
@@ -376,7 +437,7 @@
       </a>
     </div>
 
-    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 0.85rem;">
+    <div class="buyer-shops-grid">
       {% for shop in nearby_shops %}
         {% include "components/shop_card.html" with shop=shop %}
       {% empty %}
@@ -402,7 +463,25 @@
         </a>
       </div>
 
-      <div class="table-responsive">
+      <!-- Mobile Card Stream (<768px) -->
+      <div class="redemption-mobile-stream" style="display: none; flex-direction: column; gap: 0.65rem;">
+        {% for item in recent_redemptions %}
+          <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 0.75rem 0.85rem; display: flex; justify-content: space-between; align-items: center; gap: 0.5rem;">
+            <div style="min-width: 0; flex: 1;">
+              <div style="font-weight: 700; font-size: 0.85rem; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ item.shop.name }}</div>
+              <div style="font-size: 0.75rem; color: #64748b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ item.offer.title|default:"Counter Offer" }}</div>
+              <div style="font-size: 0.7rem; color: #94a3b8; margin-top: 2px;">{{ item.redeemed_at|date:"d M, h:i A" }}</div>
+            </div>
+            <div style="text-align: right; flex-shrink: 0;">
+              <div style="color: #059669; font-weight: 800; font-size: 0.9rem;">₹{{ item.discount_given|floatformat:0 }}</div>
+              <div style="color: #ea580c; font-weight: 700; font-size: 0.72rem;">+{{ item.reward_points_earned|default:10 }} pts</div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+
+      <!-- Desktop Table (>=768px) -->
+      <div class="table-responsive redemption-desktop-table">
         <table class="table" style="width: 100%; border-collapse: collapse; font-size: 0.82rem;">
           <thead>
             <tr style="border-bottom: 1px solid #e2e8f0; text-align: left; color: #64748b; font-size: 0.72rem; text-transform: uppercase;">

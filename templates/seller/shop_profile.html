@@ -481,7 +481,23 @@
   let mapInitAttempts = 0;
 
   // Ultra-reliable inline vector SVG marker pin (Zero HTTP requests, zero broken images, sharp vector rendering)
+  const SVG_PIN_DATA = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="34" height="42" viewBox="0 0 24 32"><path d="M12 0C5.37 0 0 5.37 0 12C0 21 12 32 12 32C12 32 24 21 24 12C24 5.37 18.63 0 12 0Z" fill="%23ea580c"/><circle cx="12" cy="11" r="5" fill="%23ffffff"/><circle cx="12" cy="11" r="2.8" fill="%23ea580c"/></svg>';
+
+  function configureLeafletDefaults() {
+    if (typeof L !== 'undefined' && L.Icon && L.Icon.Default) {
+      delete L.Icon.Default.prototype._getIconUrl;
+      L.Icon.Default.mergeOptions({
+        iconUrl: SVG_PIN_DATA,
+        iconRetinaUrl: SVG_PIN_DATA,
+        shadowUrl: '',
+        iconSize: [34, 42],
+        iconAnchor: [17, 42],
+      });
+    }
+  }
+
   function createStorePinIcon() {
+    configureLeafletDefaults();
     return L.divIcon({
       className: 'store-entrance-pin',
       html: `

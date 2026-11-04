@@ -167,6 +167,19 @@
     }
 
     /* Mobile Bottom Navigation Bar (5 Items Exactly Matching Reference) */
+    .buyer-content-body {
+      padding: 0.85rem 0.65rem calc(76px + env(safe-area-inset-bottom, 12px));
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
+      overflow-x: hidden;
+    }
+    @media (min-width: 769px) {
+      .buyer-content-body {
+        padding: 1.25rem 1.5rem 4rem;
+      }
+    }
+
     .mobile-bottom-nav {
       position: fixed;
       bottom: 0;
@@ -332,7 +345,7 @@
             <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/>
             <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>
           </svg>
-          <span class="buyer-bell-dot"></span>
+          {% if unread_notifications_count and unread_notifications_count > 0 %}<span class="buyer-bell-dot"></span>{% endif %}
         </a>
 
         <!-- Desktop Profile Menu -->
@@ -359,7 +372,7 @@
   {% endif %}
 
   <!-- Page Content -->
-  <main style="padding: 0.85rem 0 5.5rem;">
+  <main class="buyer-content-body">
     {% block content %}{% endblock %}
   </main>
 

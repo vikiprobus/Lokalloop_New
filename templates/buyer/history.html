@@ -2,8 +2,40 @@
 
 {% block title %}Activity & Savings History — {{ BRAND_NAME }}{% endblock %}
 
+{% block extra_css %}
+<style>
+  .history-summary-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+  @media (min-width: 640px) {
+    .history-summary-grid {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
+  }
+  @media (max-width: 768px) {
+    .history-desktop-table {
+      display: none !important;
+    }
+    .history-mobile-stream {
+      display: flex !important;
+    }
+  }
+  @media (min-width: 769px) {
+    .history-desktop-table {
+      display: block !important;
+    }
+    .history-mobile-stream {
+      display: none !important;
+    }
+  }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container" style="padding-top: 1.5rem; padding-bottom: 3.5rem;">
+<div class="container" style="padding: 0.5rem 0.5rem 2.5rem; width: 100%; box-sizing: border-box;">
   
   <div class="d-flex align-center justify-between flex-wrap gap-2" style="margin-bottom: 2rem;">
     <div>
@@ -20,7 +52,7 @@
   </div>
 
   <!-- Summary Cards -->
-  <div class="d-grid grid-3 gap-3" style="margin-bottom: 2.25rem;">
+  <div class="history-summary-grid" style="margin-bottom: 1.5rem;">
     <div class="card card-padded" style="background: #ffffff; border: 1px solid var(--border-light); box-shadow: var(--shadow-sm);">
       <span class="stat-label">Total Real Cash Saved</span>
       <div class="stat-val text-success" style="font-variant-numeric: tabular-nums;">₹{{ total_saved|floatformat:0 }}</div>
@@ -52,7 +84,40 @@
       <span class="badge badge-neutral" style="font-variant-numeric: tabular-nums;">{{ redemptions|length }} Visits</span>
     </div>
 
-    <div class="table-responsive">
+    <!-- Mobile Visit Cards (<768px) -->
+    <div class="history-mobile-stream" style="display: none; flex-direction: column; gap: 0.75rem; margin-bottom: 1rem;">
+      {% for r in redemptions %}
+        <div style="background: #ffffff; border: 1px solid var(--border-light); border-radius: 12px; padding: 0.85rem; box-shadow: var(--shadow-sm);">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 0.5rem; margin-bottom: 0.4rem;">
+            <div>
+              <div style="font-weight: 800; font-size: 0.92rem; color: var(--brand-navy-900);">{{ r.shop.name }}</div>
+              <div style="font-size: 0.75rem; color: var(--text-muted);"><i class="bi bi-geo-alt"></i> {{ r.shop.locality }}, {{ r.shop.city }}</div>
+            </div>
+            <span class="badge badge-success" style="font-size: 0.72rem;"><i class="bi bi-patch-check-fill"></i> Verified</span>
+          </div>
+          <div style="font-size: 0.82rem; font-weight: 600; color: var(--brand-navy-800); margin-bottom: 0.5rem;">
+            {{ r.offer.title }}
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f1f5f9; padding-top: 0.5rem; font-size: 0.8rem;">
+            <div>
+              <span style="color: var(--text-muted);">Bill: </span><strong>₹{{ r.bill_amount|floatformat:0 }}</strong> &bull;
+              <span class="text-success" style="font-weight: 800;">Saved ₹{{ r.discount_given|floatformat:0 }}</span>
+            </div>
+            <div style="color: var(--brand-saffron-600); font-weight: 800;">+{{ r.reward_points_earned }} Pts</div>
+          </div>
+          <div style="font-size: 0.7rem; color: #94a3b8; margin-top: 0.35rem; text-align: right;">
+            {{ r.redeemed_at|date:"d M Y, h:i A" }}
+          </div>
+        </div>
+      {% empty %}
+        <div class="text-center text-muted" style="padding: 2rem 1rem;">
+          No store visits recorded yet. Check the Explore tab to find deals near you!
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- Desktop Table (>=768px) -->
+    <div class="table-responsive history-desktop-table">
       <table class="table">
         <thead>
           <tr>

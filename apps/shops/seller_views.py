@@ -838,16 +838,21 @@ def map_tile_proxy_view(request, z, x, y):
     cache_key = f"tile_proxy:{z}:{x}:{y}"
     cached_data = cache.get(cache_key)
     if cached_data:
-        response = HttpResponse(cached_data, content_type='image/png')
+        if isinstance(cached_data, tuple):
+            tile_bytes, ctype = cached_data
+        else:
+            tile_bytes, ctype = cached_data, 'image/png'
+        response = HttpResponse(tile_bytes, content_type=ctype)
         response['Cache-Control'] = 'public, max-age=86400'
         return response
 
-    # Try high-definition Google Maps road tile, then fallback to CartoDB Voyager and OSM
+    # Multi-provider upstream cascade: ESRI ArcGIS World Street Map (high reliability, no key), OSM, CartoDB, Google Maps
     candidate_urls = [
+        f"https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",
+        f"https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+        f"https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png",
         f"https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
         f"https://mt0.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
-        f"https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png",
-        f"https://tile.openstreetmap.org/{z}/{x}/{y}.png",
     ]
 
     for tile_url in candidate_urls:
@@ -860,8 +865,8 @@ def map_tile_proxy_view(request, z, x, y):
                 if upstream.status == 200:
                     tile_bytes = upstream.read()
                     # Cache in memory for 7 days
-                    cache.set(cache_key, tile_bytes, timeout=86400 * 7)
                     content_type = upstream.headers.get('Content-Type', 'image/png')
+                    cache.set(cache_key, (tile_bytes, content_type), timeout=86400 * 7)
                     response = HttpResponse(tile_bytes, content_type=content_type)
                     response['Cache-Control'] = 'public, max-age=86400'
                     return response

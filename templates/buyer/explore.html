@@ -3,8 +3,30 @@
 
 {% block title %}Explore Local Deals & Stores — {{ BRAND_NAME }}{% endblock %}
 
+{% block extra_css %}
+<style>
+  .buyer-explore-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.85rem;
+  }
+  @media (min-width: 600px) {
+    .buyer-explore-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+  }
+  @media (min-width: 992px) {
+    .buyer-explore-grid {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
+  }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container" style="max-width: 900px; margin: 0 auto; padding: 0.25rem 0.85rem 3.5rem;">
+<div class="container" style="max-width: 960px; margin: 0 auto; padding: 0.25rem 0.5rem 2.5rem; width: 100%; box-sizing: border-box;">
   
   <div style="display: none;">✨ Welcome to the Gennie App {{ request.user.buyer_profile.nickname|default:"Shopper" }} !!!</div>
 
@@ -88,7 +110,7 @@
 
   <!-- 4. Listings Section (Full Component Card Rendering) -->
   {% if view_type == 'offers' %}
-    <div class="d-grid grid-3 gap-3">
+    <div class="buyer-explore-grid">
       {% for offer in offers %}
         {% include "components/offer_card.html" with offer=offer is_buyer=True %}
       {% empty %}
@@ -98,7 +120,7 @@
       {% endfor %}
     </div>
   {% else %}
-    <div class="d-grid grid-3 gap-3">
+    <div class="buyer-explore-grid">
       {% for shop in shops %}
         {% include "components/shop_card.html" with shop=shop is_buyer=True %}
       {% empty %}

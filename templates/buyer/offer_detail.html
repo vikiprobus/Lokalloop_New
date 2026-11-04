@@ -2,8 +2,23 @@
 
 {% block title %}{{ offer.title }} — Buyer Portal | {{ BRAND_NAME }}{% endblock %}
 
+{% block extra_css %}
+<style>
+  .buyer-offer-stats {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+  }
+  @media (max-width: 480px) {
+    .buyer-offer-stats {
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+    }
+  }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container container-narrow" style="padding-top: 1.5rem; padding-bottom: 3.5rem;">
+<div class="container container-narrow" style="padding: 0.5rem 0.5rem 2.5rem; width: 100%; box-sizing: border-box;">
   
   <div style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.4rem;">
     <a href="/buyer/dashboard/" style="color: var(--text-muted); text-decoration: none;">Dashboard</a>
@@ -30,8 +45,8 @@
       </div>
     </div>
 
-    <div class="card-body" style="padding: 1.75rem;">
-      <div class="d-grid grid-3 gap-3" style="margin-bottom: 1.75rem; background: var(--bg-subtle); padding: 1rem; border-radius: var(--radius-md); border: 1px solid var(--border-light);">
+    <div class="card-body" style="padding: 1.15rem 0.85rem;">
+      <div class="d-grid buyer-offer-stats" style="margin-bottom: 1.5rem; background: var(--bg-subtle); padding: 0.85rem; border-radius: var(--radius-md); border: 1px solid var(--border-light);">
         <div>
           <span style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em;">Min. Bill</span>
           <div style="font-size: 1.2rem; font-weight: 800; color: var(--brand-navy-900); font-variant-numeric: tabular-nums; margin-top: 0.2rem;">

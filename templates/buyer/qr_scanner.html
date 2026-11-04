@@ -4,7 +4,7 @@
 {% block title %}Scan & Redeem In-Store — {{ BRAND_NAME }}{% endblock %}
 
 {% block content %}
-<div class="container container-narrow" style="padding-top: 1rem; padding-bottom: 4rem;">
+<div class="container container-narrow" style="padding: 0.5rem 0.5rem 2.5rem; width: 100%; box-sizing: border-box;">
   
   <div class="text-center" style="margin-bottom: 2rem;">
     <div style="width: 52px; height: 52px; border-radius: var(--radius-md); background: var(--ink-950); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; margin: 0 auto 0.75rem;">
@@ -69,7 +69,7 @@
     </div>
 
     <!-- Redemption Form -->
-    <div class="card-body" style="padding: 2rem;">
+    <div class="card-body" style="padding: 1.15rem 0.85rem;">
       <form method="POST" action="/buyer/scan/" id="redemption-form">
         {% csrf_token %}
         <input type="hidden" name="idempotency_key" value="{{ generated_idempotency_key }}">

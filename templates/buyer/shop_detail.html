@@ -37,7 +37,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="container" style="padding-top: 1.5rem; padding-bottom: 3.5rem;">
+<div class="container" style="padding: 0.5rem 0.5rem 2.5rem; width: 100%; box-sizing: border-box;">
   
   <!-- Breadcrumb -->
   <div style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.4rem;">
@@ -193,10 +193,25 @@
           attributionControl: false
         }).setView([lat, lng], 15);
 
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        const proxyTiles = L.tileLayer('/api/tiles/{z}/{x}/{y}/', {
+          maxZoom: 19,
+          attribution: '&copy; OpenStreetMap &copy; Esri'
+        });
+        const arcgisTiles = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+          maxZoom: 19,
+          attribution: '&copy; Esri'
+        });
+        const osmTiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
           maxZoom: 19,
           attribution: '&copy; OpenStreetMap'
-        }).addTo(map);
+        });
+        proxyTiles.on('tileerror', function() {
+          if (!map.hasLayer(arcgisTiles)) arcgisTiles.addTo(map);
+        });
+        arcgisTiles.on('tileerror', function() {
+          if (!map.hasLayer(osmTiles)) osmTiles.addTo(map);
+        });
+        proxyTiles.addTo(map);
 
         const pinHtml = '<div style="background: #f97316; color: white; width: 32px; height: 32px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.35); border: 2px solid white;"><i class="bi bi-shop" style="transform: rotate(45deg); font-size: 14px;"></i></div>';
         
