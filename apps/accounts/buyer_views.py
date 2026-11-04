@@ -34,10 +34,14 @@ def buyer_dashboard_view(request):
     buyer_profile = getattr(buyer, 'buyer_profile', None)
     reward_account = get_or_create_reward_account(buyer)
 
-    # City filter
-    city = buyer_profile.preferred_city if buyer_profile else profile.city or 'Bengaluru'
+    # City filter: URL param > session > buyer profile > user profile > default Pune
+    city = request.GET.get('city') or request.session.get('selected_city') or (buyer_profile.preferred_city if buyer_profile and buyer_profile.preferred_city else None) or (buyer_profile.district if buyer_profile and buyer_profile.district else None) or (profile.city if profile and profile.city else None) or 'Pune'
+    city = city.strip()
+    request.session['selected_city'] = city
 
     nearby_shops_qs = Shop.objects.filter(is_approved=True, is_active=True, city__iexact=city).select_related('category')[:6]
+    if not nearby_shops_qs.exists() and city != 'all':
+        nearby_shops_qs = Shop.objects.filter(is_approved=True, is_active=True).select_related('category')[:6]
     lat_dash = request.GET.get('lat')
     lng_dash = request.GET.get('lng')
     lat_val, lng_val = safe_parse_coordinates(lat_dash, lng_dash)
@@ -50,7 +54,7 @@ def buyer_dashboard_view(request):
             nearby_shops = list(nearby_shops_qs)[:4]
     else:
         nearby_shops = list(nearby_shops_qs)[:4]
-    popular_offers = list(Offer.objects.filter(
+    popular_offers_qs = Offer.objects.filter(
         status=OfferStatus.ACTIVE,
         shop__is_active=True,
         shop__is_approved=True,
@@ -58,7 +62,17 @@ def buyer_dashboard_view(request):
         start_date__lte=timezone.now(),
         end_date__gte=timezone.now(),
         current_redemptions__lt=F('max_redemptions')
-    ).select_related('shop', 'shop__category')[:4])
+    ).select_related('shop', 'shop__category')[:4]
+    if not popular_offers_qs.exists() and city != 'all':
+        popular_offers_qs = Offer.objects.filter(
+            status=OfferStatus.ACTIVE,
+            shop__is_active=True,
+            shop__is_approved=True,
+            start_date__lte=timezone.now(),
+            end_date__gte=timezone.now(),
+            current_redemptions__lt=F('max_redemptions')
+        ).select_related('shop', 'shop__category')[:4]
+    popular_offers = list(popular_offers_qs)
 
     if lat_val is not None and lng_val is not None:
         for o in popular_offers:
@@ -96,10 +110,13 @@ def buyer_explore_view(request):
     raw_city = request.GET.get('city')
     if raw_city:
         city = raw_city.strip()
+        request.session['selected_city'] = city
     else:
-        buyer_prof = getattr(request.user, 'buyer_profile', None)
-        city = (buyer_prof.preferred_city if buyer_prof and buyer_prof.preferred_city else getattr(getattr(request.user, 'profile', None), 'city', '')) or 'Pune'
-        city = city.strip()
+        city = request.session.get('selected_city')
+        if not city:
+            buyer_prof = getattr(request.user, 'buyer_profile', None)
+            city = (buyer_prof.preferred_city if buyer_prof and buyer_prof.preferred_city else getattr(getattr(request.user, 'profile', None), 'city', '')) or 'Pune'
+            city = city.strip()
     view_type = request.GET.get('type', 'offers')  # default to offers for buyers
     lat = request.GET.get('lat')
     lng = request.GET.get('lng')

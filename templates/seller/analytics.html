@@ -3,132 +3,212 @@
 {% block title %}Store Analytics — {{ BRAND_NAME }} Business{% endblock %}
 {% block page_title %}Footfall & Sales Performance{% endblock %}
 
+{% block extra_css %}
+<style>
+  .analytics-kpi-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+  }
+  @media (min-width: 768px) {
+    .analytics-kpi-grid {
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+    }
+  }
+  .funnel-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+  @media (min-width: 992px) {
+    .funnel-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+</style>
+{% endblock %}
+
 {% block content %}
-<!-- Analytics KPI Grid -->
-<div class="d-grid grid-4 gap-3" style="margin-bottom: 2rem;">
+<!-- Page Title Header (Screenshot 3 & 7) -->
+<div style="margin-bottom: 1.25rem;">
+  <h1 style="font-size: 1.35rem; font-weight: 800; color: #0f172a; margin: 0 0 0.25rem; font-family: 'Outfit', sans-serif;">
+    Footfall &amp; Analytics
+  </h1>
+  <p style="font-size: 0.82rem; color: #64748b; margin: 0;">
+    Neighborhood conversion and sales trends
+  </p>
+</div>
+
+<!-- Analytics KPI Grid (2x2 on Mobile, 4-col on Desktop) -->
+<div class="analytics-kpi-grid">
   
-  <div class="stat-card">
-    <div>
-      <span class="stat-label">Unique Customers Reached</span>
-      <div class="stat-val" style="color: var(--brand-navy-900); font-variant-numeric: tabular-nums;">{{ total_customers }}</div>
-      <span style="font-size: 0.75rem; color: var(--text-muted);">Verified local shoppers</span>
+  <!-- Card 1: Unique Customers -->
+  <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 18px; padding: 1rem; box-shadow: 0 2px 10px rgba(0,0,0,0.03); display: flex; flex-direction: column; justify-content: space-between;">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.4rem;">
+      <span style="font-size: 0.7rem; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.03em;">Shoppers</span>
+      <div style="width: 28px; height: 28px; border-radius: 8px; background: #eff6ff; color: #2563eb; display: flex; align-items: center; justify-content: center;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+      </div>
     </div>
-    <div class="stat-icon" style="background: var(--bg-subtle); color: var(--brand-navy-800); border: 1px solid var(--border-light);">
-      <i class="bi bi-people-fill"></i>
+    <div>
+      <div style="font-size: 1.5rem; font-weight: 800; color: #0f172a; font-family: 'Outfit', sans-serif; line-height: 1.1; font-variant-numeric: tabular-nums;">
+        {{ total_customers|default:0 }}
+      </div>
+      <div style="font-size: 0.7rem; color: #94a3b8; margin-top: 0.25rem; font-weight: 600;">
+        Verified local shoppers
+      </div>
     </div>
   </div>
 
-  <div class="stat-card">
-    <div>
-      <span class="stat-label">Gross In-Store Sales (₹)</span>
-      <div class="stat-val text-success" style="font-variant-numeric: tabular-nums;">₹{{ total_sales_generated|floatformat:0 }}</div>
-      <span style="font-size: 0.75rem; color: var(--text-muted);">Purchases via LokalLoop</span>
+  <!-- Card 2: Gross In-Store Sales -->
+  <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 18px; padding: 1rem; box-shadow: 0 2px 10px rgba(0,0,0,0.03); display: flex; flex-direction: column; justify-content: space-between;">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.4rem;">
+      <span style="font-size: 0.7rem; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.03em;">Gross Sales</span>
+      <div style="width: 28px; height: 28px; border-radius: 8px; background: #ecfdf5; color: #059669; display: flex; align-items: center; justify-content: center;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
+      </div>
     </div>
-    <div class="stat-icon" style="background: #ecfdf5; color: var(--color-success); border: 1px solid #a7f3d0;">
-      <i class="bi bi-cash-stack"></i>
+    <div>
+      <div style="font-size: 1.5rem; font-weight: 800; color: #059669; font-family: 'Outfit', sans-serif; line-height: 1.1; font-variant-numeric: tabular-nums;">
+        ₹{{ total_sales_generated|floatformat:0|default:"0" }}
+      </div>
+      <div style="font-size: 0.7rem; color: #94a3b8; margin-top: 0.25rem; font-weight: 600;">
+        Via LokalLoop
+      </div>
     </div>
   </div>
 
-  <div class="stat-card">
-    <div>
-      <span class="stat-label">Discounts Provided (₹)</span>
-      <div class="stat-val text-saffron" style="font-variant-numeric: tabular-nums;">₹{{ total_discounts|floatformat:0 }}</div>
-      <span style="font-size: 0.75rem; color: var(--text-muted);">Delivered customer savings</span>
+  <!-- Card 3: Discounts Provided -->
+  <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 18px; padding: 1rem; box-shadow: 0 2px 10px rgba(0,0,0,0.03); display: flex; flex-direction: column; justify-content: space-between;">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.4rem;">
+      <span style="font-size: 0.7rem; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.03em;">Discounts</span>
+      <div style="width: 28px; height: 28px; border-radius: 8px; background: #fff7ed; color: #ea580c; display: flex; align-items: center; justify-content: center;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M21.41 11.58l-9-9C12.05 2.22 11.55 2 11 2H4c-1.1 0-2 .9-2 2v7c0 .55.22 1.05.59 1.42l9 9c.36.36.86.58 1.41.58s1.05-.22 1.41-.59l7-7c.37-.36.59-.86.59-1.41s-.23-1.06-.59-1.42zM5.5 7C4.67 7 4 6.33 4 5.5S4.67 4 5.5 4 7 4.67 7 5.5 6.33 7 5.5 7z"/></svg>
+      </div>
     </div>
-    <div class="stat-icon" style="background: #fff7ed; color: var(--brand-saffron-600); border: 1px solid #fed7aa;">
-      <i class="bi bi-tag-fill"></i>
+    <div>
+      <div style="font-size: 1.5rem; font-weight: 800; color: #ea580c; font-family: 'Outfit', sans-serif; line-height: 1.1; font-variant-numeric: tabular-nums;">
+        ₹{{ total_discounts|floatformat:0|default:"0" }}
+      </div>
+      <div style="font-size: 0.7rem; color: #94a3b8; margin-top: 0.25rem; font-weight: 600;">
+        Customer savings delivered
+      </div>
     </div>
   </div>
 
-  <div class="stat-card">
-    <div>
-      <span class="stat-label">Store Profile Views</span>
-      <div class="stat-val" style="color: var(--brand-navy-900); font-variant-numeric: tabular-nums;">{{ shop.views_count|default:48 }}</div>
-      <span style="font-size: 0.75rem; color: var(--text-muted);">Neighborhood directory searches</span>
+  <!-- Card 4: Store Profile Views -->
+  <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 18px; padding: 1rem; box-shadow: 0 2px 10px rgba(0,0,0,0.03); display: flex; flex-direction: column; justify-content: space-between;">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.4rem;">
+      <span style="font-size: 0.7rem; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.03em;">Store Views</span>
+      <div style="width: 28px; height: 28px; border-radius: 8px; background: #f8fafc; color: #475569; display: flex; align-items: center; justify-content: center; border: 1px solid #e2e8f0;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+      </div>
     </div>
-    <div class="stat-icon" style="background: var(--bg-subtle); color: var(--brand-navy-800); border: 1px solid var(--border-light);">
-      <i class="bi bi-eye-fill"></i>
+    <div>
+      <div style="font-size: 1.5rem; font-weight: 800; color: #0f172a; font-family: 'Outfit', sans-serif; line-height: 1.1; font-variant-numeric: tabular-nums;">
+        {{ shop.views_count|default:48 }}
+      </div>
+      <div style="font-size: 0.7rem; color: #94a3b8; margin-top: 0.25rem; font-weight: 600;">
+        Map &amp; directory searches
+      </div>
     </div>
   </div>
 
 </div>
 
 <!-- Conversion Funnel & Offer Breakdown -->
-<div class="d-grid grid-2 gap-4">
+<div class="funnel-grid">
   
   <!-- Conversion Funnel Card -->
-  <div class="card card-padded" style="background: #ffffff; border: 1px solid var(--border-light); box-shadow: var(--shadow-sm);">
-    <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--brand-navy-900); margin: 0 0 1.25rem;">
+  <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 20px; padding: 1.25rem; box-shadow: 0 4px 15px -3px rgba(0,0,0,0.04);">
+    <h3 style="font-size: 1.05rem; font-weight: 800; color: #0f172a; margin: 0 0 1.25rem; font-family: 'Outfit', sans-serif;">
       In-Store Checkout Conversion Funnel
     </h3>
 
     <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+      
+      <!-- Stage 1 -->
       <div>
-        <div class="d-flex justify-between" style="font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem;">
-          <span style="color: var(--brand-navy-800);">1. Store Discovered in Directory</span>
-          <strong style="font-variant-numeric: tabular-nums; color: var(--brand-navy-900);">100% ({{ shop.views_count|default:50 }} shoppers)</strong>
+        <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.45rem;">
+          <span style="color: #1e293b;">1. Store Discovered in Directory</span>
+          <span style="color: #2563eb; font-variant-numeric: tabular-nums;">100% ({{ shop.views_count|default:50 }} shoppers)</span>
         </div>
-        <div style="height: 7px; background: var(--bg-subtle); border-radius: 4px; overflow: hidden;">
-          <div style="width: 100%; height: 100%; background: var(--brand-navy-800);"></div>
+        <div style="height: 10px; background: #f1f5f9; border-radius: 9999px; overflow: hidden;">
+          <div style="width: 100%; height: 100%; background: linear-gradient(90deg, #3b82f6, #1d4ed8); border-radius: 9999px;"></div>
         </div>
       </div>
 
+      <!-- Stage 2 -->
       <div>
-        <div class="d-flex justify-between" style="font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem;">
-          <span style="color: var(--brand-navy-800);">2. Counter QR Scanned at Checkout</span>
-          <strong style="font-variant-numeric: tabular-nums; color: var(--brand-saffron-600);">{{ scan_rate|default:68 }}% ({{ scans_count|default:0 }} scans)</strong>
+        <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.45rem;">
+          <span style="color: #1e293b;">2. Counter QR Scanned at Checkout</span>
+          <span style="color: #ea580c; font-variant-numeric: tabular-nums;">{{ scan_rate|default:68 }}% ({{ scans_count|default:0 }} scans)</span>
         </div>
-        <div style="height: 7px; background: var(--bg-subtle); border-radius: 4px; overflow: hidden;">
-          <div style="width: {{ scan_rate|default:68 }}%; height: 100%; background: var(--brand-saffron-500);"></div>
+        <div style="height: 10px; background: #f1f5f9; border-radius: 9999px; overflow: hidden;">
+          <div style="width: {{ scan_rate|default:68 }}%; height: 100%; background: linear-gradient(90deg, #f97316, #ea580c); border-radius: 9999px;"></div>
         </div>
       </div>
 
+      <!-- Stage 3 -->
       <div>
-        <div class="d-flex justify-between" style="font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem;">
-          <span style="color: var(--brand-navy-800);">3. Completed Bill Redemptions</span>
-          <strong style="font-variant-numeric: tabular-nums; color: var(--color-success);">{{ redemption_rate|default:54 }}% ({{ success_count|default:0 }} verified)</strong>
+        <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.45rem;">
+          <span style="color: #1e293b;">3. Completed Bill Redemptions</span>
+          <span style="color: #059669; font-variant-numeric: tabular-nums;">{{ redemption_rate|default:54 }}% ({{ success_count|default:0 }} verified)</span>
         </div>
-        <div style="height: 7px; background: var(--bg-subtle); border-radius: 4px; overflow: hidden;">
-          <div style="width: {{ redemption_rate|default:54 }}%; height: 100%; background: var(--color-success);"></div>
+        <div style="height: 10px; background: #f1f5f9; border-radius: 9999px; overflow: hidden;">
+          <div style="width: {{ redemption_rate|default:54 }}%; height: 100%; background: linear-gradient(90deg, #10b981, #059669); border-radius: 9999px;"></div>
         </div>
       </div>
+
     </div>
   </div>
 
   <!-- Offer Performance Table -->
-  <div class="card card-padded" style="background: #ffffff; border: 1px solid var(--border-light); box-shadow: var(--shadow-sm);">
-    <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--brand-navy-900); margin: 0 0 1rem;">
+  <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 20px; padding: 1.25rem; box-shadow: 0 4px 15px -3px rgba(0,0,0,0.04);">
+    <h3 style="font-size: 1.05rem; font-weight: 800; color: #0f172a; margin: 0 0 1rem; font-family: 'Outfit', sans-serif;">
       Campaign Performance Breakdown
     </h3>
 
-    <div class="table-responsive">
-      <table class="table" style="font-size: 0.85rem;">
+    <div style="overflow-x: auto;">
+      <table style="width: 100%; border-collapse: collapse; font-size: 0.82rem;">
         <thead>
-          <tr>
-            <th>Campaign</th>
-            <th>Discount</th>
-            <th>Redemptions</th>
-            <th>Quota Progress</th>
+          <tr style="border-bottom: 1.5px solid #e2e8f0; text-align: left;">
+            <th style="padding: 0.6rem 0.5rem; color: #64748b; font-weight: 700;">Campaign</th>
+            <th style="padding: 0.6rem 0.5rem; color: #64748b; font-weight: 700;">Discount</th>
+            <th style="padding: 0.6rem 0.5rem; color: #64748b; font-weight: 700;">Redeemed</th>
+            <th style="padding: 0.6rem 0.5rem; color: #64748b; font-weight: 700;">Claimed</th>
           </tr>
         </thead>
         <tbody>
           {% for o in offers %}
-            <tr>
-              <td><strong style="color: var(--brand-navy-900);">{{ o.title }}</strong></td>
-              <td><span class="badge badge-saffron" style="font-size: 0.72rem;">{{ o.discount_display }}</span></td>
-              <td style="font-weight: 700; font-variant-numeric: tabular-nums;">{{ o.current_redemptions }}</td>
-              <td>
-                <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.2rem; font-variant-numeric: tabular-nums;">
-                  {{ o.percentage_claimed }}% claimed
+            <tr style="border-bottom: 1px solid #f1f5f9;">
+              <td style="padding: 0.75rem 0.5rem;">
+                <strong style="color: #0f172a;">{{ o.title }}</strong>
+              </td>
+              <td style="padding: 0.75rem 0.5rem;">
+                <span style="background: #fff7ed; color: #ea580c; font-size: 0.7rem; font-weight: 800; padding: 0.2rem 0.5rem; border-radius: 6px; border: 1px solid #fed7aa;">
+                  {{ o.discount_display }}
+                </span>
+              </td>
+              <td style="padding: 0.75rem 0.5rem; font-weight: 700; color: #0f172a; font-variant-numeric: tabular-nums;">
+                {{ o.current_redemptions }}
+              </td>
+              <td style="padding: 0.75rem 0.5rem;">
+                <div style="font-size: 0.72rem; color: #64748b; margin-bottom: 0.25rem; font-variant-numeric: tabular-nums; font-weight: 600;">
+                  {{ o.percentage_claimed }}%
                 </div>
-                <div style="width: 70px; height: 4px; background: var(--bg-subtle); border-radius: 2px; overflow: hidden;">
-                  <div style="width: {{ o.percentage_claimed }}%; height: 100%; background: var(--brand-saffron-500);"></div>
+                <div style="width: 60px; height: 5px; background: #f1f5f9; border-radius: 9999px; overflow: hidden;">
+                  <div style="width: {{ o.percentage_claimed }}%; height: 100%; background: #ea580c; border-radius: 9999px;"></div>
                 </div>
               </td>
             </tr>
           {% empty %}
             <tr>
-              <td colspan="4" class="text-center text-muted" style="padding: 2rem 0;">No campaigns launched yet.</td>
+              <td colspan="4" style="text-align: center; color: #94a3b8; padding: 2rem 0; font-size: 0.85rem;">
+                No campaigns launched yet.
+              </td>
             </tr>
           {% endfor %}
         </tbody>

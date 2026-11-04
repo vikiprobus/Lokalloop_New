@@ -4,11 +4,13 @@
 {% block page_title %}Store Performance &amp; Counter Overview{% endblock %}
 
 {% block content %}
-<!-- Merchant Store Header Banner (Matching Reference Screenshot 1) -->
+<!-- 1. Merchant Store Header Banner (Matching Reference Screenshot 1) -->
 <div style="background: #111a2e; border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 1.15rem 1.25rem; margin-bottom: 1.25rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; box-shadow: 0 4px 20px rgba(0,0,0,0.25);">
   <div style="display: flex; align-items: center; gap: 1rem; min-width: 0;">
-    <div style="width: 48px; height: 48px; border-radius: 14px; background: linear-gradient(135deg, #f97316, #ea580c); display: flex; align-items: center; justify-content: center; color: #ffffff; font-size: 1.35rem; flex-shrink: 0; box-shadow: 0 4px 12px rgba(234,88,12,0.35);">
-      {% if shop.category.icon %}<i class="bi {{ shop.category.icon }}"></i>{% else %}<i class="bi bi-shop"></i>{% endif %}
+    <div style="width: 48px; height: 48px; border-radius: 14px; background: linear-gradient(135deg, #f97316, #ea580c); display: flex; align-items: center; justify-content: center; color: #ffffff; flex-shrink: 0; box-shadow: 0 4px 12px rgba(234,88,12,0.35);">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M19 7h-3V6a4 4 0 0 0-8 0v1H5a1 1 0 0 0-1 1v11a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V8a1 1 0 0 0-1-1zm-9-1a2 2 0 0 1 4 0v1h-4V6zm8 13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V9h2v1a1 1 0 0 0 2 0V9h4v1a1 1 0 0 0 2 0V9h2v10z"/>
+      </svg>
     </div>
     <div style="min-width: 0;">
       <h2 style="font-size: 1.15rem; font-weight: 800; color: #ffffff; margin: 0; font-family: 'Outfit', sans-serif; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
@@ -28,122 +30,87 @@
 
 {% if not user.seller_profile.is_verified %}
 <!-- Application Under Compliance Review Banner -->
-<div class="card card-padded" style="margin-bottom: 1.5rem; background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 60%, #1e293b 100%); color: #ffffff; border: 1px solid #f59e0b; border-left: 6px solid #f59e0b; border-radius: 20px; box-shadow: 0 10px 25px -5px rgba(245, 158, 11, 0.15); position: relative; overflow: hidden;">
-  <div style="position: absolute; top: -50px; right: -50px; width: 180px; height: 180px; background: radial-gradient(circle, rgba(245, 158, 11, 0.25) 0%, rgba(245, 158, 11, 0) 70%); border-radius: 50%; pointer-events: none;"></div>
-
-  <div class="d-flex align-center justify-between flex-wrap gap-3" style="position: relative; z-index: 2;">
+<div class="card card-padded" style="margin-bottom: 1.25rem; background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 60%, #1e293b 100%); color: #ffffff; border: 1px solid #f59e0b; border-left: 6px solid #f59e0b; border-radius: 20px; box-shadow: 0 10px 25px -5px rgba(245, 158, 11, 0.15); position: relative; overflow: hidden;">
+  <div class="d-flex align-center justify-between flex-wrap gap-3">
     <div>
       <div class="d-flex align-center gap-2 flex-wrap" style="margin-bottom: 0.5rem;">
-        <span style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.3rem 0.8rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4);">
-          <i class="bi bi-clock-history"></i> Application Under Compliance Review ⏳
+        <span style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.72rem; font-weight: 800; text-transform: uppercase; background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4);">
+          Application Under Compliance Review ⏳
         </span>
-        <span style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.3rem 0.8rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 800; background: #0f172a; color: #38bdf8; border: 1px solid #38bdf8; font-family: monospace; cursor: pointer;" onclick="if(typeof copyToClipboard==='function'){copyToClipboard('{{ user.seller_profile.merchant_id }}',this);}else{navigator.clipboard&&navigator.clipboard.writeText('{{ user.seller_profile.merchant_id }}');} alert('Merchant ID copied: {{ user.seller_profile.merchant_id }}');" title="Click to copy Merchant ID">
-          <i class="bi bi-hash"></i> {{ user.seller_profile.merchant_id|default:"Pending ID" }} <i class="bi bi-clipboard" style="font-size: 0.72rem; margin-left: 2px;"></i>
+        <span style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.72rem; font-weight: 800; background: #0f172a; color: #38bdf8; border: 1px solid #38bdf8; font-family: monospace;">
+          {{ user.seller_profile.merchant_id|default:"Pending ID" }}
         </span>
       </div>
-
-      <h3 style="font-size: 1.35rem; font-weight: 800; color: #ffffff; margin: 0 0 0.5rem 0;">
-        {{ user.seller_profile.business_name|default:primary_shop.name }}
-      </h3>
-
-      <p style="font-size: 0.9rem; color: #cbd5e1; margin: 0 0 1rem 0; line-height: 1.5; max-width: 800px;">
-        Your application and statutory documents are being verified by our compliance team. Portal features (Offer Creation, QR Desk, Redemptions) will be unlocked once approved.
+      <p style="font-size: 0.82rem; color: #cbd5e1; margin: 0; line-height: 1.4;">
+        Your documents are being verified by our compliance team. Feature limits unlock once verified.
       </p>
-
-      <!-- Compliance Metadata Badges -->
-      <div class="d-flex align-center gap-3 flex-wrap" style="font-size: 0.8rem; color: #94a3b8;">
-        <div style="background: rgba(255, 255, 255, 0.06); padding: 0.35rem 0.75rem; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.1);">
-          <span style="color: #64748b; font-weight: 600;">Shop Act License:</span>
-          <strong style="color: #f1f5f9; font-family: monospace; margin-left: 0.35rem;">{{ primary_shop.verification.shop_act_license_number|default:"Under Audit" }}</strong>
-        </div>
-        <div style="background: rgba(255, 255, 255, 0.06); padding: 0.35rem 0.75rem; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.1);">
-          <span style="color: #64748b; font-weight: 600;">Submission Date:</span>
-          <strong style="color: #f1f5f9; margin-left: 0.35rem;">{{ user.seller_profile.created_at|date:"d M Y, h:i A"|default:"Recently Submitted" }}</strong>
-        </div>
-        <div style="background: rgba(255, 255, 255, 0.06); padding: 0.35rem 0.75rem; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.1);">
-          <span style="color: #64748b; font-weight: 600;">Status:</span>
-          <strong style="color: #fbbf24; margin-left: 0.35rem;">Awaiting Platform Admin Approval</strong>
-        </div>
-      </div>
     </div>
   </div>
 </div>
 {% endif %}
 
-<!-- Modern High-Definition 2x2 (Mobile) / 4-Col (Desktop) KPI Cards Grid -->
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+<!-- 2. Modern 2x2 KPI Cards Grid (Matching Reference Screenshot 1) -->
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1.25rem;">
   
-  <!-- 1. Available Credits -->
-  <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 18px; padding: 1.15rem 1.25rem; box-shadow: 0 4px 15px -3px rgba(0, 0, 0, 0.04); position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; min-height: 130px;">
-    <div style="position: absolute; right: -15px; top: -15px; width: 70px; height: 70px; background: rgba(16, 185, 129, 0.06); border-radius: 50%; pointer-events: none;"></div>
-    <div class="d-flex align-center justify-between" style="margin-bottom: 0.5rem;">
-      <span style="font-size: 0.75rem; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.04em;">Credits Balance</span>
-      <div style="width: 38px; height: 38px; border-radius: 12px; background: #ecfdf5; color: #059669; display: flex; align-items: center; justify-content: center; font-size: 1.15rem; flex-shrink: 0;">
-        <i class="bi bi-lightning-charge-fill"></i>
-      </div>
+  <!-- Card 1: Available Credits -->
+  <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 18px; padding: 0.95rem 1rem; box-shadow: 0 4px 15px -3px rgba(0, 0, 0, 0.04); position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; min-height: 110px;">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.35rem;">
+      <span style="font-size: 0.7rem; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.03em;">Credits Balance</span>
+      <span style="background: #ecfdf5; color: #059669; font-size: 0.65rem; font-weight: 800; padding: 0.15rem 0.45rem; border-radius: 9999px;">+10%</span>
     </div>
     <div>
-      <div style="font-size: 1.75rem; font-weight: 800; color: #059669; font-family: var(--font-display); line-height: 1.1;">
-        {% if user.seller_profile.is_verified %}{{ wallet.balance_credits }} <span style="font-size: 0.95rem; font-weight: 700;">Cr</span>{% else %}0 (Standby ⏳){% endif %}
+      <div style="font-size: 1.5rem; font-weight: 800; color: #059669; font-family: 'Outfit', sans-serif; line-height: 1.1;">
+        {% if user.seller_profile.is_verified %}{{ wallet.balance_credits }} <span style="font-size: 0.85rem; font-weight: 700;">Cr</span>{% else %}0 Cr{% endif %}
       </div>
-      <div style="font-size: 0.75rem; color: #94a3b8; margin-top: 0.35rem; font-weight: 600;">
-        {% if wallet.balance_credits < 20 %}<strong style="color: #ef4444;">Low balance</strong> &bull; <a href="/seller/credits/" style="color: #059669; text-decoration: underline;">Recharge</a>{% else %}Promotional balance active{% endif %}
+      <div style="font-size: 0.7rem; color: #94a3b8; margin-top: 0.25rem; font-weight: 600;">
+        Promotional balance active
       </div>
     </div>
   </div>
 
-  <!-- 2. Total Counter Visits -->
-  <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 18px; padding: 1.15rem 1.25rem; box-shadow: 0 4px 15px -3px rgba(0, 0, 0, 0.04); position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; min-height: 130px;">
-    <div style="position: absolute; right: -15px; top: -15px; width: 70px; height: 70px; background: rgba(59, 130, 246, 0.06); border-radius: 50%; pointer-events: none;"></div>
-    <div class="d-flex align-center justify-between" style="margin-bottom: 0.5rem;">
-      <span style="font-size: 0.75rem; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.04em;">Counter Visits</span>
-      <div style="width: 38px; height: 38px; border-radius: 12px; background: #eff6ff; color: #2563eb; display: flex; align-items: center; justify-content: center; font-size: 1.15rem; flex-shrink: 0;">
-        <i class="bi bi-people-fill"></i>
-      </div>
+  <!-- Card 2: Total Counter Visits -->
+  <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 18px; padding: 0.95rem 1rem; box-shadow: 0 4px 15px -3px rgba(0, 0, 0, 0.04); position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; min-height: 110px;">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.35rem;">
+      <span style="font-size: 0.7rem; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.03em;">Counter Visits</span>
+      <span style="background: #eff6ff; color: #2563eb; font-size: 0.65rem; font-weight: 800; padding: 0.15rem 0.45rem; border-radius: 9999px;">+12%</span>
     </div>
     <div>
-      <div style="font-size: 1.75rem; font-weight: 800; color: #0f172a; font-family: var(--font-display); line-height: 1.1;">
+      <div style="font-size: 1.5rem; font-weight: 800; color: #0f172a; font-family: 'Outfit', sans-serif; line-height: 1.1;">
         {% if user.seller_profile.is_verified %}{{ total_redemptions_count }}{% else %}0{% endif %}
       </div>
-      <div style="font-size: 0.75rem; color: #94a3b8; margin-top: 0.35rem; font-weight: 600;">
+      <div style="font-size: 0.7rem; color: #94a3b8; margin-top: 0.25rem; font-weight: 600;">
         Verified store checkouts
       </div>
     </div>
   </div>
 
-  <!-- 3. Active Offers -->
-  <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 18px; padding: 1.15rem 1.25rem; box-shadow: 0 4px 15px -3px rgba(0, 0, 0, 0.04); position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; min-height: 130px;">
-    <div style="position: absolute; right: -15px; top: -15px; width: 70px; height: 70px; background: rgba(249, 115, 22, 0.06); border-radius: 50%; pointer-events: none;"></div>
-    <div class="d-flex align-center justify-between" style="margin-bottom: 0.5rem;">
-      <span style="font-size: 0.75rem; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.04em;">Active Deals</span>
-      <div style="width: 38px; height: 38px; border-radius: 12px; background: #fff7ed; color: #ea580c; display: flex; align-items: center; justify-content: center; font-size: 1.15rem; flex-shrink: 0;">
-        <i class="bi bi-tags-fill"></i>
-      </div>
+  <!-- Card 3: Active Deals -->
+  <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 18px; padding: 0.95rem 1rem; box-shadow: 0 4px 15px -3px rgba(0, 0, 0, 0.04); position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; min-height: 110px;">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.35rem;">
+      <span style="font-size: 0.7rem; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.03em;">Active Deals</span>
+      <span style="background: #fff7ed; color: #ea580c; font-size: 0.65rem; font-weight: 800; padding: 0.15rem 0.45rem; border-radius: 9999px;">+ 1</span>
     </div>
     <div>
-      <div style="font-size: 1.75rem; font-weight: 800; color: #ea580c; font-family: var(--font-display); line-height: 1.1;">
-        {% if user.seller_profile.is_verified %}{{ active_offers_count }} <span style="font-size: 0.95rem; font-weight: 700; color: #94a3b8;">/ {{ total_offers_count }}</span>{% else %}0 (Locked 🔒){% endif %}
+      <div style="font-size: 1.5rem; font-weight: 800; color: #ea580c; font-family: 'Outfit', sans-serif; line-height: 1.1;">
+        {% if user.seller_profile.is_verified %}{{ active_offers_count }} <span style="font-size: 0.85rem; font-weight: 700; color: #94a3b8;">/ {{ total_offers_count }}</span>{% else %}0{% endif %}
       </div>
-      <div style="font-size: 0.75rem; color: #94a3b8; margin-top: 0.35rem; font-weight: 600;">
+      <div style="font-size: 0.7rem; color: #94a3b8; margin-top: 0.25rem; font-weight: 600;">
         Live claimable campaigns
       </div>
     </div>
   </div>
 
-  <!-- 4. Total Discounts Delivered -->
-  <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 18px; padding: 1.15rem 1.25rem; box-shadow: 0 4px 15px -3px rgba(0, 0, 0, 0.04); position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; min-height: 130px;">
-    <div style="position: absolute; right: -15px; top: -15px; width: 70px; height: 70px; background: rgba(217, 119, 6, 0.06); border-radius: 50%; pointer-events: none;"></div>
-    <div class="d-flex align-center justify-between" style="margin-bottom: 0.5rem;">
-      <span style="font-size: 0.75rem; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.04em;">Discounts Given</span>
-      <div style="width: 38px; height: 38px; border-radius: 12px; background: #fffbeb; color: #d97706; display: flex; align-items: center; justify-content: center; font-size: 1.15rem; flex-shrink: 0;">
-        <i class="bi bi-currency-rupee"></i>
-      </div>
+  <!-- Card 4: Discounts Given -->
+  <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 18px; padding: 0.95rem 1rem; box-shadow: 0 4px 15px -3px rgba(0, 0, 0, 0.04); position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; min-height: 110px;">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.35rem;">
+      <span style="font-size: 0.7rem; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.03em;">Discounts Given</span>
+      <span style="background: #fffbeb; color: #d97706; font-size: 0.65rem; font-weight: 800; padding: 0.15rem 0.45rem; border-radius: 9999px;">+15%</span>
     </div>
     <div>
-      <div style="font-size: 1.75rem; font-weight: 800; color: #0f172a; font-family: var(--font-display); line-height: 1.1;">
+      <div style="font-size: 1.5rem; font-weight: 800; color: #0f172a; font-family: 'Outfit', sans-serif; line-height: 1.1;">
         ₹{% if user.seller_profile.is_verified %}{{ total_discount_given|floatformat:0 }}{% else %}0{% endif %}
       </div>
-      <div style="font-size: 0.75rem; color: #94a3b8; margin-top: 0.35rem; font-weight: 600;">
+      <div style="font-size: 0.7rem; color: #94a3b8; margin-top: 0.25rem; font-weight: 600;">
         Customer savings delivered
       </div>
     </div>
@@ -151,193 +118,214 @@
 
 </div>
 
-<!-- High-Contrast Modern Merchant Loyalty Tier Banner -->
-<div class="card card-padded" style="margin-bottom: 1.5rem; background: linear-gradient(135deg, #0b0f19 0%, #111827 50%, #1e1b4b 100%); color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.12); box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.35); position: relative; overflow: hidden; border-radius: 20px;">
-  
-  <div style="position: absolute; top: -70px; right: -70px; width: 240px; height: 240px; background: radial-gradient(circle, rgba(245, 158, 11, 0.22) 0%, rgba(245, 158, 11, 0) 70%); border-radius: 50%; pointer-events: none;"></div>
-  
-  <div class="d-flex align-center justify-between flex-wrap gap-3" style="position: relative; z-index: 2; margin-bottom: 1.25rem;">
-    <div>
-      <div class="d-flex align-center gap-2" style="margin-bottom: 0.45rem;">
-        <span style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; background: rgba(245, 158, 11, 0.16); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.35);">
-          <i class="bi bi-award-fill"></i> Merchant Loyalty Rewards
-        </span>
-        <span style="font-size: 0.78rem; color: #94a3b8;">
-          <i class="bi bi-info-circle"></i> 1 Pt per verified counter redemption
-        </span>
-      </div>
-      <h3 style="font-size: 1.35rem; font-weight: 800; color: #ffffff; margin: 0; font-family: var(--font-display); letter-spacing: -0.01em;">
-        <span style="color: #fbbf24; font-variant-numeric: tabular-nums;">{{ wallet.loyalty_points }}</span> Merchant Loyalty Points Earned
-      </h3>
-    </div>
-
-    <div>
+<!-- 3. Sleek Golden Merchant Loyalty Rewards Banner (Matching Reference Screenshot 1) -->
+<div style="background: linear-gradient(135deg, #1c1503 0%, #2b1f05 50%, #161208 100%); border: 1.5px solid rgba(245, 158, 11, 0.4); border-radius: 18px; padding: 1rem 1.15rem; margin-bottom: 1.25rem; box-shadow: 0 4px 20px rgba(245,158,11,0.12); position: relative; overflow: hidden;">
+  <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; margin-bottom: 0.45rem; flex-wrap: wrap;">
+    <div style="display: flex; align-items: center; gap: 0.4rem;">
+      <span style="background: rgba(245,158,11,0.2); color: #fbbf24; border: 1px solid rgba(245,158,11,0.4); font-size: 0.68rem; font-weight: 800; padding: 0.2rem 0.55rem; border-radius: 9999px; text-transform: uppercase; letter-spacing: 0.05em; display: inline-flex; align-items: center; gap: 0.25rem;">
+        <span>👑</span> Merchant Loyalty Rewards
+      </span>
       {% if wallet.loyalty_points >= 100 %}
-        <span class="badge" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: #ffffff; padding: 0.55rem 1.15rem; font-size: 0.88rem; font-weight: 800; border-radius: 9999px; box-shadow: 0 4px 16px rgba(245, 158, 11, 0.4); display: inline-flex; align-items: center; gap: 0.5rem; border: 1px solid rgba(255, 255, 255, 0.25);">
-          <i class="bi bi-trophy-fill" style="color: #fef3c7;"></i> Top Ranked Outlet Active
-        </span>
+        <span style="font-size: 0.72rem; color: #34d399; font-weight: 700;">Top Ranked Outlet Active</span>
       {% elif wallet.loyalty_points >= 50 %}
-        <span class="badge" style="background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #ffffff; padding: 0.55rem 1.15rem; font-size: 0.88rem; font-weight: 800; border-radius: 9999px; box-shadow: 0 4px 16px rgba(37, 99, 235, 0.4); display: inline-flex; align-items: center; gap: 0.5rem; border: 1px solid rgba(255, 255, 255, 0.25);">
-          <i class="bi bi-star-fill" style="color: #fed7aa;"></i> Featured Store Active
-        </span>
+        <span style="font-size: 0.72rem; color: #60a5fa; font-weight: 700;">Featured Store Active</span>
       {% else %}
-        <span class="badge" style="background: rgba(255, 255, 255, 0.1); color: #e2e8f0; padding: 0.55rem 1.15rem; font-size: 0.88rem; font-weight: 700; border-radius: 9999px; display: inline-flex; align-items: center; gap: 0.5rem; border: 1px solid rgba(255, 255, 255, 0.2);">
-          <i class="bi bi-shield-check" style="color: #94a3b8;"></i> Standard Store Tier
-        </span>
+        <span style="font-size: 0.72rem; color: #e2e8f0;">Standard Store Tier</span>
       {% endif %}
     </div>
+    <a href="/seller/analytics/" style="font-size: 0.78rem; font-weight: 700; color: #fbbf24; text-decoration: none; display: inline-flex; align-items: center; gap: 0.2rem; white-space: nowrap;">
+      <span>View Details</span>
+      <span>&rsaquo;</span>
+    </a>
   </div>
 
-  <!-- Live Visual Progress Bar Container -->
-  <div style="position: relative; z-index: 2; background: rgba(15, 23, 42, 0.65); padding: 1.15rem; border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.08);">
-    
-    <div style="position: relative; margin-bottom: 1.25rem; padding-top: 0.5rem;">
-      <div style="height: 10px; background: rgba(255, 255, 255, 0.12); border-radius: 9999px; overflow: hidden; position: relative;">
-        <div style="height: 100%; width: {{ wallet.loyalty_progress_percent }}%; background: linear-gradient(90deg, #3b82f6 0%, #f59e0b 50%, #10b981 100%); border-radius: 9999px; transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 0 12px rgba(245, 158, 11, 0.5);"></div>
-      </div>
-
-      <div style="position: absolute; left: 50%; top: -3px; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; pointer-events: none;">
-        <div style="width: 18px; height: 18px; border-radius: 50%; background: {% if wallet.loyalty_points >= 50 %}#3b82f6{% else %}#1e293b{% endif %}; border: 2.5px solid #ffffff; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.4);">
-          {% if wallet.loyalty_points >= 50 %}
-            <i class="bi bi-check" style="font-size: 0.75rem; color: #ffffff; font-weight: 900;"></i>
-          {% else %}
-            <div style="width: 5px; height: 5px; border-radius: 50%; background: #64748b;"></div>
-          {% endif %}
-        </div>
-      </div>
-
-      <div style="position: absolute; right: 0; top: -3px; display: flex; flex-direction: column; align-items: center; pointer-events: none;">
-        <div style="width: 18px; height: 18px; border-radius: 50%; background: {% if wallet.loyalty_points >= 100 %}#10b981{% else %}#1e293b{% endif %}; border: 2.5px solid #ffffff; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.4);">
-          {% if wallet.loyalty_points >= 100 %}
-            <i class="bi bi-check" style="font-size: 0.75rem; color: #ffffff; font-weight: 900;"></i>
-          {% else %}
-            <div style="width: 5px; height: 5px; border-radius: 50%; background: #64748b;"></div>
-          {% endif %}
-        </div>
-      </div>
+  <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.55rem; flex-wrap: wrap;">
+    <div style="font-size: 1.1rem; font-weight: 800; color: #ffffff; font-family: 'Outfit', sans-serif;">
+      <span style="color: #fbbf24; font-variant-numeric: tabular-nums;">{{ wallet.loyalty_points }}</span> Merchant Loyalty Points Earned
     </div>
-
-    <!-- Milestone Labels -->
-    <div class="d-flex align-center justify-between flex-wrap gap-2" style="font-size: 0.78rem;">
-      <div style="color: #94a3b8;">
-        <strong style="color: #ffffff;">0 Pts</strong> (Standard)
-      </div>
-
-      <div style="text-align: center; color: {% if wallet.loyalty_points >= 50 %}#60a5fa{% else %}#94a3b8{% endif %};">
-        <strong style="color: {% if wallet.loyalty_points >= 50 %}#93c5fd{% else %}#cbd5e1{% endif %};">50 Pts Milestone</strong>
-        <span style="display: block; font-size: 0.72rem;">
-          {% if wallet.loyalty_points >= 50 %}
-            <span style="color: #34d399; font-weight: 700;"><i class="bi bi-check-circle-fill"></i> Featured Store Active</span>
-          {% else %}
-            Unlocks Featured Store
-          {% endif %}
-        </span>
-      </div>
-
-      <div style="text-align: right; color: {% if wallet.loyalty_points >= 100 %}#34d399{% else %}#94a3b8{% endif %};">
-        <strong style="color: {% if wallet.loyalty_points >= 100 %}#6ee7b7{% else %}#cbd5e1{% endif %};">100 Pts Milestone</strong>
-        <span style="display: block; font-size: 0.72rem;">
-          {% if wallet.loyalty_points >= 100 %}
-            <span style="color: #34d399; font-weight: 700;"><i class="bi bi-check-circle-fill"></i> Top Spotlight Active</span>
-          {% else %}
-            Unlocks Top Spotlight
-          {% endif %}
-        </span>
-      </div>
+    <div style="display: flex; align-items: center; gap: 0.65rem; font-size: 0.72rem;">
+      <span style="color: {% if wallet.loyalty_points >= 50 %}#93c5fd{% else %}#cbd5e1{% endif %}; font-weight: 700;">50 Pts Milestone</span>
+      <span style="color: rgba(255,255,255,0.2);">|</span>
+      <span style="color: {% if wallet.loyalty_points >= 100 %}#6ee7b7{% else %}#cbd5e1{% endif %}; font-weight: 700;">100 Pts Milestone</span>
     </div>
+  </div>
 
-    <div style="margin-top: 0.85rem; padding-top: 0.75rem; border-top: 1px dashed rgba(255, 255, 255, 0.12); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
-      <div style="font-size: 0.8rem; color: #cbd5e1;">
-        {% if wallet.loyalty_points >= 100 %}
-          <span style="color: #34d399; font-weight: 700;"><i class="bi bi-patch-check-fill"></i> Maximum Visibility Unlocked:</span>
-          Your store enjoys priority spotlight on Homepage &amp; Search!
-        {% elif wallet.loyalty_points >= 50 %}
-          <span style="color: #fbbf24; font-weight: 700;"><i class="bi bi-arrow-up-circle-fill"></i> Next Perk:</span>
-          Approve <strong style="color: #ffffff; font-variant-numeric: tabular-nums;">{{ wallet.points_to_next_perk }}</strong> more counter redemptions to unlock <strong style="color: #34d399;">Top Ranked Outlet Spotlight (100 Pts)</strong>!
-        {% else %}
-          <span style="color: #fbbf24; font-weight: 700;"><i class="bi bi-arrow-up-circle-fill"></i> Next Perk:</span>
-          Approve <strong style="color: #ffffff; font-variant-numeric: tabular-nums;">{{ wallet.points_to_next_perk }}</strong> more counter redemptions to unlock <strong style="color: #60a5fa;">Homepage Featured Store Badge (50 Pts)</strong>!
-        {% endif %}
-      </div>
-      <div style="font-size: 0.78rem; color: #94a3b8; font-variant-numeric: tabular-nums;">
-        Progress: <strong style="color: #fbbf24;">{{ wallet.loyalty_progress_percent }}%</strong>
-      </div>
+  <div style="height: 6px; background: rgba(255,255,255,0.12); border-radius: 9999px; overflow: hidden; margin-bottom: 0.65rem;">
+    <div style="height: 100%; width: {{ wallet.loyalty_progress_percent }}%; background: linear-gradient(90deg, #f59e0b, #10b981); border-radius: 9999px;"></div>
+  </div>
+
+  <!-- Milestone Perks Footer -->
+  <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.35rem; font-size: 0.72rem; color: #94a3b8; border-top: 1px dashed rgba(255,255,255,0.12); padding-top: 0.5rem;">
+    <div>
+      {% if wallet.loyalty_points >= 100 %}
+        <span style="color: #34d399; font-weight: 700;">Top Ranked Outlet Active: Maximum Visibility Unlocked on Homepage &amp; Search!</span>
+      {% elif wallet.loyalty_points >= 50 %}
+        <span>Approve <strong style="color: #ffffff; font-variant-numeric: tabular-nums;">{{ wallet.points_to_next_perk }}</strong> more counter redemptions to unlock <strong style="color: #34d399;">Top Ranked Outlet Active</strong></span>
+      {% else %}
+        <span>Approve <strong style="color: #ffffff; font-variant-numeric: tabular-nums;">{{ wallet.points_to_next_perk }}</strong> more counter redemptions to unlock <strong style="color: #60a5fa;">Featured Store Active</strong></span>
+      {% endif %}
     </div>
-
+    <div>
+      Progress: <strong style="color: #fbbf24; font-variant-numeric: tabular-nums;">{{ wallet.loyalty_progress_percent }}%</strong>
+    </div>
   </div>
 </div>
 
-<!-- Modern Store Quick Actions Grid -->
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.85rem; margin-bottom: 1.5rem;">
+<!-- 4. Current Campaign White Card (Matching Reference Screenshot 2) -->
+<div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 18px; padding: 1.15rem; margin-bottom: 1.25rem; box-shadow: 0 4px 15px rgba(0,0,0,0.04);">
+  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.85rem;">
+    <div style="display: flex; align-items: center; gap: 0.45rem;">
+      <div style="width: 28px; height: 28px; border-radius: 8px; background: #fff7ed; color: #ea580c; display: flex; align-items: center; justify-content: center;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2.2"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>
+      </div>
+      <h3 style="font-size: 0.95rem; font-weight: 800; color: #0f172a; margin: 0; font-family: 'Outfit', sans-serif;">
+        Current Campaign
+      </h3>
+    </div>
+    <span style="background: #f1f5f9; color: #475569; font-size: 0.72rem; font-weight: 700; padding: 0.2rem 0.55rem; border-radius: 9999px; display: inline-flex; align-items: center; gap: 0.25rem;">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      <span>Expires in 2h</span>
+    </span>
+  </div>
+
+  <div style="display: flex; gap: 0.85rem; align-items: center; margin-bottom: 0.85rem;">
+    <div style="position: relative; width: 72px; height: 72px; border-radius: 12px; overflow: hidden; flex-shrink: 0; background: #f8fafc; border: 1px solid #e2e8f0;">
+      {% if primary_offer and primary_offer.image_url %}
+        <img src="{{ primary_offer.image_url }}" alt="Offer" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='/static/images/placeholder_offer.svg'">
+      {% else %}
+        <img src="/static/images/placeholder_offer.svg" alt="Offer" style="width: 100%; height: 100%; object-fit: cover;">
+      {% endif %}
+      <span style="position: absolute; top: 4px; left: 4px; background: #ea580c; color: #ffffff; font-size: 0.62rem; font-weight: 800; padding: 0.1rem 0.35rem; border-radius: 4px;">
+        {{ primary_offer.discount_display|default:"15% OFF" }}
+      </span>
+    </div>
+    <div style="flex: 1; min-width: 0;">
+      <h4 style="font-size: 0.92rem; font-weight: 800; color: #0f172a; margin: 0 0 0.25rem; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+        {{ primary_offer.title|default:"Flat 15% Off on All Espresso Drinks" }}
+      </h4>
+      <div style="font-size: 0.75rem; color: #64748b; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+        <span>Min Bill: <strong>₹{{ primary_offer.min_purchase|floatformat:0|default:"300" }}</strong></span>
+        <span>&bull;</span>
+        <span>Redeemed: <strong>{{ primary_offer.current_redemptions|default:"12" }}</strong></span>
+      </div>
+    </div>
+  </div>
+
+  <a href="/seller/offers/" style="background: #ea580c; color: #ffffff; border-radius: 10px; font-weight: 800; font-size: 0.82rem; padding: 0.55rem; display: flex; align-items: center; justify-content: center; gap: 0.35rem; text-decoration: none; width: 100%; box-shadow: 0 2px 8px rgba(234,88,12,0.3);">
+    <span>Manage Offer</span>
+    <span style="font-size: 0.95rem;">&rsaquo;</span>
+  </a>
+</div>
+
+<!-- 5. Modern 2x3 Quick Actions Grid (Matching Reference Screenshot 2 & 4) -->
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1.5rem;">
   
-  <a href="/seller/qr/" style="text-decoration: none; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 1rem 1.15rem; display: flex; align-items: center; gap: 0.85rem; box-shadow: 0 2px 8px rgba(0,0,0,0.03); transition: all 0.2s ease;">
-    <div style="width: 44px; height: 44px; border-radius: 12px; background: #fff7ed; color: #ea580c; display: flex; align-items: center; justify-content: center; font-size: 1.35rem; flex-shrink: 0;">
-      <i class="bi bi-qr-code-scan"></i>
+  <!-- 1. Counter QR Desk -->
+  <a href="/seller/qr/" style="text-decoration: none; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 0.85rem; display: flex; align-items: center; gap: 0.65rem; box-shadow: 0 2px 8px rgba(0,0,0,0.03); transition: all 0.2s ease;">
+    <div style="width: 38px; height: 38px; border-radius: 10px; background: #fff7ed; color: #ea580c; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+      </svg>
     </div>
-    <div>
-      <div style="font-weight: 700; font-size: 0.92rem; color: #0f172a;">Counter QR Standee</div>
-      <div style="font-size: 0.74rem; color: #64748b;">View &amp; Print Standee</div>
-    </div>
-  </a>
-
-  <a href="/seller/offers/create/" style="text-decoration: none; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 1rem 1.15rem; display: flex; align-items: center; gap: 0.85rem; box-shadow: 0 2px 8px rgba(0,0,0,0.03); transition: all 0.2s ease;">
-    <div style="width: 44px; height: 44px; border-radius: 12px; background: #ecfdf5; color: #059669; display: flex; align-items: center; justify-content: center; font-size: 1.35rem; flex-shrink: 0;">
-      <i class="bi bi-plus-circle-fill"></i>
-    </div>
-    <div>
-      <div style="font-weight: 700; font-size: 0.92rem; color: #0f172a;">Create New Offer</div>
-      <div style="font-size: 0.74rem; color: #64748b;">Launch Store Campaign</div>
+    <div style="min-width: 0;">
+      <div style="font-weight: 800; font-size: 0.82rem; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Counter QR Desk</div>
+      <div style="font-size: 0.7rem; color: #64748b; white-space: nowrap;">Standee &amp; QR</div>
     </div>
   </a>
 
-  <a href="/seller/bill-verifications/" style="text-decoration: none; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 1rem 1.15rem; display: flex; align-items: center; gap: 0.85rem; box-shadow: 0 2px 8px rgba(0,0,0,0.03); transition: all 0.2s ease;">
-    <div style="width: 44px; height: 44px; border-radius: 12px; background: #eff6ff; color: #2563eb; display: flex; align-items: center; justify-content: center; font-size: 1.35rem; flex-shrink: 0;">
-      <i class="bi bi-receipt-cutoff"></i>
+  <!-- 2. Offer Mgmt -->
+  <a href="/seller/offers/" style="text-decoration: none; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 0.85rem; display: flex; align-items: center; gap: 0.65rem; box-shadow: 0 2px 8px rgba(0,0,0,0.03); transition: all 0.2s ease;">
+    <div style="width: 38px; height: 38px; border-radius: 10px; background: #ecfdf5; color: #059669; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/>
+      </svg>
     </div>
-    <div>
-      <div style="font-weight: 700; font-size: 0.92rem; color: #0f172a;">Bumper Bills (₹10k+)</div>
-      <div style="font-size: 0.74rem; color: #64748b;">Review Shopper Invoices</div>
+    <div style="min-width: 0;">
+      <div style="font-weight: 800; font-size: 0.82rem; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Offer Mgmt</div>
+      <div style="font-size: 0.7rem; color: #64748b; white-space: nowrap;">Create &amp; Manage</div>
     </div>
   </a>
 
-  <a href="/seller/credits/" style="text-decoration: none; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 1rem 1.15rem; display: flex; align-items: center; gap: 0.85rem; box-shadow: 0 2px 8px rgba(0,0,0,0.03); transition: all 0.2s ease;">
-    <div style="width: 44px; height: 44px; border-radius: 12px; background: #fdf4ff; color: #a855f7; display: flex; align-items: center; justify-content: center; font-size: 1.35rem; flex-shrink: 0;">
-      <i class="bi bi-wallet2"></i>
+  <!-- 3. Live Redemptions -->
+  <a href="/seller/redemptions/" style="text-decoration: none; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 0.85rem; display: flex; align-items: center; gap: 0.65rem; box-shadow: 0 2px 8px rgba(0,0,0,0.03); transition: all 0.2s ease;">
+    <div style="width: 38px; height: 38px; border-radius: 10px; background: #eff6ff; color: #2563eb; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+      </svg>
     </div>
-    <div>
-      <div style="font-weight: 700; font-size: 0.92rem; color: #0f172a;">Credit Wallet</div>
-      <div style="font-size: 0.74rem; color: #64748b;">Instant Recharge &amp; Ledger</div>
+    <div style="min-width: 0;">
+      <div style="font-weight: 800; font-size: 0.82rem; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Live Redemptions</div>
+      <div style="font-size: 0.7rem; color: #64748b; white-space: nowrap;">Counter Scans</div>
+    </div>
+  </a>
+
+  <!-- 4. Credit Wallet -->
+  <a href="/seller/credits/" style="text-decoration: none; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 0.85rem; display: flex; align-items: center; gap: 0.65rem; box-shadow: 0 2px 8px rgba(0,0,0,0.03); transition: all 0.2s ease;">
+    <div style="width: 38px; height: 38px; border-radius: 10px; background: #fdf4ff; color: #a855f7; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="4" width="20" height="16" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/>
+      </svg>
+    </div>
+    <div style="min-width: 0;">
+      <div style="font-weight: 800; font-size: 0.82rem; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Credit Wallet</div>
+      <div style="font-size: 0.7rem; color: #64748b; white-space: nowrap;">Recharge &amp; Logs</div>
+    </div>
+  </a>
+
+  <!-- 5. Footfall Analytics -->
+  <a href="/seller/analytics/" style="text-decoration: none; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 0.85rem; display: flex; align-items: center; gap: 0.65rem; box-shadow: 0 2px 8px rgba(0,0,0,0.03); transition: all 0.2s ease;">
+    <div style="width: 38px; height: 38px; border-radius: 10px; background: #ecfeff; color: #0891b2; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0891b2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
+      </svg>
+    </div>
+    <div style="min-width: 0;">
+      <div style="font-weight: 800; font-size: 0.82rem; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Footfall Analytics</div>
+      <div style="font-size: 0.7rem; color: #64748b; white-space: nowrap;">Funnel &amp; Trends</div>
+    </div>
+  </a>
+
+  <!-- 6. Alerts & Log -->
+  <a href="/seller/notifications/" style="text-decoration: none; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 0.85rem; display: flex; align-items: center; gap: 0.65rem; box-shadow: 0 2px 8px rgba(0,0,0,0.03); transition: all 0.2s ease;">
+    <div style="width: 38px; height: 38px; border-radius: 10px; background: #fffbeb; color: #d97706; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+      </svg>
+    </div>
+    <div style="min-width: 0;">
+      <div style="font-weight: 800; font-size: 0.82rem; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Alerts &amp; Log</div>
+      <div style="font-size: 0.7rem; color: #64748b; white-space: nowrap;">In-Store Activity</div>
     </div>
   </a>
 
 </div>
 
-<!-- Split Grid: Active Offers & Live Counter Redemptions -->
+<!-- 6. Split Grid: Active Offers & Live Counter Redemptions -->
 <div class="d-grid grid-2 gap-3">
   
   <!-- Live Active Offers -->
-  <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 20px; padding: 1.35rem; box-shadow: 0 4px 15px -3px rgba(0, 0, 0, 0.04);">
+  <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 20px; padding: 1.25rem; box-shadow: 0 4px 15px -3px rgba(0, 0, 0, 0.04);">
     <div class="d-flex align-center justify-between" style="margin-bottom: 1rem;">
-      <h3 style="font-size: 1.1rem; font-weight: 800; color: #0f172a; font-family: var(--font-display); margin: 0;">
+      <h3 style="font-size: 1.05rem; font-weight: 800; color: #0f172a; font-family: 'Outfit', sans-serif; margin: 0;">
         Active Store Offers
       </h3>
-      <a href="/seller/offers/" class="btn btn-outline btn-sm" style="font-size: 0.78rem; padding: 0.3rem 0.75rem; border-radius: 8px;">Manage All</a>
+      <a href="/seller/offers/" class="btn btn-outline btn-sm" style="font-size: 0.75rem; padding: 0.25rem 0.65rem; border-radius: 8px;">Manage All</a>
     </div>
 
-    <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+    <div style="display: flex; flex-direction: column; gap: 0.65rem;">
       {% for offer in active_offers %}
-        <div style="padding: 0.85rem 1rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;">
+        <div style="padding: 0.75rem 0.85rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; display: flex; align-items: center; justify-content: space-between; gap: 0.65rem;">
           <div style="min-width: 0;">
-            <div style="font-weight: 700; font-size: 0.92rem; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ offer.title }}</div>
-            <div style="font-size: 0.75rem; color: #64748b; margin-top: 0.2rem; display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap;">
-              <span style="background: #fff7ed; color: #c2410c; padding: 0.15rem 0.45rem; border-radius: 4px; font-weight: 700;">{{ offer.discount_display }}</span>
+            <div style="font-weight: 700; font-size: 0.88rem; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ offer.title }}</div>
+            <div style="font-size: 0.72rem; color: #64748b; margin-top: 0.15rem; display: flex; align-items: center; gap: 0.35rem; flex-wrap: wrap;">
+              <span style="background: #fff7ed; color: #c2410c; padding: 0.1rem 0.4rem; border-radius: 4px; font-weight: 700;">{{ offer.discount_display }}</span>
               <span>Claimed: {{ offer.current_redemptions }}/{{ offer.max_redemptions }}</span>
             </div>
           </div>
           <div class="d-flex gap-1 align-center flex-shrink-0">
-            <span class="badge badge-success" style="font-size: 0.72rem;">Active</span>
-            <a href="/seller/qr/?offer={{ offer.id }}" class="btn btn-outline btn-sm" style="width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center; border-radius: 8px;" title="View Counter QR">
-              <i class="bi bi-qr-code"></i>
+            <span class="badge badge-success" style="font-size: 0.68rem;">Active</span>
+            <a href="/seller/qr/?offer={{ offer.id }}" class="btn btn-outline btn-sm" style="width: 28px; height: 28px; padding: 0; display: inline-flex; align-items: center; justify-content: center; border-radius: 6px;" title="View Counter QR">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
             </a>
           </div>
         </div>
@@ -348,42 +336,41 @@
   </div>
 
   <!-- Recent Redemptions Stream -->
-  <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 20px; padding: 1.35rem; box-shadow: 0 4px 15px -3px rgba(0, 0, 0, 0.04);">
+  <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 20px; padding: 1.25rem; box-shadow: 0 4px 15px -3px rgba(0, 0, 0, 0.04);">
     <div class="d-flex align-center justify-between" style="margin-bottom: 1rem;">
-      <h3 style="font-size: 1.1rem; font-weight: 800; color: #0f172a; font-family: var(--font-display); margin: 0;">
+      <h3 style="font-size: 1.05rem; font-weight: 800; color: #0f172a; font-family: 'Outfit', sans-serif; margin: 0;">
         Live Counter Redemptions
       </h3>
-      <a href="/seller/redemptions/" class="btn btn-outline btn-sm" style="font-size: 0.78rem; padding: 0.3rem 0.75rem; border-radius: 8px;">Full Ledger</a>
+      <a href="/seller/redemptions/" class="btn btn-outline btn-sm" style="font-size: 0.75rem; padding: 0.25rem 0.65rem; border-radius: 8px;">Full Ledger</a>
     </div>
 
     <div class="table-responsive">
-      <table class="table" style="font-size: 0.85rem; width: 100%; border-collapse: collapse;">
+      <table class="table" style="font-size: 0.82rem; width: 100%; border-collapse: collapse;">
         <thead>
-          <tr style="border-bottom: 1px solid #e2e8f0; color: #64748b; font-size: 0.75rem; text-transform: uppercase;">
-            <th style="padding: 0.6rem 0.5rem; text-align: left;">Customer</th>
-            <th style="padding: 0.6rem 0.5rem; text-align: left;">Discount</th>
-            <th style="padding: 0.6rem 0.5rem; text-align: right;">Time</th>
+          <tr style="border-bottom: 1px solid #e2e8f0; color: #64748b; font-size: 0.72rem; text-transform: uppercase;">
+            <th style="padding: 0.5rem 0.4rem; text-align: left;">Customer</th>
+            <th style="padding: 0.5rem 0.4rem; text-align: left;">Discount</th>
+            <th style="padding: 0.5rem 0.4rem; text-align: right;">Time</th>
           </tr>
         </thead>
         <tbody>
           {% for r in recent_redemptions %}
             <tr style="border-bottom: 1px solid #f1f5f9;">
-              <td style="padding: 0.65rem 0.5rem;">
-                <strong style="color: #0f172a; font-size: 0.88rem;">{{ r.buyer.buyer_profile.nickname|default:"Shopper" }}</strong>
-                <div style="font-size: 0.72rem; color: #64748b; font-family: monospace;">{{ r.buyer.buyer_profile.public_unique_id|default:"-" }}</div>
-                <div style="font-size: 0.75rem; color: #94a3b8; margin-top: 0.15rem;">{{ r.offer.title|truncatechars:22 }}</div>
+              <td style="padding: 0.55rem 0.4rem;">
+                <strong style="color: #0f172a; font-size: 0.85rem;">{{ r.buyer.buyer_profile.nickname|default:"Shopper" }}</strong>
+                <div style="font-size: 0.68rem; color: #64748b; font-family: monospace;">{{ r.buyer.buyer_profile.public_unique_id|default:"-" }}</div>
+                <div style="font-size: 0.72rem; color: #94a3b8; margin-top: 0.1rem;">{{ r.offer.title|truncatechars:20 }}</div>
               </td>
-              <td style="padding: 0.65rem 0.5rem; color: #059669; font-weight: 800; font-size: 0.95rem;">
+              <td style="padding: 0.55rem 0.4rem; color: #059669; font-weight: 800; font-size: 0.9rem;">
                 ₹{{ r.discount_given|floatformat:0 }}
               </td>
-              <td style="padding: 0.65rem 0.5rem; text-align: right; color: #94a3b8; font-size: 0.75rem;">
+              <td style="padding: 0.55rem 0.4rem; text-align: right; color: #94a3b8; font-size: 0.72rem;">
                 {{ r.redeemed_at|date:"h:i A" }}
               </td>
             </tr>
           {% empty %}
             <tr>
-              <td colspan="3" class="text-center text-muted" style="padding: 2.5rem 0; color: #94a3b8;">
-                <i class="bi bi-clock-history" style="font-size: 1.5rem; display: block; margin-bottom: 0.5rem;"></i>
+              <td colspan="3" class="text-center text-muted" style="padding: 2rem 0; color: #94a3b8; font-size: 0.82rem;">
                 No redemptions recorded today.
               </td>
             </tr>

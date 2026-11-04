@@ -6,9 +6,9 @@
     <!-- Distance Pill Badge (Top Left) -->
     <span style="position: absolute; top: 12px; left: 12px; background: rgba(11, 15, 25, 0.85); backdrop-filter: blur(6px); color: #ffffff; font-weight: 700; font-size: 0.75rem; padding: 0.3rem 0.65rem; border-radius: var(--radius-full); display: inline-flex; align-items: center; gap: 0.3rem; border: 1px solid rgba(255,255,255,0.15);">
       <i class="bi bi-geo-alt-fill" style="color: #f97316;"></i>
-      {% if shop.distance_display %}
+      {% if shop.distance_display and shop.distance_km < 9990 %}
         {{ shop.distance_display }}
-      {% elif shop.distance_km %}
+      {% elif shop.distance_km and shop.distance_km < 9990 %}
         ~ {{ shop.distance_km|floatformat:1 }} km
       {% else %}
         {{ shop.locality|default:shop.city }}

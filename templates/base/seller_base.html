@@ -356,54 +356,53 @@
     <div class="portal-main">
       
       <!-- Merchant Top Bar -->
-      <header class="portal-topbar" style="display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; background: #070c18; border-bottom: 1px solid rgba(255,255,255,0.08); padding: 0.85rem 1.25rem;">
+      <header class="portal-topbar" style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; background: #070c18; border-bottom: 1px solid rgba(255,255,255,0.08); padding: 0.65rem 0.85rem; flex-wrap: nowrap;">
         
         <!-- Left Section: Logo, Name & PRO Badge -->
-        <div class="d-flex align-center gap-2" style="min-width: 0;">
-          <button type="button" class="mobile-sidebar-toggle" id="sellerMobileMenuBtn" aria-label="Toggle Navigation" style="background: #141c2e; border: 1px solid rgba(255,255,255,0.1); color: #ffffff;">
-            <i class="bi bi-list"></i>
-          </button>
-          
-          <div style="display: flex; align-items: center; gap: 0.65rem;">
-            <div style="width: 38px; height: 38px; border-radius: 10px; background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); display: flex; align-items: center; justify-content: center; color: #ffffff; font-size: 1.15rem; flex-shrink: 0; box-shadow: 0 4px 12px rgba(234, 88, 12, 0.35);">
-              <i class="bi bi-bag-fill"></i>
+        <div style="display: flex; align-items: center; gap: 0.55rem; min-width: 0;">
+          <div style="width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); display: flex; align-items: center; justify-content: center; color: #ffffff; flex-shrink: 0; box-shadow: 0 4px 12px rgba(234, 88, 12, 0.35);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19 7h-3V6a4 4 0 0 0-8 0v1H5a1 1 0 0 0-1 1v11a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V8a1 1 0 0 0-1-1zm-9-1a2 2 0 0 1 4 0v1h-4V6zm8 13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V9h2v1a1 1 0 0 0 2 0V9h4v1a1 1 0 0 0 2 0V9h2v10z"/>
+            </svg>
+          </div>
+          <div style="line-height: 1.15; min-width: 0;">
+            <div style="display: flex; align-items: center; gap: 0.35rem;">
+              <span style="font-size: 1.05rem; font-weight: 800; color: #ffffff; font-family: 'Outfit', sans-serif;">Lokal<span style="color: #ea580c;">Loop</span></span>
+              <span style="background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1.5px solid #10b981; font-size: 0.62rem; font-weight: 800; padding: 1px 5px; border-radius: 5px; letter-spacing: 0.04em;">PRO</span>
             </div>
-            <div style="line-height: 1.15;">
-              <div style="display: flex; align-items: center; gap: 0.35rem;">
-                <span style="font-size: 1.15rem; font-weight: 800; color: #ffffff; font-family: var(--font-display);">Lokal<span style="color: #ea580c;">Loop</span></span>
-                <span style="background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1.5px solid #10b981; font-size: 0.65rem; font-weight: 800; padding: 1px 6px; border-radius: 6px; letter-spacing: 0.05em;">PRO</span>
-              </div>
-              <span style="display: block; font-size: 0.72rem; color: #94a3b8; font-weight: 600;">Merchant Portal</span>
-            </div>
+            <span style="display: block; font-size: 0.68rem; color: #94a3b8; font-weight: 600;">Merchant Portal</span>
           </div>
         </div>
 
-        <!-- Right Section: Alerts Bell & Shop Avatar with Online Status Dot -->
-        <div class="d-flex align-center gap-2 flex-shrink-0">
+        <!-- Right Section: Credits, Bell & Shop Avatar -->
+        <div style="display: flex; align-items: center; gap: 0.45rem; flex-shrink: 0;">
           
           <!-- Credits pill badge -->
-          <a href="/seller/credits/" class="credit-badge-seller" style="background: rgba(16, 185, 129, 0.12); border-color: rgba(16, 185, 129, 0.3); color: #34d399; text-decoration: none;" title="Promotional Credits Balance">
-            <i class="bi bi-lightning-charge-fill" style="color: #10b981;"></i>
+          <a href="/seller/credits/" class="credit-badge-seller" style="background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.3); color: #34d399; text-decoration: none; padding: 0.3rem 0.6rem; font-size: 0.75rem; border-radius: 9999px; display: inline-flex; align-items: center; gap: 0.25rem; font-weight: 800;" title="Credits Balance">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="#10b981"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
             <span>{{ user.wallet.balance_credits|default:0 }} Cr</span>
           </a>
 
           <!-- Alerts Bell with Red Badge -->
-          <a href="/seller/notifications/" style="width: 38px; height: 38px; border-radius: 50%; background: #141c2e; border: 1px solid rgba(255, 255, 255, 0.08); display: flex; align-items: center; justify-content: center; position: relative; color: #cbd5e1; text-decoration: none;" title="Alerts & Activity">
-            <i class="bi bi-bell" style="font-size: 1.1rem;"></i>
-            <span style="position: absolute; top: -2px; right: -2px; width: 17px; height: 17px; border-radius: 50%; background: #ef4444; color: #ffffff; font-size: 0.65rem; font-weight: 800; display: flex; align-items: center; justify-content: center; border: 2px solid #070c18;">{% if unread_notifications_count %}{{ unread_notifications_count }}{% else %}2{% endif %}</span>
+          <a href="/seller/notifications/" style="width: 34px; height: 34px; border-radius: 50%; background: #141c2e; border: 1px solid rgba(255, 255, 255, 0.08); display: flex; align-items: center; justify-content: center; position: relative; color: #cbd5e1; text-decoration: none;" title="Alerts & Activity">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+            </svg>
+            <span style="position: absolute; top: -2px; right: -2px; width: 16px; height: 16px; border-radius: 50%; background: #ef4444; color: #ffffff; font-size: 0.62rem; font-weight: 800; display: flex; align-items: center; justify-content: center; border: 2px solid #070c18;">{% if unread_notifications_count %}{{ unread_notifications_count }}{% else %}2{% endif %}</span>
           </a>
 
           <!-- Shop Avatar with Online Status Indicator -->
           <div class="user-dropdown-container">
             <button type="button" class="dropdown-toggle" id="sellerProfileDropdownBtn" style="background: none; border: none; padding: 0; cursor: pointer; display: flex; align-items: center; position: relative;">
-              <div style="width: 38px; height: 38px; border-radius: 50%; border: 2px solid rgba(255, 255, 255, 0.15); overflow: hidden; background: #141c2e; display: flex; align-items: center; justify-content: center;">
+              <div style="width: 34px; height: 34px; border-radius: 50%; border: 2px solid rgba(255, 255, 255, 0.15); overflow: hidden; background: #141c2e; display: flex; align-items: center; justify-content: center;">
                 {% if user.seller_profile.logo_image_url %}
                   <img src="{{ user.seller_profile.logo_image_url }}" alt="Logo" style="width: 100%; height: 100%; object-fit: cover;">
                 {% else %}
-                  <div style="font-weight: 800; color: #ea580c; font-size: 0.95rem;">{{ user.seller_profile.business_name|default:user.username|slice:":1"|upper }}</div>
+                  <div style="font-weight: 800; color: #ea580c; font-size: 0.9rem;">{{ user.seller_profile.business_name|default:user.username|slice:":1"|upper }}</div>
                 {% endif %}
               </div>
-              <span style="position: absolute; bottom: 0; right: 0; width: 11px; height: 11px; border-radius: 50%; background: #10b981; border: 2px solid #070c18;" title="Online"></span>
+              <span style="position: absolute; bottom: 0; right: 0; width: 10px; height: 10px; border-radius: 50%; background: #10b981; border: 2px solid #070c18;" title="Online"></span>
             </button>
 
             <div class="dropdown-menu" style="right: 0; left: auto; min-width: 240px; margin-top: 0.5rem; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); padding: 0.5rem; background: #111827; color: #ffffff;">
@@ -418,24 +417,20 @@
               </div>
 
               <a href="/seller/shop/" class="dropdown-item" style="display: flex; align-items: center; gap: 0.55rem; padding: 0.65rem 0.85rem; border-radius: 8px; font-weight: 600; font-size: 0.85rem; color: #cbd5e1; text-decoration: none; transition: background 0.15s ease;">
-                <i class="bi bi-shop-window" style="color: #ea580c; font-size: 1rem;"></i>
                 <span>🏪 My Shop Profile</span>
               </a>
 
               <a href="/seller/change-password/" class="dropdown-item" style="display: flex; align-items: center; gap: 0.55rem; padding: 0.65rem 0.85rem; border-radius: 8px; font-weight: 600; font-size: 0.85rem; color: #cbd5e1; text-decoration: none; transition: background 0.15s ease;">
-                <i class="bi bi-shield-lock-fill" style="color: #6366f1; font-size: 1rem;"></i>
                 <span>🛡️ Security &amp; Password</span>
               </a>
 
               <a href="/contact-us/?role=merchant" class="dropdown-item" style="display: flex; align-items: center; gap: 0.55rem; padding: 0.65rem 0.85rem; border-radius: 8px; font-weight: 600; font-size: 0.85rem; color: #cbd5e1; text-decoration: none; transition: background 0.15s ease;">
-                <i class="bi bi-headset" style="color: #3b82f6; font-size: 1rem;"></i>
                 <span>🎧 Help &amp; Grievance Desk</span>
               </a>
 
               <div style="border-top: 1px solid rgba(255,255,255,0.08); margin: 0.35rem 0;"></div>
 
               <a href="/seller/logout/" class="dropdown-item" style="display: flex; align-items: center; gap: 0.55rem; padding: 0.65rem 0.85rem; border-radius: 8px; font-weight: 600; font-size: 0.85rem; color: #ef4444; text-decoration: none; transition: background 0.15s ease;">
-                <i class="bi bi-box-arrow-right" style="font-size: 1rem;"></i>
                 <span>🚪 Sign Out</span>
               </a>
             </div>

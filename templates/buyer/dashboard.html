@@ -306,7 +306,7 @@
       </div>
       <div>
         <div style="font-size: 0.88rem; font-weight: 800; color: #0f172a; line-height: 1.25; font-family: 'Outfit', sans-serif;">
-          Active in-store deals in {{ city|default:"Bengaluru" }}
+          Active in-store deals in {{ city|default:"Pune" }}
         </div>
         <div style="font-size: 0.75rem; color: #64748b; margin-top: 2px;">
           Redeemable at retail billing counters
@@ -320,7 +320,7 @@
   </div>
 
   <!-- 5. Active In-Store Offers Horizontal Scroll / Cards (Matching Reference Image 1) -->
-  <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 0.85rem; margin-bottom: 2rem;">
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 2rem;">
     {% for offer in popular_offers %}
       <div style="background: #ffffff; border-radius: 16px; border: 1px solid #f1f5f9; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.03); display: flex; flex-direction: column;">
         <div style="position: relative; height: 140px; width: 100%; overflow: hidden; background: #f8fafc;">

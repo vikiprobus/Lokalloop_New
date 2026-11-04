@@ -116,8 +116,9 @@ def format_distance_display(dist_km: float) -> str:
     Format distance into user-friendly units:
     Under 1 km: meters (e.g. '750 m')
     1 km or above: kilometers with one decimal place (e.g. '1.2 km')
+    Filters out distances >= 9990.0 (unresolved/unbound).
     """
-    if dist_km is None:
+    if dist_km is None or dist_km >= 9990.0:
         return ""
     if dist_km < 1.0:
         meters = int(round(dist_km * 1000))
