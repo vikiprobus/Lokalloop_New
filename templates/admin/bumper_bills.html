@@ -18,7 +18,7 @@
   </div>
 
   <!-- Metric Overview Cards -->
-  <div class="d-grid grid-4 gap-3" style="margin-bottom: 1.75rem;">
+  <div class="admin-kpi-grid" style="margin-bottom: 1.5rem;">
     <div class="admin-kpi-card" style="border-left: 4px solid #0284c7;">
       <span class="stat-label" style="color: #0284c7; font-weight: 700;">Ready for Final Clearance</span>
       <div class="stat-value" style="color: #0284c7;">{{ store_verified_submissions }}</div>
@@ -45,7 +45,7 @@
   </div>
 
   <!-- Filter Navigation Tabs -->
-  <div class="d-flex align-center flex-wrap gap-2" style="margin-bottom: 1.25rem;">
+  <div class="admin-tabs-scroll" style="margin-bottom: 1.25rem;">
     <a href="{% url 'admin_bumper_bills' %}" class="btn btn-sm {% if not status_filter %}btn-primary{% else %}btn-outline{% endif %}" style="font-weight: 700;">
       All Submissions ({{ total_submissions }})
     </a>

@@ -15,7 +15,7 @@
   <link rel="stylesheet" href="{% static 'css/main.css' %}">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
-<body style="background: radial-gradient(circle at 50% 20%, #1e293b, #090d16); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem;">
+<body style="background: radial-gradient(circle at 50% 20%, #1e293b, #090d16); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1.25rem 0.85rem; box-sizing: border-box;">
 
   <div style="width: 100%; max-width: 440px;">
     
@@ -36,7 +36,7 @@
     {% endif %}
 
     <div class="card" style="background: #0f172a; border: 1px solid rgba(255,255,255,0.1); box-shadow: var(--shadow-xl);">
-      <div class="card-body" style="padding: 2rem;">
+      <div class="card-body" style="padding: 1.35rem 1.15rem;">
         <form method="POST">
           {% csrf_token %}
 
