@@ -80,7 +80,7 @@ class RateLimitMiddleware(MiddlewareMixin):
         path = request.path
 
         # Static, media, and favicon assets are never rate-limited
-        if path.startswith('/static/') or path.startswith('/media/') or path == '/favicon.ico':
+        if path.startswith('/static/') or path.startswith('/media/') or path.startswith('/api/tiles/') or path == '/favicon.ico':
             return None
 
         matched_prefix, rule = self._get_matched_rule(path)

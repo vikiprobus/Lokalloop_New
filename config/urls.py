@@ -84,6 +84,7 @@ urlpatterns = [
 
     # 4. Seller Portal
     path('seller/dashboard/', seller_views.seller_dashboard_view, name='seller_dashboard'),
+    path('api/tiles/<int:z>/<int:x>/<int:y>/', seller_views.map_tile_proxy_view, name='map_tile_proxy'),
     path('seller/shop/', seller_views.seller_shop_view, name='seller_shop'),
     path('seller/profile/', seller_views.seller_shop_view, name='seller_profile'),
     path('seller/offers/', seller_views.seller_offers_list_view, name='seller_offers'),

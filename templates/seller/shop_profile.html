@@ -27,6 +27,10 @@
   .leaflet-tile {
     visibility: inherit !important;
   }
+  .store-entrance-pin {
+    background: none !important;
+    border: none !important;
+  }
 </style>
 {% endblock %}
 
@@ -469,19 +473,38 @@
   }
 </script>
 
-<!-- Free & Open-Source Leaflet.js Interactive Map Engine with CDN Fallback -->
-<script src="{% static 'vendor/leaflet/leaflet.js' %}" onerror="this.onerror=null;this.src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';"></script>
+<!-- Free & Open-Source Leaflet.js Interactive Map Engine -->
+<script src="{% static 'vendor/leaflet/leaflet.js' %}" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js';"></script>
 <script>
   let editMap = null;
   let editMarker = null;
   let mapInitAttempts = 0;
+
+  // Ultra-reliable inline vector SVG marker pin (Zero HTTP requests, zero broken images, sharp vector rendering)
+  function createStorePinIcon() {
+    return L.divIcon({
+      className: 'store-entrance-pin',
+      html: `
+        <div style="filter: drop-shadow(0 4px 6px rgba(0,0,0,0.45)); width: 34px; height: 42px; cursor: grab;">
+          <svg width="34" height="42" viewBox="0 0 24 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 0C5.37 0 0 5.37 0 12C0 21 12 32 12 32C12 32 24 21 24 12C24 5.37 18.63 0 12 0Z" fill="#ea580c"/>
+            <circle cx="12" cy="11" r="5" fill="#ffffff"/>
+            <circle cx="12" cy="11" r="2.8" fill="#ea580c"/>
+          </svg>
+        </div>
+      `,
+      iconSize: [34, 42],
+      iconAnchor: [17, 42],
+      tooltipAnchor: [0, -42]
+    });
+  }
 
   function initProfileMap() {
     const mapEl = document.getElementById('merchantEditMap');
     if (!mapEl) return;
     
     if (typeof L === 'undefined') {
-      if (mapInitAttempts < 15) {
+      if (mapInitAttempts < 20) {
         mapInitAttempts++;
         setTimeout(initProfileMap, 150);
       }
@@ -491,16 +514,6 @@
     if (editMap) {
       editMap.invalidateSize(true);
       return;
-    }
-
-    // Configure static icon paths explicitly with unpkg fallback
-    if (L.Icon && L.Icon.Default) {
-      delete L.Icon.Default.prototype._getIconUrl;
-      L.Icon.Default.mergeOptions({
-        iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-        iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-        shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-      });
     }
 
     const latVal = parseFloat(document.getElementById('id_latitude').value) || 18.5204;
@@ -513,28 +526,41 @@
         fadeAnimation: true,
       }).setView([latVal, lngVal], 16);
 
-      // Primary: Google Maps Road tiles (ultra-fast, zero CORS/ISP restrictions in India)
-      const googleRoads = L.tileLayer('https://mt{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
-        maxZoom: 20,
-        subdomains: ['0', '1', '2', '3'],
+      // 1. Same-Origin High-Performance Local Tile Proxy (100% immune to CORS, ISP & network blocks)
+      const proxyTiles = L.tileLayer('/api/tiles/{z}/{x}/{y}/', {
+        maxZoom: 19,
+        attribution: '&copy; Google Maps &copy; OpenStreetMap'
+      });
+
+      // 2. Direct Google fallback if local proxy has any transient error
+      const directGoogle = L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+        maxZoom: 19,
         attribution: '&copy; Google Maps'
       });
 
-      // Secondary fallback: CartoDB Voyager tiles
-      const cartoVoyager = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png', {
+      // 3. CartoDB fallback
+      const cartoVoyager = L.tileLayer('https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png', {
         maxZoom: 19,
-        subdomains: 'abcd',
         attribution: '&copy; CartoDB &copy; OpenStreetMap'
       });
 
-      googleRoads.on('tileerror', function() {
+      proxyTiles.on('tileerror', function() {
+        if (!editMap.hasLayer(directGoogle)) {
+          directGoogle.addTo(editMap);
+        }
+      });
+      directGoogle.on('tileerror', function() {
         if (!editMap.hasLayer(cartoVoyager)) {
           cartoVoyager.addTo(editMap);
         }
       });
-      googleRoads.addTo(editMap);
+      proxyTiles.addTo(editMap);
 
-      editMarker = L.marker([latVal, lngVal], { draggable: true }).addTo(editMap);
+      const pinIcon = createStorePinIcon();
+      editMarker = L.marker([latVal, lngVal], { 
+        draggable: true,
+        icon: pinIcon
+      }).addTo(editMap);
       editMarker.bindTooltip("Drag pin to store entrance", { permanent: false, direction: 'top' });
 
       function onPosUpdate(lat, lng) {

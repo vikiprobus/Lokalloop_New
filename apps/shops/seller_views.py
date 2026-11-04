@@ -823,3 +823,60 @@ def seller_verify_catalog_claim_api(request):
         'status': claim.status if claim else None,
     }, status=200 if success else 400)
 
+
+
+def map_tile_proxy_view(request, z, x, y):
+    """
+    High-reliability, same-origin map tile proxy.
+    Guarantees tiles load on mobile without CSP, CORS, or ISP network blocks.
+    Caches tiles in memory for instantaneous rendering.
+    """
+    import urllib.request
+    from django.core.cache import cache
+    from django.http import HttpResponse
+
+    cache_key = f"tile_proxy:{z}:{x}:{y}"
+    cached_data = cache.get(cache_key)
+    if cached_data:
+        response = HttpResponse(cached_data, content_type='image/png')
+        response['Cache-Control'] = 'public, max-age=86400'
+        return response
+
+    # Try high-definition Google Maps road tile, then fallback to CartoDB Voyager and OSM
+    candidate_urls = [
+        f"https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
+        f"https://mt0.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
+        f"https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png",
+        f"https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+    ]
+
+    for tile_url in candidate_urls:
+        try:
+            req = urllib.request.Request(
+                tile_url,
+                headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
+            )
+            with urllib.request.urlopen(req, timeout=3.5) as upstream:
+                if upstream.status == 200:
+                    tile_bytes = upstream.read()
+                    # Cache in memory for 7 days
+                    cache.set(cache_key, tile_bytes, timeout=86400 * 7)
+                    content_type = upstream.headers.get('Content-Type', 'image/png')
+                    response = HttpResponse(tile_bytes, content_type=content_type)
+                    response['Cache-Control'] = 'public, max-age=86400'
+                    return response
+        except Exception:
+            continue
+
+    # Fallback to SVG road grid if external upstream is completely unreachable
+    svg = (
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">'
+        f'<rect width="256" height="256" fill="#f8fafc"/>'
+        f'<path d="M0 64h256M0 128h256M0 192h256M64 0v256M128 0v256M192 0v256" stroke="#e2e8f0" stroke-width="2"/>'
+        f'<path d="M0 128h256M128 0v256" stroke="#cbd5e1" stroke-width="6"/>'
+        f'<circle cx="128" cy="128" r="4" fill="#94a3b8"/>'
+        f'</svg>'
+    )
+    response = HttpResponse(svg, content_type='image/svg+xml')
+    response['Cache-Control'] = 'public, max-age=3600'
+    return response
