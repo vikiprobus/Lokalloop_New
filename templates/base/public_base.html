@@ -390,11 +390,14 @@
         if (toggle) toggle.setAttribute('aria-expanded', 'true');
         if (lines) lines.style.display = 'none';
         if (close) close.style.display = 'block';
+        if (typeof window.pushModalHistory === 'function') {
+          window.pushModalHistory('mobileMenuDrawer');
+        }
       }
       return false;
     }
 
-    function closePublicMobileNav() {
+    function closePublicMobileNav(fromPopstate) {
       var drawer = document.getElementById('mobileMenuDrawer');
       var toggle = document.getElementById('mobileNavToggle');
       var lines = document.getElementById('navToggleIconLines');
@@ -407,6 +410,13 @@
       if (toggle) toggle.setAttribute('aria-expanded', 'false');
       if (lines) lines.style.display = 'block';
       if (close) close.style.display = 'none';
+      if (!fromPopstate) {
+        if (window.history.state && window.history.state.modalOpen) {
+          window.history.back();
+        } else if (typeof window.popModalHistorySilent === 'function') {
+          window.popModalHistorySilent();
+        }
+      }
     }
   </script>
 

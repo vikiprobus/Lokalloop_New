@@ -1,6 +1,153 @@
 // LokalLoop Vanilla JavaScript Utility Layer
 
+// ============================================================================
+// 0. Median / GoNative Android WebView Native Bridge & Status Bar Sync (WEB-01)
+// ============================================================================
+window.syncNativeStatusBar = function(hexColor, contentStyle) {
+  try {
+    if (!hexColor) return;
+
+    // A. Update or create standard HTML5 theme-color meta tag
+    let meta = document.querySelector('meta[name="theme-color"]');
+    if (!meta) {
+      meta = document.createElement('meta');
+      meta.name = 'theme-color';
+      document.head.appendChild(meta);
+    }
+    meta.setAttribute('content', hexColor);
+
+    // B. Calculate contentStyle if not explicitly provided ('light' for dark bg, 'dark' for light bg)
+    let style = contentStyle;
+    if (!style) {
+      const cleanHex = hexColor.replace('#', '');
+      const r = parseInt(cleanHex.substring(0, 2), 16) || 0;
+      const g = parseInt(cleanHex.substring(2, 4), 16) || 0;
+      const b = parseInt(cleanHex.substring(4, 6), 16) || 0;
+      // Perceived luminance formula (ITU-R BT.709)
+      const luminance = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+      style = luminance > 0.6 ? 'dark' : 'light';
+    }
+
+    // C. Update iOS web clip status bar meta tag
+    let appleMeta = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
+    if (!appleMeta) {
+      appleMeta = document.createElement('meta');
+      appleMeta.name = 'apple-mobile-web-app-status-bar-style';
+      document.head.appendChild(appleMeta);
+    }
+    appleMeta.setAttribute('content', style === 'light' ? 'black-translucent' : 'default');
+
+    // D. Median (GoNative) JavaScript Bridge invocation
+    // Median documentation: style: 'light' (white text/icons) or 'dark' (dark text/icons)
+    const bridgePayload = { color: hexColor, style: style };
+    if (window.median && window.median.statusbar && typeof window.median.statusbar.set === 'function') {
+      window.median.statusbar.set(bridgePayload);
+    } else if (window.gonative && window.gonative.statusbar && typeof window.gonative.statusbar.set === 'function') {
+      window.gonative.statusbar.set(bridgePayload);
+    }
+  } catch (err) {
+    console.debug('StatusBar sync notice:', err);
+  }
+};
+
+// ============================================================================
+// 0.1 Universal Android Hardware Back-Stack History Trapping (WEB-03)
+// ============================================================================
+window._activeModalStack = window._activeModalStack || [];
+
+window.pushModalHistory = function(modalRef) {
+  try {
+    window._activeModalStack.push(modalRef);
+    window.history.pushState({ modalOpen: true, modalRef: typeof modalRef === 'string' ? modalRef : 'generic' }, '');
+  } catch (e) {
+    console.debug('pushModalHistory error:', e);
+  }
+};
+
+window.popModalHistorySilent = function() {
+  if (window._activeModalStack.length > 0) {
+    window._activeModalStack.pop();
+  }
+};
+
+window.addEventListener('popstate', function(e) {
+  // 1. Check Public Mobile Navigation Drawer
+  const publicDrawer = document.getElementById('mobileMenuDrawer');
+  if (publicDrawer && (publicDrawer.classList.contains('show') || publicDrawer.style.display === 'flex')) {
+    if (typeof closePublicMobileNav === 'function') {
+      closePublicMobileNav(true);
+      return;
+    }
+  }
+
+  // 2. Check Buyer Mobile Account Drawer
+  const accountDrawer = document.getElementById('mobileAccountDrawer');
+  if (accountDrawer && accountDrawer.style.display === 'block') {
+    if (typeof closeMobileAccountDrawer === 'function') {
+      closeMobileAccountDrawer(true);
+      return;
+    }
+  }
+
+  // 2.5 Check Seller Mobile Sidebar Drawer
+  const sellerBackdrop = document.getElementById('sellerSidebarBackdrop');
+  if (sellerBackdrop && (sellerBackdrop.classList.contains('show') || sellerBackdrop.style.display === 'block')) {
+    if (typeof closeSellerSidebar === 'function') {
+      closeSellerSidebar(true);
+      return;
+    }
+  }
+
+  // 3. Check Admin Mobile Sidebar Drawer
+  const adminBackdrop = document.querySelector('.admin-sidebar-backdrop.show');
+  if (adminBackdrop) {
+    if (typeof closeAdminSidebar === 'function') {
+      closeAdminSidebar(true);
+      return;
+    }
+  }
+
+  // 4. Check Generic Modal Backdrops (.modal-backdrop)
+  const openModals = document.querySelectorAll('.modal-backdrop');
+  for (let i = openModals.length - 1; i >= 0; i--) {
+    const modal = openModals[i];
+    if (modal.style.display === 'flex' || modal.style.display === 'block' || modal.classList.contains('show')) {
+      modal.style.display = 'none';
+      modal.classList.remove('show');
+      window.popModalHistorySilent();
+      return;
+    }
+  }
+
+  // 5. Check Counter Request Modal specifically
+  const counterModal = document.getElementById('counterRequestModal');
+  if (counterModal && (counterModal.style.display === 'flex' || counterModal.style.display === 'block')) {
+    if (typeof closeCounterModal === 'function') {
+      closeCounterModal(true);
+      return;
+    }
+  }
+
+  // 6. Check Custom Named Modals
+  const customModalIds = ['sellerQuickActionsModal', 'qrScannerBackdrop', 'dealClaimModal'];
+  for (const id of customModalIds) {
+    const el = document.getElementById(id);
+    if (el && (el.style.display === 'flex' || el.style.display === 'block' || el.classList.contains('show'))) {
+      el.style.display = 'none';
+      el.classList.remove('show');
+      window.popModalHistorySilent();
+      return;
+    }
+  }
+});
+
+
 document.addEventListener('DOMContentLoaded', () => {
+  // Auto-sync status bar based on initial meta tag (WEB-01)
+  const initialMeta = document.querySelector('meta[name="theme-color"]');
+  if (initialMeta && initialMeta.getAttribute('content')) {
+    window.syncNativeStatusBar(initialMeta.getAttribute('content'));
+  }
   // 1. Auto dismiss alerts after 5 seconds
   const alerts = document.querySelectorAll('.alert');
   alerts.forEach(alert => {
@@ -20,6 +167,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const modal = document.getElementById(targetId);
       if (modal) {
         modal.style.display = 'flex';
+        window.pushModalHistory(targetId);
       }
     });
   });
@@ -29,6 +177,11 @@ document.addEventListener('DOMContentLoaded', () => {
       const modal = closer.closest('.modal-backdrop');
       if (modal) {
         modal.style.display = 'none';
+        if (window.history.state && window.history.state.modalOpen) {
+          window.history.back();
+        } else {
+          window.popModalHistorySilent();
+        }
       }
     });
   });

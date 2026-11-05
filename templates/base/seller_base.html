@@ -6,6 +6,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="description" content="{% block meta_description %}LokalLoop Merchant Business Portal — Manage store profile, launch campaigns, track redemptions and counter QR codes.{% endblock %}">
   <link rel="icon" type="image/svg+xml" href="{% static 'images/favicon.svg' %}">
+  
+  <!-- Progressive Web App & Android WebView Status Bar Integration (WEB-01) -->
+  <meta name="theme-color" content="#070C18">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="LokalLoop Merchant">
   <title>{% block title %}Merchant Portal — LokalLoop Business{% endblock %}</title>
   
   <!-- Fonts -->
@@ -705,9 +711,12 @@
         }
         if (modal) modal.style.display = 'flex';
         if (pill) pill.style.display = 'none';
+        if (typeof window.pushModalHistory === 'function') {
+          window.pushModalHistory('counterRequestModal');
+        }
       };
 
-      window.closeCounterModal = function() {
+      window.closeCounterModal = function(fromPopstate) {
         const modal = document.getElementById('counterRequestModal');
         const pill = document.getElementById('floatingCounterPill');
         if (currentRequest) {
@@ -716,6 +725,13 @@
         if (modal) modal.style.display = 'none';
         if (pendingRequests && pendingRequests.length > 0 && pill) {
           pill.style.display = 'flex';
+        }
+        if (!fromPopstate) {
+          if (window.history.state && window.history.state.modalOpen) {
+            window.history.back();
+          } else if (typeof window.popModalHistorySilent === 'function') {
+            window.popModalHistorySilent();
+          }
         }
       };
 
@@ -811,13 +827,29 @@
     const sellerBackdrop = document.getElementById('sellerSidebarBackdrop');
 
     function toggleSellerSidebar() {
-      if (sellerSidebar) sellerSidebar.classList.toggle('show');
-      if (sellerBackdrop) sellerBackdrop.classList.toggle('show');
+      if (!sellerSidebar || !sellerBackdrop) return;
+      const isOpen = sellerSidebar.classList.contains('show');
+      if (isOpen) {
+        closeSellerSidebar();
+      } else {
+        sellerSidebar.classList.add('show');
+        sellerBackdrop.classList.add('show');
+        if (typeof window.pushModalHistory === 'function') {
+          window.pushModalHistory('sellerSidebar');
+        }
+      }
     }
 
-    function closeSellerSidebar() {
+    function closeSellerSidebar(fromPopstate) {
       if (sellerSidebar) sellerSidebar.classList.remove('show');
       if (sellerBackdrop) sellerBackdrop.classList.remove('show');
+      if (!fromPopstate) {
+        if (window.history.state && window.history.state.modalOpen) {
+          window.history.back();
+        } else if (typeof window.popModalHistorySilent === 'function') {
+          window.popModalHistorySilent();
+        }
+      }
     }
 
     if (sellerMobileBtn) {

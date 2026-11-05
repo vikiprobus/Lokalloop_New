@@ -514,10 +514,20 @@
     function openMobileAccountDrawer() {
       document.getElementById('mobileAccountBackdrop').style.display = 'block';
       document.getElementById('mobileAccountDrawer').style.display = 'block';
+      if (typeof window.pushModalHistory === 'function') {
+        window.pushModalHistory('mobileAccountDrawer');
+      }
     }
-    function closeMobileAccountDrawer() {
+    function closeMobileAccountDrawer(fromPopstate) {
       document.getElementById('mobileAccountBackdrop').style.display = 'none';
       document.getElementById('mobileAccountDrawer').style.display = 'none';
+      if (!fromPopstate) {
+        if (window.history.state && window.history.state.modalOpen) {
+          window.history.back();
+        } else if (typeof window.popModalHistorySilent === 'function') {
+          window.popModalHistorySilent();
+        }
+      }
     }
   </script>
 
