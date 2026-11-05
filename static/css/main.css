@@ -1458,3 +1458,33 @@ body {
     -webkit-tap-highlight-color: transparent;
   }
 }
+
+
+/* ==========================================================================
+   Batch 4: Visual Refinements & Micro-Interactions (MIC-01, MIC-02)
+   ========================================================================== */
+
+.font-display {
+  font-family: var(--font-display, 'Outfit', sans-serif) !important;
+}
+
+/* Active Card Tap Micro-Interactions (MIC-02) */
+.shop-card,
+.offer-card,
+.stat-card,
+.cat-card-modern,
+.step-card-modern,
+.mobile-nav-link-card,
+.merchant-pill-item,
+.ll-card {
+  transition: transform 0.15s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.15s ease !important;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.shop-card:active,
+.offer-card:active,
+.cat-card-modern:active,
+.step-card-modern:active,
+.merchant-pill-item:active {
+  transform: scale(0.985);
+}

@@ -103,7 +103,7 @@
           <div style="font-size: 0.75rem; text-transform: uppercase; color: #64748b; letter-spacing: 0.05em; font-weight: 700;">
             Billing Counter Code (OTP)
           </div>
-          <div style="font-size: 2.75rem; font-weight: 900; font-family: monospace; letter-spacing: 0.15em; color: var(--brand-navy-900); margin: 0.25rem 0;">
+          <div style="font-size: 2.75rem; font-weight: 900; font-family: monospace; letter-spacing: 0.25em; color: var(--brand-navy-900); margin: 0.25rem 0;">
             {{ redemption_voucher.verification_otp|default:"6824" }}
           </div>
           <div id="voucherOtpStatus" style="font-size: 0.8rem; font-weight: 700; color: {% if redemption_voucher.status == 'PENDING_APPROVAL' %}#d97706{% elif redemption_voucher.status == 'CANCELLED' %}#dc2626{% else %}#059669{% endif %}; display: flex; align-items: center; justify-content: center; gap: 0.35rem;">
