@@ -281,7 +281,7 @@ class BuyerRegistrationForm(CaptchaFieldMixin, forms.Form):
     last_name = forms.CharField(max_length=50, label="Last Name", widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Last Name'}))
     gender = forms.ChoiceField(choices=GENDER_CHOICES, required=False, label="Gender", widget=forms.Select(attrs={'class': 'form-select'}))
     email = forms.EmailField(label="Email Address", widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Enter your email'}))
-    phone = forms.CharField(max_length=15, label="Mobile Number", widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter mobile number'}))
+    phone = forms.CharField(max_length=15, label="Mobile Number", widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter mobile number', 'type': 'tel', 'inputmode': 'tel', 'autocomplete': 'tel'}))
     city = forms.CharField(max_length=100, label="City", initial="Bengaluru", widget=forms.TextInput(attrs={'class': 'form-control'}))
     password = forms.CharField(label="Password", widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Min 8 characters', 'autocomplete': 'new-password'}))
     # Anti-bot honeypot field (hidden via CSS; must remain empty)
@@ -381,7 +381,10 @@ class SellerRegistrationForm(CaptchaFieldMixin, forms.Form):
         widget=forms.TextInput(attrs={
             'class': 'form-control',
             'id': 'id_pincode',
-            'placeholder': '411001'
+            'placeholder': '411001',
+            'inputmode': 'numeric',
+            'pattern': '[0-9]{6}',
+            'autocomplete': 'postal-code'
         })
     )
     latitude = forms.DecimalField(
@@ -416,7 +419,10 @@ class SellerRegistrationForm(CaptchaFieldMixin, forms.Form):
         widget=forms.TextInput(attrs={
             'class': 'form-control',
             'id': 'id_display_phone',
-            'placeholder': '+91 20 2544 0000 or mobile'
+            'placeholder': '+91 20 2544 0000 or mobile',
+            'type': 'tel',
+            'inputmode': 'tel',
+            'autocomplete': 'tel'
         })
     )
 
@@ -456,6 +462,8 @@ class SellerRegistrationForm(CaptchaFieldMixin, forms.Form):
             'class': 'form-control',
             'id': 'id_phone',
             'placeholder': '9822011223 (10 digits)',
+            'type': 'tel',
+            'inputmode': 'tel',
             'autocomplete': 'tel'
         })
     )

@@ -1397,3 +1397,64 @@ body {
   touch-action: pan-x pan-y !important;
   -webkit-overflow-scrolling: touch;
 }
+
+
+/* ==========================================================================
+   Batch 3: Touch Target Ergonomics & Form Double-Submit Protection
+   WCAG 2.2 SC 2.5.8 (Target Size Minimum) & Transaction Integrity (COMP-01)
+   ========================================================================== */
+
+/* Form Double-Submission Lockout & Loading Indicator (COMP-01) */
+.btn-loading {
+  position: relative !important;
+  pointer-events: none !important;
+  opacity: 0.85 !important;
+  cursor: not-allowed !important;
+}
+
+.btn-spinner {
+  display: inline-block;
+  width: 0.875rem;
+  height: 0.875rem;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: ll-spin 0.7s linear infinite;
+  vertical-align: -0.125em;
+  margin-right: 0.45rem;
+}
+
+@keyframes ll-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Touch Target Size Minimum (A11Y-02 / Android 48dp) */
+@media (max-width: 991px) {
+  .btn-sm,
+  .btn-icon,
+  .touch-target-expanded,
+  .pagination .page-link {
+    position: relative;
+  }
+
+  .btn-sm::after,
+  .btn-icon::after,
+  .touch-target-expanded::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    min-width: 48px;
+    min-height: 48px;
+    width: 100%;
+    height: 100%;
+    pointer-events: auto;
+  }
+
+  .bottom-nav-item,
+  .seller-bottom-nav a {
+    min-height: 48px;
+    -webkit-tap-highlight-color: transparent;
+  }
+}

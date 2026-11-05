@@ -202,17 +202,19 @@
       align-items: center;
       justify-content: center;
       gap: 0.25rem;
-      font-size: 0.7rem;
+      font-size: 0.72rem;
       font-weight: 600;
-      color: #64748b;
+      color: #94a3b8;
       text-decoration: none;
       flex: 1;
-      min-width: 44px;
+      min-width: 48px;
+      min-height: 48px;
       padding: 0.35rem 0;
       transition: color 0.15s ease;
+      -webkit-tap-highlight-color: transparent;
     }
     .seller-bottom-nav a.active {
-      color: #ea580c !important;
+      color: #f97316 !important;
       font-weight: 800;
     }
     .seller-bottom-nav .seller-nav-center-btn {
@@ -912,7 +914,7 @@
     </a>
 
     <!-- Center Floating Action Button (4-Squares Grid Icon) -->
-    <button type="button" class="seller-nav-center-btn" onclick="toggleSellerQuickActionsModal()" aria-label="Quick Actions" aria-label="Close Quick Actions Modal" title="Close Quick Actions Modal">
+    <button type="button" class="seller-nav-center-btn" onclick="toggleSellerQuickActionsModal()" aria-label="Open Quick Actions Menu" title="Quick Actions">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="#ffffff" stroke="none">
         <rect x="3" y="3" width="7" height="7" rx="2" />
         <rect x="14" y="3" width="7" height="7" rx="2" />

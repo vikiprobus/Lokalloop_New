@@ -124,7 +124,7 @@
       </div>
       <div class="form-group">
         <label class="form-label">PIN Code</label>
-        <input type="text" name="pincode" class="form-control" value="{{ shop.pincode }}" required>
+        <input type="text" name="pincode" class="form-control" value="{{ shop.pincode }}" required inputmode="numeric" pattern="[0-9]{6}" placeholder="6-digit PIN code" autocomplete="postal-code">
       </div>
     </div>
 
@@ -138,7 +138,7 @@
           <button type="button" class="btn btn-sm btn-outline" onclick="detectGPSLocationProfile()" style="font-size: 0.75rem; padding: 0.25rem 0.65rem; font-weight: 700;">
             <i class="bi bi-crosshair"></i> Use Current Location
           </button>
-          <button type="button" class="btn btn-sm btn-outline" onclick="refreshProfileMap()" style="font-size: 0.75rem; padding: 0.25rem 0.65rem; font-weight: 700;" title="Redraw map tiles">
+          <button type="button" class="btn btn-sm btn-outline touch-target-expanded" onclick="refreshProfileMap()" style="font-size: 0.75rem; padding: 0.25rem 0.65rem; font-weight: 700;" title="Redraw map tiles" aria-label="Redraw map tiles">
             <i class="bi bi-arrow-clockwise"></i> Redraw Map
           </button>
         </div>
@@ -161,7 +161,7 @@
     <div class="d-grid grid-2 gap-2">
       <div class="form-group">
         <label class="form-label">Store Phone Number <span class="text-danger">*</span></label>
-        <input type="text" name="phone" class="form-control" value="{{ shop.phone }}" required placeholder="+91 98234 56789">
+        <input type="tel" name="phone" class="form-control" value="{{ shop.phone }}" required placeholder="+91 98234 56789" inputmode="tel" autocomplete="tel">
       </div>
       <div class="form-group">
         <label class="form-label">Store Email</label>

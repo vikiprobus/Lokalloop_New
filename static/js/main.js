@@ -142,6 +142,51 @@ window.addEventListener('popstate', function(e) {
 });
 
 
+
+// ============================================================================
+// 0.3 Universal Form Double-Submission Lockout & Loading Indicator (COMP-01)
+// ============================================================================
+document.addEventListener('submit', function(e) {
+  const form = e.target;
+  if (!form || form.tagName !== 'FORM') return;
+
+  // Skip GET forms (search, filters) or forms explicitly opting out
+  if ((form.method && form.method.toLowerCase() === 'get') || form.hasAttribute('data-no-lockout')) {
+    return;
+  }
+
+  // Prevent duplicate submission if already processing
+  if (form.getAttribute('data-submitting') === 'true') {
+    e.preventDefault();
+    return false;
+  }
+
+  form.setAttribute('data-submitting', 'true');
+
+  // Find primary submit button
+  const submitBtn = form.querySelector('button[type="submit"], input[type="submit"], .btn-primary');
+  if (submitBtn && !submitBtn.disabled) {
+    submitBtn.classList.add('btn-loading');
+
+    // For <button>, inject a loading spinner
+    if (submitBtn.tagName === 'BUTTON' && !submitBtn.querySelector('.btn-spinner')) {
+      const spinner = document.createElement('span');
+      spinner.className = 'btn-spinner';
+      spinner.setAttribute('role', 'status');
+      spinner.setAttribute('aria-hidden', 'true');
+      submitBtn.insertAdjacentElement('afterbegin', spinner);
+    }
+
+    // Safety fallback: Release lockout after 8 seconds in case of client-side validation interruptions
+    setTimeout(() => {
+      form.removeAttribute('data-submitting');
+      submitBtn.classList.remove('btn-loading');
+      const sp = submitBtn.querySelector('.btn-spinner');
+      if (sp) sp.remove();
+    }, 8000);
+  }
+});
+
 document.addEventListener('DOMContentLoaded', () => {
   // Auto-sync status bar based on initial meta tag (WEB-01)
   const initialMeta = document.querySelector('meta[name="theme-color"]');
