@@ -454,3 +454,149 @@ function copyToClipboard(text, btnElement) {
     fallbackExecCopy(text);
   }
 }
+
+
+// ============================================================================
+// 7. Navigation State & City Filter Persistence (User Directive)
+// ============================================================================
+(function initCityPersistence() {
+  try {
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlCity = urlParams.get('city');
+    if (urlCity) {
+      sessionStorage.setItem('lokalloop_selected_city', urlCity);
+    }
+
+    document.addEventListener('click', (e) => {
+      const link = e.target.closest('a[href*="city="]');
+      if (link) {
+        try {
+          const u = new URL(link.href, window.location.origin);
+          const c = u.searchParams.get('city');
+          if (c) sessionStorage.setItem('lokalloop_selected_city', c);
+        } catch (err) {}
+      }
+    });
+  } catch (e) {}
+})();
+
+// ============================================================================
+// 8. Form Draft Auto-Save & Accidental Loss Protection (User Directive)
+// ============================================================================
+(function initFormDraftProtection() {
+  document.addEventListener('DOMContentLoaded', () => {
+    const targetForms = document.querySelectorAll('form:not([method="get"]):not([data-no-draft])');
+
+    targetForms.forEach(form => {
+      const formKey = form.id || form.getAttribute('action') || window.location.pathname;
+      const storageKey = 'll_draft_' + btoa(formKey).substring(0, 32);
+
+      // 1. Restore draft if present and inputs are empty
+      try {
+        const savedRaw = sessionStorage.getItem(storageKey);
+        if (savedRaw) {
+          const savedData = JSON.parse(savedRaw);
+          Object.keys(savedData).forEach(name => {
+            const field = form.elements[name];
+            if (field && field.type !== 'password' && field.type !== 'file' && field.type !== 'hidden') {
+              if (!field.value || field.value.trim() === '') {
+                if (field.type === 'checkbox') {
+                  field.checked = Boolean(savedData[name]);
+                } else {
+                  field.value = savedData[name];
+                }
+              }
+            }
+          });
+        }
+      } catch (err) {}
+
+      // 2. Track changes and auto-save (debounced)
+      let saveTimer = null;
+      let isFormDirty = false;
+
+      form.addEventListener('input', (e) => {
+        if (!e.target || e.target.type === 'password' || e.target.type === 'file') return;
+        isFormDirty = true;
+        clearTimeout(saveTimer);
+        saveTimer = setTimeout(() => {
+          try {
+            const formData = {};
+            const elements = form.elements;
+            for (let i = 0; i < elements.length; i++) {
+              const el = elements[i];
+              if (el.name && el.type !== 'password' && el.type !== 'file' && el.type !== 'hidden') {
+                formData[el.name] = el.type === 'checkbox' ? el.checked : el.value;
+              }
+            }
+            sessionStorage.setItem(storageKey, JSON.stringify(formData));
+          } catch (err) {}
+        }, 400);
+      });
+
+      // 3. Clear draft on successful submit
+      form.addEventListener('submit', () => {
+        isFormDirty = false;
+        try {
+          sessionStorage.removeItem(storageKey);
+        } catch (err) {}
+      });
+
+      // 4. Warn before navigating away if form was edited
+      window.addEventListener('beforeunload', (e) => {
+        if (isFormDirty) {
+          e.preventDefault();
+          e.returnValue = '';
+        }
+      });
+    });
+  });
+})();
+
+// ============================================================================
+// 9. Root Page Double-Back to Exit (Android WebView Natural Feel)
+// ============================================================================
+(function initDoubleBackToExit() {
+  const rootPaths = ['/', '/buyer/dashboard/', '/seller/dashboard/'];
+  let lastBackPress = 0;
+
+  if (rootPaths.includes(window.location.pathname)) {
+    try {
+      if (!window.history.state || !window.history.state.isRootSentinel) {
+        window.history.pushState({ isRootSentinel: true }, '');
+      }
+    } catch (err) {}
+
+    window.addEventListener('popstate', (e) => {
+      const hasOpenModal = document.querySelector('.modal-backdrop.show, .mobile-menu-drawer.show, #mobileAccountDrawer[style*="block"], .admin-sidebar-backdrop.show, #counterRequestModal[style*="flex"]');
+      if (hasOpenModal) return;
+
+      const now = Date.now();
+      if (now - lastBackPress < 2000) {
+        if (window.median && window.median.screen && typeof window.median.screen.exit === 'function') {
+          window.median.screen.exit();
+        } else {
+          window.history.back();
+        }
+      } else {
+        lastBackPress = now;
+        try {
+          window.history.pushState({ isRootSentinel: true }, '');
+        } catch (err) {}
+
+        let toast = document.getElementById('ll-exit-toast');
+        if (!toast) {
+          toast = document.createElement('div');
+          toast.id = 'll-exit-toast';
+          toast.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(15,23,42,0.92);color:#ffffff;padding:0.6rem 1.25rem;border-radius:9999px;font-size:0.82rem;font-weight:700;z-index:99999;box-shadow:0 8px 20px rgba(0,0,0,0.3);backdrop-filter:blur(4px);pointer-events:none;transition:opacity 0.3s ease;';
+          document.body.appendChild(toast);
+        }
+        toast.textContent = 'Press back again to exit';
+        toast.style.opacity = '1';
+        setTimeout(() => {
+          if (toast) toast.style.opacity = '0';
+        }, 1800);
+      }
+    });
+  }
+})();

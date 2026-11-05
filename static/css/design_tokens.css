@@ -95,4 +95,19 @@
   --brand-saffron-accent: #f97316;
   --border-glass: rgba(255, 255, 255, 0.12);
   --shadow-capsule: 0 16px 40px -8px rgba(0, 0, 0, 0.25), 0 4px 12px -2px rgba(0, 0, 0, 0.08);
+
+  /* Android Native Shell & Semantic Accent Alignment */
+  --native-accent-light: #ea580c;
+  --native-background-light: #ffffff;
+  --native-statusbar-light: #0f172a;
+
+  /* Consistent Dark Theme Brand Continuity (No teal shift; True Brand Saffron) */
+  --native-accent-dark: #fb923c;
+  --native-background-dark: #070c18;
+  --native-statusbar-dark: #070c18;
+
+  --brand-primary: #ea580c;
+  --brand-primary-hover: #c2410c;
+  --brand-primary-dark: #fb923c;
+
 }
