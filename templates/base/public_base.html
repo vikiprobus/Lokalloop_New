@@ -416,7 +416,7 @@
       {% for message in messages %}
         <div class="alert alert-{{ message.tags }}">
           <span>{{ message }}</span>
-          <button type="button" style="background: none; border: none; cursor: pointer; font-size: 1.1rem;" onclick="this.parentElement.remove();">&times;</button>
+          <button type="button" aria-label="Dismiss alert" title="Dismiss alert" style="background: none; border: none; cursor: pointer; font-size: 1.1rem;" onclick="this.parentElement.remove();">&times;</button>
         </div>
       {% endfor %}
     </div>

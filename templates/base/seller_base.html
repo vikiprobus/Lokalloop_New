@@ -297,7 +297,7 @@
             <span style="display: block; font-size: 0.65rem; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Merchant Portal</span>
           </div>
         </a>
-        <button type="button" class="d-none-desktop" onclick="closeSellerSidebar()" style="background: none; border: none; color: #94a3b8; font-size: 1.5rem; cursor: pointer; padding: 0.25rem; line-height: 1;">
+        <button type="button" class="d-none-desktop" onclick="closeSellerSidebar()" style="background: none; border: none; color: #94a3b8; font-size: 1.5rem; cursor: pointer; padding: 0.25rem; line-height: 1;" aria-label="Close Navigation Sidebar" title="Close Navigation Sidebar">
           &times;
         </button>
       </div>
@@ -485,7 +485,7 @@
           {% for message in messages %}
             <div class="alert alert-{{ message.tags }}">
               <span>{{ message }}</span>
-              <button type="button" style="background: none; border: none; cursor: pointer; font-size: 1.1rem;" onclick="this.parentElement.remove();">&times;</button>
+              <button type="button" aria-label="Dismiss alert" title="Dismiss alert" style="background: none; border: none; cursor: pointer; font-size: 1.1rem;" onclick="this.parentElement.remove();">&times;</button>
             </div>
           {% endfor %}
         </div>
@@ -521,7 +521,7 @@
             🚨 Counter Checkout Request
           </h3>
         </div>
-        <button type="button" onclick="closeCounterModal()" style="background: rgba(255,255,255,0.18); border: none; color: #ffffff; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.1rem; line-height: 1; transition: background 0.15s ease;">
+        <button type="button" onclick="closeCounterModal()" style="background: rgba(255,255,255,0.18); border: none; color: #ffffff; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.1rem; line-height: 1; transition: background 0.15s ease;" aria-label="Close Counter Modal" title="Close Counter Modal">
           &times;
         </button>
       </div>
@@ -880,7 +880,7 @@
     </a>
 
     <!-- Center Floating Action Button (4-Squares Grid Icon) -->
-    <button type="button" class="seller-nav-center-btn" onclick="toggleSellerQuickActionsModal()" aria-label="Quick Actions">
+    <button type="button" class="seller-nav-center-btn" onclick="toggleSellerQuickActionsModal()" aria-label="Quick Actions" aria-label="Close Quick Actions Modal" title="Close Quick Actions Modal">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="#ffffff" stroke="none">
         <rect x="3" y="3" width="7" height="7" rx="2" />
         <rect x="14" y="3" width="7" height="7" rx="2" />
@@ -915,7 +915,7 @@
           <span style="width: 28px; height: 28px; border-radius: 8px; background: #ea580c; display: inline-flex; align-items: center; justify-content: center; font-size: 0.85rem;"><i class="bi bi-grid-fill"></i></span>
           Quick Actions
         </h3>
-        <button type="button" onclick="toggleSellerQuickActionsModal()" style="background: rgba(255,255,255,0.08); border: none; color: #94a3b8; width: 32px; height: 32px; border-radius: 50%; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center;">&times;</button>
+        <button type="button" onclick="toggleSellerQuickActionsModal()" style="background: rgba(255,255,255,0.08); border: none; color: #94a3b8; width: 32px; height: 32px; border-radius: 50%; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center;" aria-label="Close Quick Actions Modal" title="Close Quick Actions Modal">&times;</button>
       </div>
       <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem;">
         <a href="/seller/qr/" style="text-decoration: none; background: #141c2e; border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 1rem 0.5rem; text-align: center; color: #ffffff; display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">

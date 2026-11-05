@@ -365,7 +365,7 @@
       {% for message in messages %}
         <div class="alert alert-{{ message.tags }}" style="border-radius: 12px; margin-bottom: 0.5rem;">
           <span>{{ message }}</span>
-          <button type="button" style="background: none; border: none; cursor: pointer; font-size: 1.1rem; float: right;" onclick="this.parentElement.remove();">&times;</button>
+          <button type="button" aria-label="Dismiss alert" title="Dismiss alert" style="background: none; border: none; cursor: pointer; font-size: 1.1rem; float: right;" onclick="this.parentElement.remove();">&times;</button>
         </div>
       {% endfor %}
     </div>
@@ -476,7 +476,7 @@
           </div>
         </div>
       </div>
-      <button type="button" onclick="closeMobileAccountDrawer()" style="background: none; border: none; font-size: 1.4rem; color: #94a3b8; cursor: pointer; padding: 0.25rem;">
+      <button type="button" onclick="closeMobileAccountDrawer()" style="background: none; border: none; font-size: 1.4rem; color: #94a3b8; cursor: pointer; padding: 0.25rem;" aria-label="Close Account Menu" title="Close Account Menu">
         &times;
       </button>
     </div>
