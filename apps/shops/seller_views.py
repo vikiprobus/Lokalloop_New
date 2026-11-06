@@ -357,13 +357,13 @@ def seller_offer_create_view(request):
                         if parsed_val > Decimal('0.00'):
                             max_discount = parsed_val
                         elif parsed_val < Decimal('0.00'):
-                            messages.error(request, "कमाल सवलत मर्यादा 0 पेक्षा कमी असू शकत नाही / Maximum discount cap cannot be negative.")
+                            messages.error(request, "Maximum discount cap cannot be negative.")
                             return render(request, 'seller/offer_form.html', {'shop': shop, 'offer_types': OfferType.choices, 'form_data': form_data})
                         else:
                             # 0 means seller wants unlimited / no cap
                             max_discount = None
                     except Exception:
-                        messages.error(request, "कमाल सवलत रकमेमध्ये फक्त आकडे टाकावेत (उदा. 200) / Invalid maximum discount cap. Please enter numbers only (e.g. 200).")
+                        messages.error(request, "Invalid maximum discount cap. Please enter numbers only (e.g. 200).")
                         return render(request, 'seller/offer_form.html', {'shop': shop, 'offer_types': OfferType.choices, 'form_data': form_data})
 
             if not title:

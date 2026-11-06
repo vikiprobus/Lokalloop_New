@@ -53,11 +53,11 @@
 
       <div class="form-group" id="max_discount_wrapper">
         <label class="form-label" for="id_max_discount">
-          Max Discount Cap (₹) <span class="text-muted">(कमाल मर्यादा - Optional)</span>
+          Max Discount Cap (₹) <span class="text-muted">(Optional for %)</span>
         </label>
-        <input type="number" step="10" min="0" name="max_discount" id="id_max_discount" class="form-control" value="{{ form_data.max_discount|default:'' }}" placeholder="उदा. 200 (मर्यादा नसेल तर 0 किंवा रिकामा ठेवा)">
+        <input type="number" step="10" min="0" name="max_discount" id="id_max_discount" class="form-control" value="{{ form_data.max_discount|default:'' }}" placeholder="e.g. 200 (leave blank or 0 for no limit)">
         <div class="form-text" id="max_discount_help" style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.25rem;">
-          जास्तीत जास्त किती रुपयांची सूट द्यायची? (उदा. 20% सूट कमाल ₹200 पर्यंत). कोणतीही मर्यादा नको असल्यास हे रिकामा ठेवा किंवा 0 लिहा.
+          Maximum rupee discount cap (e.g. 20% off up to ₹200). Leave blank or enter 0 for no limit.
         </div>
       </div>
     </div>
@@ -189,7 +189,7 @@
     if (input.files && input.files[0]) {
       const file = input.files[0];
       if (file.size > 5 * 1024 * 1024) {
-        alert("निवडलेल्या फोटोची साईझ 5MB पेक्षा जास्त आहे (" + (file.size / (1024*1024)).toFixed(1) + "MB). कृपया 5MB पेक्षा लहान फोटो निवडा.");
+        alert("Selected image size exceeds 5MB (" + (file.size / (1024*1024)).toFixed(1) + "MB). Please select an image under 5MB.");
         input.value = "";
         return;
       }
