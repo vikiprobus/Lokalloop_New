@@ -1,5 +1,6 @@
 import io
 import os
+import re
 import uuid
 from PIL import Image, ImageOps
 from django.core.files.storage import default_storage
@@ -27,7 +28,6 @@ MAGIC_SIGNATURES = {
 # Dangerous executable / script patterns forbidden anywhere in the raw binary content
 SUSPICIOUS_CONTENT_PATTERNS = [
     b'<?php',
-    b'<?=',
     b'<script',
     b'<html',
     b'<body',
@@ -42,8 +42,11 @@ SUSPICIOUS_CONTENT_PATTERNS = [
     b'document.cookie',
     b'onload=',
     b'onerror=',
-    b'MZ',             # Windows EXE / DLL header (MZ)
+    b'MZ\x90\x00',     # Windows PE executable header (MZ DOS stub signature)
 ]
+
+# Regex pattern for PHP short echo tags followed by identifiers or expressions
+PHP_SHORT_TAG_REGEX = re.compile(rb'<\?=\s*[$"\'a-zA-Z_]')
 
 
 class ImageSecurityException(ValidationError):
@@ -112,6 +115,11 @@ def validate_image_security(file_obj):
             raise ImageSecurityException(
                 "Security Alert: Harmful script, shell payload or executable pattern detected in uploaded file."
             )
+
+    if PHP_SHORT_TAG_REGEX.search(sample_data):
+        raise ImageSecurityException(
+            "Security Alert: Harmful script, shell payload or executable pattern detected in uploaded file."
+        )
 
     # 5. Pillow Deep Image Decode & Pixel Sanitization
     try:

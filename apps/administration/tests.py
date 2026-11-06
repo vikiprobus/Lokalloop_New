@@ -1148,6 +1148,34 @@ class BugFixesBatch98To116Tests(TestCase):
         self.assertIsNotNone(bogo_offer)
         self.assertEqual(bogo_offer.discount_value, Decimal('50.00'))
 
+        # 3. Max discount 0 or blank on percentage offer treated cleanly as None (no limit) without error
+        post_zero_cap = {
+            'title': 'Percentage Offer With Zero Cap',
+            'offer_type': 'PERCENTAGE',
+            'discount_value': '25',
+            'min_purchase': '300',
+            'max_discount': '0',
+            'max_redemptions': '50',
+            'days_valid': '30'
+        }
+        resp_zero_cap = self.client.post('/seller/offers/create/', post_zero_cap)
+        self.assertRedirects(resp_zero_cap, '/seller/offers/')
+        zero_cap_offer = Offer.objects.filter(shop=shop, title='Percentage Offer With Zero Cap').first()
+        self.assertIsNotNone(zero_cap_offer)
+        self.assertIsNone(zero_cap_offer.max_discount)
+
+        # 4. Realistic camera image validates cleanly without false positive
+        import io
+        from PIL import Image
+        from services.image_security_service import validate_image_security
+        test_img = Image.new('RGB', (200, 200), color=(120, 180, 220))
+        img_buf = io.BytesIO()
+        test_img.save(img_buf, format='JPEG', quality=85)
+        img_buf.seek(0)
+        img_buf.name = 'photo.jpg'
+        verified = validate_image_security(img_buf)
+        self.assertIsNotNone(verified)
+
     def test_bug2_1_service_worker_excludes_authenticated_routes(self):
         """
         Bug 2.1: Service worker must strictly exclude authenticated dashboards and APIs

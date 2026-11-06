@@ -347,19 +347,24 @@ def seller_offer_create_view(request):
                 messages.error(request, "Invalid campaign duration. Please enter days as a number (e.g. 30).")
                 return render(request, 'seller/offer_form.html', {'shop': shop, 'offer_types': OfferType.choices, 'form_data': form_data})
 
-            # Clean and sanitize max discount cap
-            raw_max_discount = form_data.get('max_discount', '').replace('₹', '').replace(',', '').strip()
+            # Clean and sanitize max discount cap (applicable for PERCENTAGE offers)
             max_discount = None
-            if raw_max_discount:
-                try:
-                    max_discount = Decimal(raw_max_discount)
-                except Exception:
-                    messages.error(request, "Invalid maximum discount cap. Please enter numbers only (e.g. 200).")
-                    return render(request, 'seller/offer_form.html', {'shop': shop, 'offer_types': OfferType.choices, 'form_data': form_data})
-
-            if max_discount is not None and max_discount <= Decimal('0.00'):
-                messages.error(request, "Maximum discount cap must be greater than zero.")
-                return render(request, 'seller/offer_form.html', {'shop': shop, 'offer_types': OfferType.choices, 'form_data': form_data})
+            if offer_type == OfferType.PERCENTAGE:
+                raw_max_discount = form_data.get('max_discount', '').replace('₹', '').replace(',', '').strip()
+                if raw_max_discount:
+                    try:
+                        parsed_val = Decimal(raw_max_discount)
+                        if parsed_val > Decimal('0.00'):
+                            max_discount = parsed_val
+                        elif parsed_val < Decimal('0.00'):
+                            messages.error(request, "कमाल सवलत मर्यादा 0 पेक्षा कमी असू शकत नाही / Maximum discount cap cannot be negative.")
+                            return render(request, 'seller/offer_form.html', {'shop': shop, 'offer_types': OfferType.choices, 'form_data': form_data})
+                        else:
+                            # 0 means seller wants unlimited / no cap
+                            max_discount = None
+                    except Exception:
+                        messages.error(request, "कमाल सवलत रकमेमध्ये फक्त आकडे टाकावेत (उदा. 200) / Invalid maximum discount cap. Please enter numbers only (e.g. 200).")
+                        return render(request, 'seller/offer_form.html', {'shop': shop, 'offer_types': OfferType.choices, 'form_data': form_data})
 
             if not title:
                 messages.error(request, "Campaign title cannot be empty. Please enter an offer title.")

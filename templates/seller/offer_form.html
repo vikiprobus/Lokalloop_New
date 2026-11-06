@@ -52,8 +52,13 @@
       </div>
 
       <div class="form-group" id="max_discount_wrapper">
-        <label class="form-label">Max Discount Cap (₹) <span class="text-muted">(Optional for %)</span></label>
-        <input type="number" step="10" min="1" name="max_discount" id="id_max_discount" class="form-control" value="{{ form_data.max_discount|default:'' }}" placeholder="e.g. 200 (₹ cap)">
+        <label class="form-label" for="id_max_discount">
+          Max Discount Cap (₹) <span class="text-muted">(कमाल मर्यादा - Optional)</span>
+        </label>
+        <input type="number" step="10" min="0" name="max_discount" id="id_max_discount" class="form-control" value="{{ form_data.max_discount|default:'' }}" placeholder="उदा. 200 (मर्यादा नसेल तर 0 किंवा रिकामा ठेवा)">
+        <div class="form-text" id="max_discount_help" style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.25rem;">
+          जास्तीत जास्त किती रुपयांची सूट द्यायची? (उदा. 20% सूट कमाल ₹200 पर्यंत). कोणतीही मर्यादा नको असल्यास हे रिकामा ठेवा किंवा 0 लिहा.
+        </div>
       </div>
     </div>
 
