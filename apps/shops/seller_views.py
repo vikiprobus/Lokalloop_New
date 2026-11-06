@@ -295,7 +295,7 @@ def seller_offers_list_view(request):
 @verified_seller_required
 def seller_offer_create_view(request):
     """
-    Launch New In-Store Offer
+    Launch New In-Store Offer with Robust Sanitization & Error Transparency
     """
     seller = request.user
     shop = Shop.objects.filter(seller=seller).first()
@@ -303,65 +303,102 @@ def seller_offer_create_view(request):
         messages.error(request, "Please set up your store profile first.")
         return redirect('/seller/shop/')
 
+    form_data = {}
     if request.method == 'POST':
+        form_data = request.POST.copy()
         try:
-            title = request.POST.get('title', '').strip()
-            description = request.POST.get('description', '').strip()
-            terms = request.POST.get('terms', '').strip()
-            offer_type = request.POST.get('offer_type', 'PERCENTAGE')
-            raw_discount = request.POST.get('discount_value', '').strip()
+            title = form_data.get('title', '').strip()
+            description = form_data.get('description', '').strip()
+            terms = form_data.get('terms', '').strip()
+            offer_type = form_data.get('offer_type', 'PERCENTAGE')
+
+            # Clean and sanitize discount value (remove %, Rs, symbols)
+            raw_discount = form_data.get('discount_value', '').replace('%', '').replace('₹', '').replace(',', '').strip()
             if not raw_discount:
                 discount_value = Decimal('50.00') if offer_type == 'BOGO' else Decimal('20.00')
             else:
-                discount_value = Decimal(raw_discount)
-            min_purchase = Decimal(request.POST.get('min_purchase', '0.00'))
-            max_redemptions = int(request.POST.get('max_redemptions', '100'))
-            days_valid = int(request.POST.get('days_valid', '30'))
-            
-            raw_max_discount = request.POST.get('max_discount', '').strip()
-            max_discount = Decimal(raw_max_discount) if raw_max_discount else None
+                try:
+                    discount_value = Decimal(raw_discount)
+                except Exception:
+                    messages.error(request, "Invalid discount value. Please enter numbers only (e.g. 20 or 100).")
+                    return render(request, 'seller/offer_form.html', {'shop': shop, 'offer_types': OfferType.choices, 'form_data': form_data})
+
+            # Clean and sanitize minimum purchase bill
+            raw_min = form_data.get('min_purchase', '0').replace('₹', '').replace(',', '').strip() or '0'
+            try:
+                min_purchase = Decimal(raw_min)
+            except Exception:
+                messages.error(request, "Invalid minimum purchase amount. Please enter numbers only (e.g. 400).")
+                return render(request, 'seller/offer_form.html', {'shop': shop, 'offer_types': OfferType.choices, 'form_data': form_data})
+
+            # Clean and sanitize max redemptions
+            raw_redemptions = form_data.get('max_redemptions', '100').strip() or '100'
+            try:
+                max_redemptions = int(float(raw_redemptions))
+            except Exception:
+                messages.error(request, "Invalid redemption quota. Please enter a whole number (e.g. 100).")
+                return render(request, 'seller/offer_form.html', {'shop': shop, 'offer_types': OfferType.choices, 'form_data': form_data})
+
+            # Clean and sanitize duration in days
+            raw_days = form_data.get('days_valid', '30').strip() or '30'
+            try:
+                days_valid = int(float(raw_days))
+            except Exception:
+                messages.error(request, "Invalid campaign duration. Please enter days as a number (e.g. 30).")
+                return render(request, 'seller/offer_form.html', {'shop': shop, 'offer_types': OfferType.choices, 'form_data': form_data})
+
+            # Clean and sanitize max discount cap
+            raw_max_discount = form_data.get('max_discount', '').replace('₹', '').replace(',', '').strip()
+            max_discount = None
+            if raw_max_discount:
+                try:
+                    max_discount = Decimal(raw_max_discount)
+                except Exception:
+                    messages.error(request, "Invalid maximum discount cap. Please enter numbers only (e.g. 200).")
+                    return render(request, 'seller/offer_form.html', {'shop': shop, 'offer_types': OfferType.choices, 'form_data': form_data})
+
             if max_discount is not None and max_discount <= Decimal('0.00'):
                 messages.error(request, "Maximum discount cap must be greater than zero.")
-                return render(request, 'seller/offer_form.html', {'shop': shop, 'offer_types': OfferType.choices})
+                return render(request, 'seller/offer_form.html', {'shop': shop, 'offer_types': OfferType.choices, 'form_data': form_data})
 
             if not title:
-                messages.error(request, "Campaign title cannot be empty.")
-                return render(request, 'seller/offer_form.html', {'shop': shop, 'offer_types': OfferType.choices})
+                messages.error(request, "Campaign title cannot be empty. Please enter an offer title.")
+                return render(request, 'seller/offer_form.html', {'shop': shop, 'offer_types': OfferType.choices, 'form_data': form_data})
 
             if discount_value <= Decimal('0.00'):
                 messages.error(request, "Discount value must be greater than zero.")
-                return render(request, 'seller/offer_form.html', {'shop': shop, 'offer_types': OfferType.choices})
+                return render(request, 'seller/offer_form.html', {'shop': shop, 'offer_types': OfferType.choices, 'form_data': form_data})
 
             if offer_type in [OfferType.PERCENTAGE, OfferType.BOGO] and discount_value > Decimal('100.00'):
-                messages.error(request, "Percentage discount cannot exceed 100%.")
-                return render(request, 'seller/offer_form.html', {'shop': shop, 'offer_types': OfferType.choices})
+                messages.error(request, "Percentage discount cannot exceed 100%. For cash discount, choose 'Flat Cash Discount (₹ INR)'.")
+                return render(request, 'seller/offer_form.html', {'shop': shop, 'offer_types': OfferType.choices, 'form_data': form_data})
 
             if offer_type == OfferType.FLAT:
                 if min_purchase <= Decimal('0.00'):
                     messages.error(request, "Flat cash discount campaigns require a minimum purchase amount.")
-                    return render(request, 'seller/offer_form.html', {'shop': shop, 'offer_types': OfferType.choices})
+                    return render(request, 'seller/offer_form.html', {'shop': shop, 'offer_types': OfferType.choices, 'form_data': form_data})
                 if discount_value > min_purchase:
                     messages.error(request, "Flat discount value cannot exceed the minimum bill purchase requirement.")
-                    return render(request, 'seller/offer_form.html', {'shop': shop, 'offer_types': OfferType.choices})
+                    return render(request, 'seller/offer_form.html', {'shop': shop, 'offer_types': OfferType.choices, 'form_data': form_data})
 
             if min_purchase < Decimal('0.00'):
                 messages.error(request, "Minimum purchase amount cannot be negative.")
-                return render(request, 'seller/offer_form.html', {'shop': shop, 'offer_types': OfferType.choices})
+                return render(request, 'seller/offer_form.html', {'shop': shop, 'offer_types': OfferType.choices, 'form_data': form_data})
 
             if max_redemptions <= 0:
                 messages.error(request, "Maximum redemption quota must be at least 1.")
-                return render(request, 'seller/offer_form.html', {'shop': shop, 'offer_types': OfferType.choices})
+                return render(request, 'seller/offer_form.html', {'shop': shop, 'offer_types': OfferType.choices, 'form_data': form_data})
 
             if days_valid <= 0:
                 messages.error(request, "Campaign validity must be at least 1 day.")
-                return render(request, 'seller/offer_form.html', {'shop': shop, 'offer_types': OfferType.choices})
+                return render(request, 'seller/offer_form.html', {'shop': shop, 'offer_types': OfferType.choices, 'form_data': form_data})
 
             # Check for uploaded offer promo image from device / gallery
             offer_img_file = request.FILES.get('image_file')
             if offer_img_file:
                 image_url = save_uploaded_media(offer_img_file, subfolder='offers')
             else:
-                image_url = request.POST.get('image_url', '').strip() or 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=800'
+                image_url = form_data.get('image_url', '').strip() or 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=800'
 
             start_date = timezone.now()
             end_date = start_date + timedelta(days=days_valid)
@@ -388,13 +425,16 @@ def seller_offer_create_view(request):
             messages.success(request, f"Offer '{offer.title}' published successfully! QR Code generated for counter.")
             return redirect('/seller/offers/')
         except ImageSecurityException as se:
-            messages.error(request, f"Image upload blocked: {str(se)}")
+            messages.error(request, f"Image upload error: {str(se)}")
+            return render(request, 'seller/offer_form.html', {'shop': shop, 'offer_types': OfferType.choices, 'form_data': form_data})
         except Exception as e:
             messages.error(request, f"Failed to publish offer: {str(e)}")
+            return render(request, 'seller/offer_form.html', {'shop': shop, 'offer_types': OfferType.choices, 'form_data': form_data})
 
     context = {
         'shop': shop,
         'offer_types': OfferType.choices,
+        'form_data': form_data,
     }
     return render(request, 'seller/offer_form.html', context)
 

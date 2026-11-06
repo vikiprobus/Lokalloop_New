@@ -13,12 +13,24 @@
     </p>
   </div>
 
+  <!-- Prominent Form Error / Validation Notice Box -->
+  {% if messages %}
+    <div style="margin-bottom: 1.5rem;" id="formErrorNoticeBox">
+      {% for message in messages %}
+        <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %}" style="border-radius: 12px; padding: 1rem 1.25rem; font-weight: 700; font-size: 0.92rem; margin-bottom: 0.65rem; display: flex; align-items: center; gap: 0.65rem; border: 1.5px solid {% if message.tags == 'error' %}#f87171; background: #fef2f2; color: #991b1b;{% else %}#bbf7d0; background: #f0fdf4; color: #166534;{% endif %}">
+          <i class="bi {% if message.tags == 'error' %}bi-exclamation-octagon-fill text-danger{% else %}bi-check-circle-fill text-success{% endif %}" style="font-size: 1.25rem;"></i>
+          <span>{{ message }}</span>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
   <form method="POST" enctype="multipart/form-data">
     {% csrf_token %}
 
     <div class="form-group">
       <label class="form-label">Offer Title / Headline <span class="text-danger">*</span></label>
-      <input type="text" name="title" class="form-control" placeholder="e.g. Flat 25% Off on All Bakery Items" required>
+      <input type="text" name="title" class="form-control" placeholder="e.g. Flat 25% Off on All Bakery Items" value="{{ form_data.title|default:'' }}" required>
       <div class="form-text">Clear headline seen by shoppers browsing nearby stores.</div>
     </div>
 
@@ -26,51 +38,51 @@
       <div class="form-group">
         <label class="form-label">Offer Type</label>
         <select name="offer_type" id="id_offer_type" class="form-select" onchange="handleOfferTypeChange(this.value)">
-          <option value="PERCENTAGE">Percentage Discount (%)</option>
-          <option value="FLAT">Flat Cash Discount (₹ INR)</option>
-          <option value="BOGO">Buy 1 Get 1 Free</option>
-          <option value="SPECIAL">Special Combo / Exclusive</option>
+          <option value="PERCENTAGE" {% if form_data.offer_type == 'PERCENTAGE' or not form_data.offer_type %}selected{% endif %}>Percentage Discount (%)</option>
+          <option value="FLAT" {% if form_data.offer_type == 'FLAT' %}selected{% endif %}>Flat Cash Discount (₹ INR)</option>
+          <option value="BOGO" {% if form_data.offer_type == 'BOGO' %}selected{% endif %}>Buy 1 Get 1 Free</option>
+          <option value="SPECIAL" {% if form_data.offer_type == 'SPECIAL' %}selected{% endif %}>Special Combo / Exclusive</option>
         </select>
       </div>
 
       <div class="form-group" id="discount_value_wrapper">
         <label class="form-label" id="discount_value_label">Discount Percentage (%) <span class="text-danger">*</span></label>
-        <input type="number" step="1" min="1" max="100" name="discount_value" id="id_discount_value" class="form-control" value="20" required>
+        <input type="number" step="1" min="1" max="100" name="discount_value" id="id_discount_value" class="form-control" value="{{ form_data.discount_value|default:'20' }}" required>
         <div class="form-text" id="discount_value_help">Enter discount percentage between 1% and 100%.</div>
       </div>
 
       <div class="form-group" id="max_discount_wrapper">
         <label class="form-label">Max Discount Cap (₹) <span class="text-muted">(Optional for %)</span></label>
-        <input type="number" step="10" min="1" name="max_discount" id="id_max_discount" class="form-control" placeholder="e.g. 200 (₹ cap)">
+        <input type="number" step="10" min="1" name="max_discount" id="id_max_discount" class="form-control" value="{{ form_data.max_discount|default:'' }}" placeholder="e.g. 200 (₹ cap)">
       </div>
     </div>
 
     <div class="d-grid grid-3 gap-2">
       <div class="form-group">
         <label class="form-label">Min. Bill Amount (₹)</label>
-        <input type="number" step="50" min="0" name="min_purchase" class="form-control" value="400" placeholder="e.g. 500">
+        <input type="number" step="50" min="0" name="min_purchase" class="form-control" value="{{ form_data.min_purchase|default:'400' }}" placeholder="e.g. 500">
         <div class="form-text">0 for no minimum bill.</div>
       </div>
 
       <div class="form-group">
         <label class="form-label">Max Redemptions Quota</label>
-        <input type="number" step="10" min="10" name="max_redemptions" class="form-control" value="100">
+        <input type="number" step="10" min="10" name="max_redemptions" class="form-control" value="{{ form_data.max_redemptions|default:'100' }}">
       </div>
 
       <div class="form-group">
         <label class="form-label">Duration (Days)</label>
-        <input type="number" step="5" min="1" max="365" name="days_valid" class="form-control" value="30">
+        <input type="number" step="5" min="1" max="365" name="days_valid" class="form-control" value="{{ form_data.days_valid|default:'30' }}">
       </div>
     </div>
 
     <div class="form-group">
       <label class="form-label">Offer Description</label>
-      <textarea name="description" rows="3" class="form-control" placeholder="Describe which products or menu items qualify, dining in vs takeout, etc."></textarea>
+      <textarea name="description" rows="3" class="form-control" placeholder="Describe which products or menu items qualify, dining in vs takeout, etc.">{{ form_data.description|default:'' }}</textarea>
     </div>
 
     <div class="form-group">
       <label class="form-label">Terms & Conditions</label>
-      <textarea name="terms" rows="2" class="form-control" placeholder="e.g. Valid on all days except public holidays. Cannot be combined with other ongoing offers."></textarea>
+      <textarea name="terms" rows="2" class="form-control" placeholder="e.g. Valid on all days except public holidays. Cannot be combined with other ongoing offers.">{{ form_data.terms|default:'' }}</textarea>
     </div>
 
     <div class="form-group">
@@ -170,6 +182,12 @@
 
   function previewOfferImage(input) {
     if (input.files && input.files[0]) {
+      const file = input.files[0];
+      if (file.size > 5 * 1024 * 1024) {
+        alert("निवडलेल्या फोटोची साईझ 5MB पेक्षा जास्त आहे (" + (file.size / (1024*1024)).toFixed(1) + "MB). कृपया 5MB पेक्षा लहान फोटो निवडा.");
+        input.value = "";
+        return;
+      }
       const reader = new FileReader();
       reader.onload = function(e) {
         const preview = document.getElementById('offer_banner_preview');
@@ -177,7 +195,7 @@
           preview.src = e.target.result;
         }
       };
-      reader.readAsDataURL(input.files[0]);
+      reader.readAsDataURL(file);
     }
   }
 </script>
